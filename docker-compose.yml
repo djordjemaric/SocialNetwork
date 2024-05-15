@@ -1,18 +1,18 @@
 version: '3.8'
 services:
-  postgres:
+  sn-postgres:
     image: postgres:14.2-alpine
     container_name: postgres
     environment:
-      POSTGRES_USER: ${POSTGRES_USER}
-      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD}
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: postgres
     ports:
       - '5432:5432'
     networks:
-      mreza: 
+      - mreza
     volumes:
       - pg:/var/lib/postgresql/data
-  pgadmin:
+  sn-pgadmin:
     image: dpage/pgadmin4:6.1
     container_name: pgadmin
     environment:
@@ -27,7 +27,7 @@ services:
     networks:
       - mreza
     depends_on:
-      - postgres
+      - sn-postgres
 
 networks:
   mreza:
