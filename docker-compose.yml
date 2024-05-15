@@ -1,0 +1,39 @@
+version: '3.8'
+services:
+  sn-postgres:
+    image: postgres:14.2-alpine
+    container_name: postgres
+    environment:
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: postgres
+    ports:
+      - '5432:5432'
+    networks:
+      - mreza
+    volumes:
+      - pg:/var/lib/postgresql/data
+  sn-pgadmin:
+    image: dpage/pgadmin4:6.1
+    container_name: pgadmin
+    environment:
+      PGADMIN_DEFAULT_EMAIL: develop@admin.com
+      PGADMIN_DEFAULT_PASSWORD: develop
+    ports:
+      - '3400:80'
+    logging:
+      driver: none
+    volumes:
+      - pgadmin:/var/lib/pgadmin
+    networks:
+      - mreza
+    depends_on:
+      - sn-postgres
+
+networks:
+  mreza:
+    driver: bridge
+volumes:
+  pg:
+    driver: local
+  pgadmin:
+    driver: local
