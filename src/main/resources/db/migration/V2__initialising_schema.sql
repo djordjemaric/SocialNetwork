@@ -1,0 +1,1 @@
+Alter table "Group" add column "isPublic" boolean;

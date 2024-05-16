@@ -76,7 +76,7 @@
 				<artifactId>flyway-maven-plugin</artifactId>
 				<version>6.5.7</version>
 				<configuration>
-<!--					<url>jdbc:postgresql://localhost:5432/social-network</url>-->
+					<url>jdbc:postgresql://localhost:5432/social-network</url>
 					<user>postgres</user>
 					<password>postgres</password>
 				</configuration>
