@@ -1,4 +1,4 @@
-package entity;
+package com.socialnetwork.socialnetwork.entity;
 
 import jakarta.persistence.*;
 import jakarta.validation.constraints.Email;
@@ -14,7 +14,7 @@ import static jakarta.persistence.GenerationType.IDENTITY;
 public class User {
     @Id
     @GeneratedValue(strategy = IDENTITY)
-    private Long id;
+    private Integer id;
 
     @Email
     @Column(nullable = false, unique = true)
