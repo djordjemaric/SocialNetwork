@@ -1,4 +1,4 @@
-package entity;
+package com.socialnetwork.socialnetwork.entity;
 
 import jakarta.persistence.*;
 import jakarta.validation.constraints.Email;
