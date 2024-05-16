@@ -1,147 +1,147 @@
-CREATE TABLE "Comment"
+CREATE TABLE "comment"
 (
-    "Id"                 SERIAL PRIMARY KEY,
-    "IdPost"             integer  NOT NULL,
-    "IdCommOwner"        integer  NOT NULL,
-    "Text"               varchar(2000)
+    "id"                 SERIAL PRIMARY KEY,
+    "id_post"             integer  NOT NULL,
+    "id_comm_owner"        integer  NOT NULL,
+    "text"               varchar(2000)
 );
 
-CREATE TABLE "FriendRequest"
+CREATE TABLE "friend_request"
 (
-    "Id"                 SERIAL PRIMARY KEY,
-    "IdSender"           integer  NOT NULL,
-    "IdReceiver"         integer  NOT NULL
+    "id"                 SERIAL PRIMARY KEY,
+    "id_sender"           integer  NOT NULL,
+    "id_receiver"         integer  NOT NULL
 );
 
-CREATE TABLE "Friends"
+CREATE TABLE "friends"
 (
-    "Id"                 SERIAL PRIMARY KEY,
-    "IdFriend1"          integer  NOT NULL,
-    "IdFriend2"          integer  NOT NULL
+    "id"                 SERIAL PRIMARY KEY,
+    "id_friend1"          integer  NOT NULL,
+    "id_friend2"          integer  NOT NULL
 );
 
-CREATE TABLE "Group"
+CREATE TABLE "group"
 (
-    "Id"                 SERIAL PRIMARY KEY,
-    "IdAdmin"            integer  NOT NULL,
-    "IsPublic"           boolean
+    "id"                 SERIAL PRIMARY KEY,
+    "id_admin"            integer  NOT NULL,
+    "is_public"           boolean
 );
 
-CREATE TABLE "GroupMember"
+CREATE TABLE "group_member"
 (
-    "Id"                 SERIAL PRIMARY KEY,
-    "IdMember"           integer  NOT NULL,
-    "IdGroup"            integer  NOT NULL
+    "id"                 SERIAL PRIMARY KEY,
+    "id_member"           integer  NOT NULL,
+    "id_group"            integer  NOT NULL
 );
 
-CREATE TABLE "GroupRequest"
+CREATE TABLE "group_request"
 (
-    "Id"                 SERIAL PRIMARY KEY,
-    "IdUser"             integer  NOT NULL,
-    "IdGroup"            integer  NOT NULL
+    "id"                 SERIAL PRIMARY KEY,
+    "id_user"             integer  NOT NULL,
+    "id_group"            integer  NOT NULL
 );
 
-CREATE TABLE "Post"
+CREATE TABLE "post"
 (
-    "Id"                 SERIAL PRIMARY KEY,
-    "IsPublic"           boolean,
-    "Text"               varchar(2000),
-    "ImgUrl"             varchar(2000),
-    "IdOwner"            integer  NOT NULL,
-    "IdGroup"            integer
+    "id"                 SERIAL PRIMARY KEY,
+    "is_public"           boolean,
+    "text"               varchar(2000),
+    "img_url"             varchar(2000),
+    "id_owner"            integer  NOT NULL,
+    "id_group"            integer
 );
 
 
-CREATE TABLE "Reply"
+CREATE TABLE "reply"
 (
-    "Id"                 SERIAL PRIMARY KEY,
-    "Text"               varchar(2000),
-    "IdReplyOwner"       integer  NOT NULL,
-    "IdComment"          integer  NOT NULL
+    "id"                 SERIAL PRIMARY KEY,
+    "text"               varchar(2000),
+    "id_reply_owner"       integer  NOT NULL,
+    "id_comment"          integer  NOT NULL
 );
 
-CREATE TABLE "User"
+CREATE TABLE "user"
 (
-    "Id"                 SERIAL PRIMARY KEY,
-    "Email"              varchar(100) NOT NULL
+    "id"                 SERIAL PRIMARY KEY,
+    "email"              varchar(100) NOT NULL
 );
 
-ALTER TABLE "Comment"
-    ADD CONSTRAINT "R_25" FOREIGN KEY ("IdPost") REFERENCES "Post"("Id")
+ALTER TABLE "comment"
+    ADD CONSTRAINT "r_25" FOREIGN KEY ("id_post") REFERENCES "post"("id")
         ON DELETE CASCADE
         ON UPDATE CASCADE;
 
-ALTER TABLE "Comment"
-    ADD CONSTRAINT "R_26" FOREIGN KEY ("IdCommOwner") REFERENCES "User"("Id")
+ALTER TABLE "comment"
+    ADD CONSTRAINT "r_26" FOREIGN KEY ("id_comm_owner") REFERENCES "user"("id")
         ON DELETE NO ACTION
         ON UPDATE NO ACTION;
 
-ALTER TABLE "FriendRequest"
-    ADD CONSTRAINT "R_13" FOREIGN KEY ("IdSender") REFERENCES "User"("Id")
+ALTER TABLE "friend_request"
+    ADD CONSTRAINT "r_13" FOREIGN KEY ("id_sender") REFERENCES "user"("id")
         ON DELETE NO ACTION
         ON UPDATE NO ACTION;
 
-ALTER TABLE "FriendRequest"
-    ADD CONSTRAINT "R_14" FOREIGN KEY ("IdReceiver") REFERENCES "User"("Id")
+ALTER TABLE "friend_request"
+    ADD CONSTRAINT "r_14" FOREIGN KEY ("id_receiver") REFERENCES "user"("id")
         ON DELETE NO ACTION
         ON UPDATE NO ACTION;
 
-ALTER TABLE "Friends"
-    ADD CONSTRAINT "R_15" FOREIGN KEY ("IdFriend1") REFERENCES "User"("Id")
+ALTER TABLE "friends"
+    ADD CONSTRAINT "r_15" FOREIGN KEY ("id_friend1") REFERENCES "user"("id")
         ON DELETE NO ACTION
         ON UPDATE NO ACTION;
 
-ALTER TABLE "Friends"
-    ADD CONSTRAINT "R_16" FOREIGN KEY ("IdFriend2") REFERENCES "User"("Id")
+ALTER TABLE "friends"
+    ADD CONSTRAINT "r_16" FOREIGN KEY ("id_friend2") REFERENCES "user"("id")
         ON DELETE NO ACTION
         ON UPDATE NO ACTION;
 
-ALTER TABLE "Group"
-    ADD CONSTRAINT "R_6" FOREIGN KEY ("IdAdmin") REFERENCES "User"("Id")
+ALTER TABLE "group"
+    ADD CONSTRAINT "r_6" FOREIGN KEY ("id_admin") REFERENCES "user"("id")
         ON DELETE NO ACTION
         ON UPDATE NO ACTION;
 
-ALTER TABLE "GroupMember"
-    ADD CONSTRAINT "R_17" FOREIGN KEY ("IdMember") REFERENCES "User"("Id")
+ALTER TABLE "group_member"
+    ADD CONSTRAINT "r_17" FOREIGN KEY ("id_member") REFERENCES "user"("id")
         ON DELETE NO ACTION
         ON UPDATE NO ACTION;
 
-ALTER TABLE "GroupMember"
-    ADD CONSTRAINT "R_18" FOREIGN KEY ("IdGroup") REFERENCES "Group"("Id")
+ALTER TABLE "group_member"
+    ADD CONSTRAINT "r_18" FOREIGN KEY ("id_group") REFERENCES "group"("id")
         ON DELETE CASCADE
         ON UPDATE CASCADE;
 
-ALTER TABLE "GroupRequest"
-    ADD CONSTRAINT "R_11" FOREIGN KEY ("IdUser") REFERENCES "User"("Id")
+ALTER TABLE "group_request"
+    ADD CONSTRAINT "r_11" FOREIGN KEY ("id_user") REFERENCES "user"("id")
         ON DELETE NO ACTION
         ON UPDATE NO ACTION;
 
-ALTER TABLE "GroupRequest"
-    ADD CONSTRAINT "R_12" FOREIGN KEY ("IdGroup") REFERENCES "Group"("Id")
+ALTER TABLE "group_request"
+    ADD CONSTRAINT "r_12" FOREIGN KEY ("id_group") REFERENCES "group"("id")
         ON DELETE CASCADE
         ON UPDATE CASCADE;
 
-ALTER TABLE "Post"
-    ADD CONSTRAINT "R_19" FOREIGN KEY ("IdOwner") REFERENCES "User"("Id")
+ALTER TABLE "post"
+    ADD CONSTRAINT "r_19" FOREIGN KEY ("id_owner") REFERENCES "user"("id")
         ON DELETE NO ACTION
         ON UPDATE NO ACTION;
 
-ALTER TABLE "Post"
-    ADD CONSTRAINT "R_20" FOREIGN KEY ("IdGroup") REFERENCES "Group"("Id")
+ALTER TABLE "post"
+    ADD CONSTRAINT "r_20" FOREIGN KEY ("id_group") REFERENCES "group"("id")
         ON DELETE CASCADE
         ON UPDATE CASCADE;
 
-ALTER TABLE "Reply"
-    ADD CONSTRAINT "R_29" FOREIGN KEY ("IdComment") REFERENCES "Comment"("Id")
+ALTER TABLE "reply"
+    ADD CONSTRAINT "r_29" FOREIGN KEY ("id_comment") REFERENCES "comment"("id")
         ON DELETE CASCADE
         ON UPDATE CASCADE;
 
-ALTER TABLE "Reply"
-    ADD CONSTRAINT "R_30" FOREIGN KEY ("IdReplyOwner") REFERENCES "User"("Id")
+ALTER TABLE "reply"
+    ADD CONSTRAINT "r_30" FOREIGN KEY ("id_reply_owner") REFERENCES "user"("id")
         ON DELETE NO ACTION
         ON UPDATE NO ACTION;
 
-ALTER TABLE "User"
-    ADD CONSTRAINT "R_31" UNIQUE ("Email");
+ALTER TABLE "user"
+    ADD CONSTRAINT "r_31" UNIQUE ("email");
 
 
