@@ -18,7 +18,7 @@ public class Group {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Integer id;
 
-    @NotBlank
+    @Column(nullable = false, unique = true)
     private String name;
 
     @NotNull
