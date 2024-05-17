@@ -5,6 +5,8 @@ import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
 import lombok.*;
 
+import java.util.List;
+
 
 @Entity
 @Getter
@@ -26,9 +28,10 @@ public class Group {
     @JoinColumn(name = "id_admin")
     private User admin;
 
-
     private boolean isPublic;
 
+    @OneToMany(mappedBy = "group")
+    private List<Post> posts;
 
 
 }

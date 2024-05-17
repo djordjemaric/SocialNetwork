@@ -4,6 +4,8 @@ import jakarta.persistence.*;
 import jakarta.validation.constraints.Email;
 import lombok.*;
 
+import java.util.List;
+
 import static jakarta.persistence.GenerationType.IDENTITY;
 
 @Entity
@@ -11,6 +13,7 @@ import static jakarta.persistence.GenerationType.IDENTITY;
 @AllArgsConstructor
 @Getter
 @Setter
+@Table(name = "\"user\"")
 public class User {
     @Id
     @GeneratedValue(strategy = IDENTITY)
@@ -19,5 +22,14 @@ public class User {
     @Email
     @Column(nullable = false, unique = true)
     private String email;
+
+    @OneToMany(mappedBy = "owner")
+    private List<Post> posts;
+
+    @OneToMany(mappedBy = "commOwner")
+    private  List<Comment> comments;
+
+    @OneToMany(mappedBy = "replyOwner")
+    private List<Reply> replies;
 
 }
