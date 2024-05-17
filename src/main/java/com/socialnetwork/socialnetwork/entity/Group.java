@@ -22,7 +22,9 @@ public class Group {
     private String name;
 
     @NotNull
-    private Integer idAdmin;
+    @ManyToOne
+    @JoinColumn(name = "id_admin")
+    private User admin;
 
 
     private boolean isPublic;
