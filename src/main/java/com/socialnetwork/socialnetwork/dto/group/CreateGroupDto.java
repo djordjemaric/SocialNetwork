@@ -7,7 +7,6 @@ import jakarta.validation.constraints.NotNull;
 public record CreateGroupDto(
         @NotBlank
         String name,
-        @NotNull
         boolean isPublic) {
 
 
