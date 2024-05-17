@@ -7,7 +7,6 @@ import com.socialnetwork.socialnetwork.entity.Post;
 import com.socialnetwork.socialnetwork.mapper.PostMapper;
 import com.socialnetwork.socialnetwork.repository.GroupRepository;
 import com.socialnetwork.socialnetwork.repository.PostRepository;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.util.Objects;
@@ -15,12 +14,15 @@ import java.util.Objects;
 @Service
 public class PostService {
 
-    @Autowired
-    PostRepository postRepository;
-    @Autowired
-    PostMapper postMapper;
-    @Autowired
-    GroupRepository groupRepository;
+    private PostRepository postRepository;
+    private PostMapper postMapper;
+    private GroupRepository groupRepository;
+
+    public PostService(PostRepository postRepository, PostMapper postMapper, GroupRepository groupRepository) {
+        this.postRepository = postRepository;
+        this.postMapper = postMapper;
+        this.groupRepository = groupRepository;
+    }
 
     public void createPost(Integer idOwner, CreatePostDTO postDTO) {
         Post post;
@@ -28,10 +30,8 @@ public class PostService {
             Group group = groupRepository.findById(postDTO.idGroup()).orElseThrow();
             post = postMapper.createPostDTOtoPost(idOwner, group, postDTO);
             postRepository.save(post);
-            return;
         }
-        post = postMapper.createPostDTOtoPost(idOwner, null, postDTO);
-        postRepository.save(post);
+       postRepository.save(postMapper.createPostDTOtoPost(idOwner, null, postDTO));
     }
 
     public void updatePost(Integer idUser, UpdatePostDTO updatePostDTO){
@@ -42,7 +42,6 @@ public class PostService {
         post.setText(updatePostDTO.text());
         post.setImgUrl(updatePostDTO.imgUrl());
         post.setPublic(updatePostDTO.isPublic());
-
         postRepository.save(post);
     }
 

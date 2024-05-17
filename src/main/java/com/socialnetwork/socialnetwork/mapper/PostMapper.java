@@ -11,6 +11,7 @@ public class PostMapper {
 
     public Post createPostDTOtoPost(Integer idOwner, Group group, CreatePostDTO postDTO){
         Post post=new Post();
+
         User owner=new User();
         owner.setId(idOwner);
 

@@ -26,10 +26,4 @@ public class User {
     @OneToMany(mappedBy = "owner")
     private List<Post> posts;
 
-    @OneToMany(mappedBy = "commOwner")
-    private  List<Comment> comments;
-
-    @OneToMany(mappedBy = "replyOwner")
-    private List<Reply> replies;
-
 }
