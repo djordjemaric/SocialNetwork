@@ -11,6 +11,7 @@ import static jakarta.persistence.GenerationType.IDENTITY;
 @AllArgsConstructor
 @Getter
 @Setter
+@Table(name = "\"user\"")
 public class User {
     @Id
     @GeneratedValue(strategy = IDENTITY)
@@ -19,5 +20,8 @@ public class User {
     @Email
     @Column(nullable = false, unique = true)
     private String email;
+
+    @Transient
+    private String accessToken;
 
 }
