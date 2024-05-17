@@ -1,4 +1,8 @@
 package com.socialnetwork.socialnetwork.dto;
 
-public record UserRequest(String email,
+import jakarta.validation.constraints.NotBlank;
+
+public record UserRequest(@NotBlank
+                          String email,
+                          @NotBlank
                           String password) {}
