@@ -8,7 +8,6 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
-import java.util.Optional;
 
 @RestController
 @RequestMapping(path = "user")
@@ -31,18 +30,13 @@ public class UserController {
     }
 
     @PostMapping(path = "/signup")
-    public void createUser(@RequestBody UserRequest userRequest) {
-        userService.createUser(userRequest.email(), userRequest.password());
+    public User createUser(@RequestBody UserRequest userRequest) {
+        return userService.createUser(userRequest.email(), userRequest.password());
     }
 
     @PostMapping(path = "/login")
     public LoginResponse loginUser(@RequestBody UserRequest userRequest) {
-        Optional<LoginResponse> responseOptional = userService.loginUser(userRequest.email(), userRequest.password());
-        if (responseOptional.isPresent()) {
-            return responseOptional.get();
-        } else {
-            throw new RuntimeException("Failed login.");
-        }
+        return userService.loginUser(userRequest.email(), userRequest.password());
     }
 }
 

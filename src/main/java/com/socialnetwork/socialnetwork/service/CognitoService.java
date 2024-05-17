@@ -3,13 +3,11 @@ package com.socialnetwork.socialnetwork.service;
 import com.amazonaws.services.cognitoidp.AWSCognitoIdentityProvider;
 import com.amazonaws.services.cognitoidp.model.*;
 import com.socialnetwork.socialnetwork.dto.LoginResponse;
-import com.socialnetwork.socialnetwork.entity.User;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 
 import java.util.Map;
-import java.util.Optional;
 
 @Service
 public class CognitoService {
@@ -23,7 +21,7 @@ public class CognitoService {
         this.cognitoIdentityProvider = cognitoIdentityProvider;
     }
 
-    public boolean registerUser(String username, String email, String password) {
+    public void registerUser(String username, String email, String password) {
         // Set up the AWS Cognito registration request
         SignUpRequest signUpRequest = new SignUpRequest()
                 .withClientId(clientId)
@@ -35,16 +33,14 @@ public class CognitoService {
 
         // Register the user with Amazon Cognito
         try {
-            SignUpResult signUpResponse = cognitoIdentityProvider.signUp(signUpRequest);
-            System.out.println(signUpResponse.toString());
-            return true;
+            cognitoIdentityProvider.signUp(signUpRequest);
 
         } catch (Exception e) {
             throw new RuntimeException("User registration failed: " + e.getMessage(), e);
         }
     }
 
-    public Optional<LoginResponse> loginUser(String email, String password) {
+    public LoginResponse loginUser(String email, String password) {
         // Set up the authentication request
         InitiateAuthRequest authRequest = new InitiateAuthRequest()
                 .withAuthFlow("USER_PASSWORD_AUTH")
@@ -65,22 +61,10 @@ public class CognitoService {
             String refreshToken = authResponse.getRefreshToken();
             Integer expiresIn = authResponse.getExpiresIn();
 
-            LoginResponse loginResponse = new LoginResponse(accessToken, refreshToken, expiresIn);
-            Optional<LoginResponse> loginResponseOpt = Optional.of(loginResponse);
-            return loginResponseOpt;
-            //TODO: integrate with security? You can decode and verify the JWT tokens for user information
-
-
-            // do we need this?
-//            User loggedInUser = new User();
-//            loggedInUser.setAccessToken(accessToken);
-//
-//            return loggedInUser;
+            return new LoginResponse(accessToken, refreshToken, expiresIn);
 
         } catch (Exception e) {
-            Optional<LoginResponse> loginResponseOpt = Optional.empty();
-            return loginResponseOpt;
-//            throw new RuntimeException("User login failed: " + e.getMessage(), e);
+            throw new RuntimeException("User login failed: " + e.getMessage(), e);
         }
     }
 

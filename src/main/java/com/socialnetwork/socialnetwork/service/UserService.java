@@ -10,9 +10,6 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
-import java.util.Optional;
-
-
 
 @Service
 public class UserService {
@@ -27,12 +24,10 @@ public class UserService {
     }
 
     public User getUserByEmail(String email) {
-        Optional<User> user = userRepository.findByEmail(email);
-        if (user.isPresent()) {
-            return user.get();
-        } else {
-            throw new FunctionArgumentException("Invalid email");
-        }
+
+        return userRepository.findByEmail(email)
+                .orElseThrow(() -> new FunctionArgumentException("Invalid email"));
+
     }
 
     public List<User> getAllUsers() {
@@ -40,36 +35,28 @@ public class UserService {
     }
 
     public User getUserById(int id) {
-        Optional<User> user = userRepository.findById(id);
-        if (user.isPresent()) {
-            return user.get();
-        } else {
-            throw new FunctionArgumentException("Invalid id");
-        }
+        return userRepository.findById(id)
+                .orElseThrow(() -> new FunctionArgumentException("Invalid id"));
     }
 
 
-    public boolean createUser(String email, String password) {
+    public User createUser(String email, String password) {
 
-        Optional<User> userOptional = userRepository.findByEmail(email);
-        if (userOptional.isPresent()) {
-            //TODO: return status code indicating this
+        if (userRepository.existsByEmail(email)) {
             throw new FunctionArgumentException("User already exists");
         }
-        boolean registered = cognitoService.registerUser(email, email, password);
-        if (!registered) {
-            return false;
-        }
+
+        cognitoService.registerUser(email, email, password);
+
         User user = new User();
         user.setEmail(email);
         userRepository.save(user);
-        return true;
+        return user;
     }
 
-    public Optional<LoginResponse> loginUser(String email, String password) {
+    public LoginResponse loginUser(String email, String password) {
 
-        Optional<LoginResponse> responseOptional = cognitoService.loginUser(email, password);
-        return responseOptional;
+        return cognitoService.loginUser(email, password);
     }
 
 
