@@ -13,7 +13,7 @@ import java.util.Map;
 
 @Service
 public class CognitoService {
-    @Value("${COGNITO_CLIENT_ID}")
+    @Value("${aws.cognito.client-id}")
     private String clientId;
 
     private final CognitoIdentityProviderClient cognitoIdentityProvider;
