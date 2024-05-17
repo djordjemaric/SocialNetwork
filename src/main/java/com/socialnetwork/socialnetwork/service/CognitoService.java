@@ -15,8 +15,7 @@ public class CognitoService {
     private String clientId;
 
     private final AWSCognitoIdentityProvider cognitoIdentityProvider;
-
-    @Autowired
+    
     public CognitoService(AWSCognitoIdentityProvider cognitoIdentityProvider) {
         this.cognitoIdentityProvider = cognitoIdentityProvider;
     }
