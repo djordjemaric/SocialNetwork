@@ -6,6 +6,7 @@ import jakarta.validation.constraints.Email;
 import lombok.*;
 
 import java.util.List;
+import java.util.Objects;
 
 import static jakarta.persistence.GenerationType.IDENTITY;
 
@@ -24,19 +25,16 @@ public class User {
     @Column(nullable = false, unique = true)
     private String email;
 
-    @OneToMany(mappedBy = "friendTo", cascade = CascadeType.ALL, orphanRemoval = true)
-    @JsonManagedReference
-    private List<Friends> friendsIniated;
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
+        User user = (User) o;
+        return Objects.equals(id, user.id) && Objects.equals(email, user.email);
+    }
 
-    @OneToMany(mappedBy = "friend", cascade = CascadeType.ALL, orphanRemoval = true)
-    @JsonManagedReference
-    private List<Friends> friendsReceived;
-
-    @OneToMany(mappedBy = "from", cascade = CascadeType.ALL, orphanRemoval = true)
-    @JsonManagedReference
-    private List<FriendRequest> initiatedRequests;
-
-    @OneToMany(mappedBy = "to", cascade = CascadeType.ALL, orphanRemoval = true)
-    @JsonManagedReference
-    private List<FriendRequest> receivedRequests;
+    @Override
+    public int hashCode() {
+        return Objects.hash(id, email);
+    }
 }
