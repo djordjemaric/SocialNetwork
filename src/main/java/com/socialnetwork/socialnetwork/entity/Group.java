@@ -21,7 +21,7 @@ public class Group {
     @Column(nullable = false, unique = true)
     private String name;
 
-    @NotNull
+    @NotBlank
     @ManyToOne
     @JoinColumn(name = "id_admin")
     private User admin;
