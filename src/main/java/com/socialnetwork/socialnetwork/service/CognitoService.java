@@ -13,14 +13,8 @@ import java.util.Optional;
 
 @Service
 public class CognitoService {
-    @Value("${spring.security.oauth2.client.registration.cognito.client-id}")
+    @Value("${COGNITO_CLIENT_ID}")
     private String clientId;
-
-    @Value("${spring.security.oauth2.client.registration.cognito.scope}")
-    private String scope;
-
-    @Value("${spring.security.oauth2.client.provider.cognito.issuer-uri}")
-    private String issuerUri;
 
     private final AWSCognitoIdentityProvider cognitoIdentityProvider;
 
