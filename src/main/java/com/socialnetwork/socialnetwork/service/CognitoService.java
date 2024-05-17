@@ -1,11 +1,13 @@
 package com.socialnetwork.socialnetwork.service;
 
-import com.amazonaws.services.cognitoidp.AWSCognitoIdentityProvider;
-import com.amazonaws.services.cognitoidp.model.*;
+
 import com.socialnetwork.socialnetwork.dto.LoginResponse;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
+import software.amazon.awssdk.services.cognitoidentityprovider.CognitoIdentityProviderClient;
+import software.amazon.awssdk.services.cognitoidentityprovider.model.*;
+;
+
 
 import java.util.Map;
 
@@ -14,21 +16,21 @@ public class CognitoService {
     @Value("${COGNITO_CLIENT_ID}")
     private String clientId;
 
-    private final AWSCognitoIdentityProvider cognitoIdentityProvider;
+    private final CognitoIdentityProviderClient cognitoIdentityProvider;
     
-    public CognitoService(AWSCognitoIdentityProvider cognitoIdentityProvider) {
+    public CognitoService(CognitoIdentityProviderClient cognitoIdentityProvider) {
         this.cognitoIdentityProvider = cognitoIdentityProvider;
     }
 
     public void registerUser(String username, String email, String password) {
         // Set up the AWS Cognito registration request
-        SignUpRequest signUpRequest = new SignUpRequest()
-                .withClientId(clientId)
-                .withUsername(username)
-                .withPassword(password)
-                .withUserAttributes(
-                        new AttributeType().withName("email").withValue(email)
-                );
+        SignUpRequest signUpRequest = SignUpRequest.builder().
+                clientId(clientId)
+                .username(username)
+                .password(password)
+                .userAttributes(
+                        AttributeType.builder().name("email").value(email).build()
+                ).build();
 
         // Register the user with Amazon Cognito
         try {
@@ -41,24 +43,24 @@ public class CognitoService {
 
     public LoginResponse loginUser(String email, String password) {
         // Set up the authentication request
-        InitiateAuthRequest authRequest = new InitiateAuthRequest()
-                .withAuthFlow("USER_PASSWORD_AUTH")
-                .withClientId(clientId)
-                .withAuthParameters(
+        InitiateAuthRequest authRequest = InitiateAuthRequest.builder()
+                .authFlow(AuthFlowType.USER_PASSWORD_AUTH)
+                .clientId(clientId)
+                .authParameters(
                         Map.of(
                                 "USERNAME", email,
                                 "PASSWORD", password
                         )
-                );
+                ).build();
 
         try {
-            InitiateAuthResult authResult = cognitoIdentityProvider.initiateAuth(authRequest);
-            AuthenticationResultType authResponse = authResult.getAuthenticationResult();
+            InitiateAuthResponse authResult = cognitoIdentityProvider.initiateAuth(authRequest);
+            AuthenticationResultType authResponse = authResult.authenticationResult();
 
             // At this point, the user is successfully authenticated, and you can access JWT tokens:
-            String accessToken = authResponse.getAccessToken();
-            String refreshToken = authResponse.getRefreshToken();
-            Integer expiresIn = authResponse.getExpiresIn();
+            String accessToken = authResponse.accessToken();
+            String refreshToken = authResponse.refreshToken();
+            Integer expiresIn = authResponse.expiresIn();
 
             return new LoginResponse(accessToken, refreshToken, expiresIn);
 
