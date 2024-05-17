@@ -26,8 +26,6 @@ public class SecurityConfiguration {
                     .sessionManagement(
                             session -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS)
                     )
-                    .httpBasic(withDefaults
-                            ())
                     .build();
     }
 
