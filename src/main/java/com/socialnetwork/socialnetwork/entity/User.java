@@ -26,7 +26,7 @@ public class User {
 
     @OneToMany(mappedBy = "friendTo", cascade = CascadeType.ALL, orphanRemoval = true)
     @JsonManagedReference
-    private List<Friends> friendsIniated;
+    private List<Friends> friendsInitiated;
 
     @OneToMany(mappedBy = "friend", cascade = CascadeType.ALL, orphanRemoval = true)
     @JsonManagedReference
