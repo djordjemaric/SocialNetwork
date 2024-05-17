@@ -31,4 +31,12 @@ public class User {
     @OneToMany(mappedBy = "friend", cascade = CascadeType.ALL, orphanRemoval = true)
     @JsonManagedReference
     private List<Friends> friendsReceived;
+
+    @OneToMany(mappedBy = "from", cascade = CascadeType.ALL, orphanRemoval = true)
+    @JsonManagedReference
+    private List<FriendRequest> initiatedRequests;
+
+    @OneToMany(mappedBy = "to", cascade = CascadeType.ALL, orphanRemoval = true)
+    @JsonManagedReference
+    private List<FriendRequest> receivedRequests;
 }
