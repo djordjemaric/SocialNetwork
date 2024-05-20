@@ -8,10 +8,7 @@ import com.socialnetwork.socialnetwork.entity.Group;
 import com.socialnetwork.socialnetwork.entity.Post;
 import com.socialnetwork.socialnetwork.entity.User;
 import com.socialnetwork.socialnetwork.mapper.PostMapper;
-import com.socialnetwork.socialnetwork.repository.FriendsRepository;
-import com.socialnetwork.socialnetwork.repository.GroupRepository;
-import com.socialnetwork.socialnetwork.repository.PostRepository;
-import com.socialnetwork.socialnetwork.repository.UserRepository;
+import com.socialnetwork.socialnetwork.repository.*;
 import org.springframework.stereotype.Service;
 
 import java.util.NoSuchElementException;
@@ -26,14 +23,16 @@ public class PostService {
     private final JwtService jwtService;
     private final UserRepository userRepository;
     private final FriendsRepository friendsRepository;
+    private final GroupMemberRepository groupMemberRepository;
 
-    public PostService(PostRepository postRepository, PostMapper postMapper, GroupRepository groupRepository, JwtService jwtService, UserRepository userRepository, FriendsRepository friendsRepository) {
+    public PostService(PostRepository postRepository, PostMapper postMapper, GroupRepository groupRepository, JwtService jwtService, UserRepository userRepository, FriendsRepository friendsRepository, GroupMemberRepository groupMemberRepository) {
         this.postRepository = postRepository;
         this.postMapper = postMapper;
         this.groupRepository = groupRepository;
         this.jwtService = jwtService;
         this.userRepository = userRepository;
         this.friendsRepository = friendsRepository;
+        this.groupMemberRepository = groupMemberRepository;
     }
 
     public GetPostDTO getById(Integer idPost) {
@@ -48,9 +47,15 @@ public class PostService {
                     .orElseThrow(() -> new RuntimeException("You cannot see the post because you are not friends with the post owner."));
         }
         if(post.getGroup()!=null && !(post.getGroup().isPublic())){
-            //ODAVDE
+            if(!(groupMemberRepository.existsByUserIdAndGroupId(user.getId(), post.getGroup().getId()))){
+                throw new RuntimeException("You cannot see the post because you are not a member of the "
+                        +post.getGroup().getName()+" group.");
+            }
         }
-        return null;
+        if(post.getImgUrl()!=null){
+            //figure out the aws s3
+        }
+        return postMapper.postToGetPostDTO(post);
     }
 
     public void createPostInGroup(CreatePostDTO postDTO) {
