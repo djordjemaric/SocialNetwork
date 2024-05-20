@@ -9,6 +9,7 @@ import com.socialnetwork.socialnetwork.repository.GroupRepository;
 import com.socialnetwork.socialnetwork.repository.PostRepository;
 import org.springframework.stereotype.Service;
 
+import java.util.NoSuchElementException;
 import java.util.Objects;
 
 @Service
@@ -27,7 +28,8 @@ public class PostService {
     public void createPost(Integer idOwner, CreatePostDTO postDTO) {
         Post post;
         if (postDTO.idGroup() != null) {
-            Group group = groupRepository.findById(postDTO.idGroup()).orElseThrow();
+            Group group = groupRepository.findById(postDTO.idGroup()).orElseThrow(
+                    ()->new NoSuchElementException("There is no group with the id of "+postDTO.idGroup()));
             post = postMapper.createPostDTOtoPost(idOwner, group, postDTO);
             postRepository.save(post);
         }

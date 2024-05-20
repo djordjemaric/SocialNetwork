@@ -28,11 +28,6 @@ public class Comment {
     @JoinColumn(name = "id_comm_owner")
     private User commOwner;
 
-    @NotNull
-    @ManyToOne
-    @JoinColumn(name = "id_post")
-    private Post post;
-
     @OneToMany(mappedBy = "comment")
     private List<Reply> replies;
 
