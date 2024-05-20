@@ -26,6 +26,15 @@ public class Post {
 
     private String imgUrl;
 
+    @NotNull
+    @ManyToOne
+    @JoinColumn(name = "id_owner")
+    private User owner;
+
+    @ManyToOne
+    @JoinColumn(name = "id_group")
+    private Group group;
+
     @OneToMany(mappedBy = "post")
     private List<Comment> comments;
 

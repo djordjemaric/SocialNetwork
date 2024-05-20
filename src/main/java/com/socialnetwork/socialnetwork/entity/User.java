@@ -23,7 +23,5 @@ public class User {
     @Column(nullable = false, unique = true)
     private String email;
 
-    @OneToMany(mappedBy = "owner")
-    private List<Post> posts;
 
 }

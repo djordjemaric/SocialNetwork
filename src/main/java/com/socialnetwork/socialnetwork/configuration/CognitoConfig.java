@@ -1,7 +1,7 @@
 package com.socialnetwork.socialnetwork.configuration;
 
 
-import software.amazon.awssdk.auth.credentials.EnvironmentVariableCredentialsProvider;
+import software.amazon.awssdk.auth.credentials.AnonymousCredentialsProvider;
 import software.amazon.awssdk.regions.Region;
 import software.amazon.awssdk.services.cognitoidentityprovider.CognitoIdentityProviderClient;
 import org.springframework.context.annotation.Bean;
@@ -15,7 +15,7 @@ public class CognitoConfig {
     public CognitoIdentityProviderClient cognitoIdentityProvider() {
 
         return CognitoIdentityProviderClient.builder()
-                .credentialsProvider(EnvironmentVariableCredentialsProvider.create())
+                .credentialsProvider(AnonymousCredentialsProvider.create())
                 .region(Region.EU_CENTRAL_1).build();
     }
 }

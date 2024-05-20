@@ -23,8 +23,8 @@ public class PostController {
        postService.createPost(idOwner, postDTO);
     }
 
-    @PutMapping("/{idUser}")
-    public void update(@PathVariable Integer idUser, @RequestBody UpdatePostDTO postDTO){
-        postService.updatePost(idUser, postDTO);
+    @PutMapping("post/{idUser}/{idPost}")
+    public void update(@PathVariable Integer idUser, @PathVariable Integer idPost, @RequestBody UpdatePostDTO postDTO){
+        postService.updatePost(idUser, idPost, postDTO);
     }
 }

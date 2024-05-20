@@ -16,7 +16,7 @@ import java.util.Objects;
 public class PostService {
 
     private PostRepository postRepository;
-    private PostMapper postMapper;
+    private final PostMapper postMapper;
     private GroupRepository groupRepository;
 
     public PostService(PostRepository postRepository, PostMapper postMapper, GroupRepository groupRepository) {
@@ -36,8 +36,9 @@ public class PostService {
        postRepository.save(postMapper.createPostDTOtoPost(idOwner, null, postDTO));
     }
 
-    public void updatePost(Integer idUser, UpdatePostDTO updatePostDTO){
-        Post post=postRepository.findById(updatePostDTO.id()).orElseThrow();
+    public void updatePost(Integer idUser, Integer idPost, UpdatePostDTO updatePostDTO){
+        Post post=postRepository.findById(idPost).orElseThrow(()->
+                new NoSuchElementException("There is no post with the id of "+idPost));
         if(!(Objects.equals(post.getOwner().getId(), idUser))){
             throw new RuntimeException("User is not the owner!");
         }
