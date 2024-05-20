@@ -12,6 +12,7 @@ import com.socialnetwork.socialnetwork.mapper.FriendsMapper;
 import com.socialnetwork.socialnetwork.repository.FriendRequestRepository;
 import com.socialnetwork.socialnetwork.repository.FriendsRepository;
 import com.socialnetwork.socialnetwork.repository.UserRepository;
+import jakarta.transaction.Transactional;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
@@ -38,7 +39,8 @@ public class FriendsService {
 
 //    add 404 exception
     public PreviewFriendRequestDTO createFriendRequest(SentFriendRequestDTO requestDTO){
-        User friend = userRepository.findByEmail(requestDTO.friendsEmail()).orElseThrow(() -> new RuntimeException("User not found"));
+        User friend = userRepository.findByEmail(requestDTO.friendsEmail())
+                .orElseThrow(() -> new RuntimeException("User not found"));
 
 //        extracting user from JwtService
         User currentUser = jwtService.getUser();
@@ -59,11 +61,16 @@ public class FriendsService {
 
     public List<FriendRequestDTO> getAllPendingRequestsForUser(){
         User currentUser = jwtService.getUser();
-        return this.friendRequestRepository.getPendingForUser(currentUser.getId()).stream().map(fr -> friendRequestMapper.entityToDTO(fr)).toList();
+        return friendRequestRepository.getPendingForUser(currentUser.getId())
+                .stream()
+                .map(friendRequestMapper::entityToDTO)
+                .toList();
     }
 
+    @Transactional
     public Friends acceptRequest(Integer friendRequestId){
-        FriendRequest friendRequest = friendRequestRepository.findById(friendRequestId).orElseThrow(() -> new RuntimeException("Friend request with this id does not exist"));
+        FriendRequest friendRequest = friendRequestRepository.findById(friendRequestId)
+                .orElseThrow(() -> new RuntimeException("Friend request with this id does not exist"));
         User currentUser = jwtService.getUser();
         if(!currentUser.getId().equals(friendRequest.getTo().getId())){
             throw new RuntimeException("You can't accept someone else's friend requests");
@@ -77,7 +84,8 @@ public class FriendsService {
     }
 
     public DeclinedFriendRequestDTO declineRequest(Integer friendRequestId){
-        FriendRequest friendRequest = friendRequestRepository.findById(friendRequestId).orElseThrow(() -> new RuntimeException("Friend request with this id does not exist"));
+        FriendRequest friendRequest = friendRequestRepository.findById(friendRequestId)
+                .orElseThrow(() -> new RuntimeException("Friend request with this id does not exist"));
         User currentUser = jwtService.getUser();
         if(!currentUser.getId().equals(friendRequest.getTo().getId())){
             throw new RuntimeException("You can't decline someone else's friend requests");
@@ -85,6 +93,5 @@ public class FriendsService {
         friendRequestRepository.deleteById(friendRequestId);
 
         return new DeclinedFriendRequestDTO( "Succesfully declined a request with: " + friendRequest.getFrom().getEmail());
-
     }
 }
