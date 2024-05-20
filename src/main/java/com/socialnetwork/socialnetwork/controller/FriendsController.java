@@ -26,7 +26,7 @@ public class FriendsController {
 //    for now we will get id of the user that sent the request from path, but later will change it to it from JWT
     @GetMapping("/requests")
     public List<FriendRequestDTO> getFriendRequests(){
-        return this.friendsService.getAllPendingRequestsForUser();
+        return friendsService.getAllPendingRequestsForUser();
     }
 
     @GetMapping("/search")
