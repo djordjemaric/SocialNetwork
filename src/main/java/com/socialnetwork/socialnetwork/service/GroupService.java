@@ -1,5 +1,6 @@
 package com.socialnetwork.socialnetwork.service;
 
+import com.socialnetwork.socialnetwork.dto.GroupDto;
 import com.socialnetwork.socialnetwork.dto.group.CreateGroupDto;
 import com.socialnetwork.socialnetwork.entity.Group;
 import com.socialnetwork.socialnetwork.entity.GroupMember;
@@ -26,6 +27,7 @@ public class GroupService {
     private final GroupMapper groupMapper;
 
     private final UserRepository userRepository;
+
     private final JwtService jwtService;
 
 
@@ -38,7 +40,24 @@ public class GroupService {
         this.jwtService = jwtService;
     }
 
-    public void removeMember (Integer idGroup, Integer idUser){
+    public GroupDto createGroup(CreateGroupDto group) {
+        User currentUser = jwtService.getUser();
+
+        //provera da li postoji grupa sa tim imenom
+        if (groupRepository.existsByName(group.name())) {
+            throw new FunctionArgumentException("Group with that name already exists");
+        }
+
+        //kreiranje grupe
+        Group createdGroup = groupRepository.save(groupMapper.dtoToEntity(currentUser, group));
+
+        //dodavanje admina kao membera u tu grupu
+        groupMemberRepository.save(new GroupMember(null, currentUser, createdGroup));
+
+        return groupMapper.entityToGroupDto(createdGroup);
+    }
+
+     public void removeMember (Integer idGroup, Integer idUser){
 
         // need to check if the group with that admin and group id exists
         // need to check if the user is in the group and if he is the admin
