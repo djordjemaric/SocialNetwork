@@ -92,6 +92,6 @@ public class FriendsService {
         }
         friendRequestRepository.deleteById(friendRequestId);
 
-        return new DeclinedFriendRequestDTO( "Succesfully declined a request with: " + friendRequest.getFrom().getEmail());
+        return new DeclinedFriendRequestDTO( "Successfully declined a request with: " + friendRequest.getFrom().getEmail());
     }
 }
