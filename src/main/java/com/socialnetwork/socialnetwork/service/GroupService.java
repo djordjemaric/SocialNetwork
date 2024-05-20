@@ -18,10 +18,10 @@ import java.util.Optional;
 
 @Service
 public class GroupService {
-    private GroupRepository groupRepository;
-    private GroupRequestRepository groupRequestRepository;
-    private GroupMemberRepository groupMemberRepository;
-    private GroupMapper groupMapper;
+    private final GroupRepository groupRepository;
+    private final GroupRequestRepository groupRequestRepository;
+    private final GroupMemberRepository groupMemberRepository;
+    private final GroupMapper groupMapper;
 
 
     public GroupService(GroupRepository groupRepository, GroupMapper groupMapper,GroupMemberRepository groupMemberRepository,GroupRequestRepository groupRequestRepository) {
