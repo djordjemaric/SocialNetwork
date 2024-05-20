@@ -9,18 +9,28 @@ import org.springframework.stereotype.Component;
 @Component
 public class PostMapper {
 
-    public Post createPostDTOtoPost(Integer idOwner, Group group, CreatePostDTO postDTO){
+    public Post createPostDTOtoPostInGroup(Integer idOwner, Group group, CreatePostDTO postDTO){
         Post post=new Post();
 
         User owner=new User();
         owner.setId(idOwner);
 
-        if(group!=null){
-            post.setGroup(group);
-            post.setPublic(group.isPublic());
-        }else{
-            post.setPublic(postDTO.isPublic());
-        }
+        post.setGroup(group);
+        post.setPublic(group.isPublic());
+        post.setText(postDTO.text());
+        post.setImgUrl(postDTO.imgUrl());
+        post.setOwner(owner);
+
+        return post;
+    }
+
+    public Post createPostDTOtoPostOnTimeline(Integer idOwner, CreatePostDTO postDTO){
+        Post post=new Post();
+
+        User owner=new User();
+        owner.setId(idOwner);
+
+        post.setPublic(postDTO.isPublic());
         post.setText(postDTO.text());
         post.setImgUrl(postDTO.imgUrl());
         post.setOwner(owner);

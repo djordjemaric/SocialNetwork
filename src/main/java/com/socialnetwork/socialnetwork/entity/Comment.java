@@ -28,7 +28,8 @@ public class Comment {
     @JoinColumn(name = "id_comm_owner")
     private User commOwner;
 
-    @OneToMany(mappedBy = "comment")
+    @OneToMany
+    @JoinColumn(name = "id_comment")
     private List<Reply> replies;
 
 }

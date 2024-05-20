@@ -20,7 +20,11 @@ public class PostController {
 
     @PostMapping("/{idOwner}")
     public void save(@PathVariable Integer idOwner, @RequestBody CreatePostDTO postDTO) {
-       postService.createPost(idOwner, postDTO);
+        if(postDTO.idGroup()==null){
+            postService.createPostOnTimeline(idOwner, postDTO);
+        }else{
+            postService.createPostInGroup(idOwner, postDTO);
+        }
     }
 
     @PutMapping("post/{idUser}/{idPost}")

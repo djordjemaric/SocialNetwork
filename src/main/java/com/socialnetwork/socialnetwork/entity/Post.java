@@ -35,7 +35,8 @@ public class Post {
     @JoinColumn(name = "id_group")
     private Group group;
 
-    @OneToMany(mappedBy = "post")
+    @OneToMany
+    @JoinColumn(name = "id_post")
     private List<Comment> comments;
 
 }

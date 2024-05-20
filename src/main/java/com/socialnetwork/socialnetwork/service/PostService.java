@@ -15,9 +15,9 @@ import java.util.Objects;
 @Service
 public class PostService {
 
-    private PostRepository postRepository;
+    private final PostRepository postRepository;
     private final PostMapper postMapper;
-    private GroupRepository groupRepository;
+    private final GroupRepository groupRepository;
 
     public PostService(PostRepository postRepository, PostMapper postMapper, GroupRepository groupRepository) {
         this.postRepository = postRepository;
@@ -25,15 +25,14 @@ public class PostService {
         this.groupRepository = groupRepository;
     }
 
-    public void createPost(Integer idOwner, CreatePostDTO postDTO) {
-        Post post;
-        if (postDTO.idGroup() != null) {
+    public void createPostInGroup(Integer idOwner, CreatePostDTO postDTO) {
             Group group = groupRepository.findById(postDTO.idGroup()).orElseThrow(
                     ()->new NoSuchElementException("There is no group with the id of "+postDTO.idGroup()));
-            post = postMapper.createPostDTOtoPost(idOwner, group, postDTO);
-            postRepository.save(post);
-        }
-       postRepository.save(postMapper.createPostDTOtoPost(idOwner, null, postDTO));
+            postRepository.save(postMapper.createPostDTOtoPostInGroup(idOwner, group, postDTO));
+    }
+
+    public void createPostOnTimeline(Integer idOwner,CreatePostDTO postDTO){
+        postRepository.save(postMapper.createPostDTOtoPostOnTimeline(idOwner, postDTO));
     }
 
     public void updatePost(Integer idUser, Integer idPost, UpdatePostDTO updatePostDTO){
