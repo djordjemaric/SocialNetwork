@@ -42,17 +42,17 @@ public class PostService {
         }
         Post post = postRepository.findById(idPost).orElseThrow(
                 () -> new NoSuchElementException("The post with the id of " + idPost + " is not present in the database."));
-        if (!post.isPublic() && post.getGroup()!=null) {
+        if (!post.isPublic() && post.getGroup() != null) {
             Friends friends = friendsRepository.areTwoUsersFriends(post.getOwner().getId(), user.getId())
                     .orElseThrow(() -> new RuntimeException("You cannot see the post because you are not friends with the post owner."));
         }
-        if(post.getGroup()!=null && !(post.getGroup().isPublic())){
-            if(!(groupMemberRepository.existsByUserIdAndGroupId(user.getId(), post.getGroup().getId()))){
+        if (post.getGroup() != null && !(post.getGroup().isPublic())) {
+            if (!(groupMemberRepository.existsByUserIdAndGroupId(user.getId(), post.getGroup().getId()))) {
                 throw new RuntimeException("You cannot see the post because you are not a member of the "
-                        +post.getGroup().getName()+" group.");
+                        + post.getGroup().getName() + " group.");
             }
         }
-        if(post.getImgUrl()!=null){
+        if (post.getImgUrl() != null) {
             //figure out the aws s3
         }
         return postMapper.postToGetPostDTO(post);
@@ -93,4 +93,20 @@ public class PostService {
     }
 
 
+    public void deletePost(Integer idPost) {
+        Post post = postRepository.findById(idPost).orElseThrow(() ->
+                new NoSuchElementException("There is no post with the id of " + idPost));
+        User user = jwtService.getUser();
+        if (post.getGroup() != null) {
+            if (Objects.equals(post.getGroup().getAdmin().getId(), user.getId())) {
+                postRepository.deleteById(idPost);
+                return;
+            }
+        }
+        if (Objects.equals(user.getId(), post.getOwner().getId())) {
+            postRepository.deleteById(idPost);
+            return;
+        }
+        throw new RuntimeException("You don't have the permission to delete the post.");
+    }
 }

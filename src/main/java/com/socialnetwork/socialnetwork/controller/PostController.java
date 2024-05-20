@@ -23,8 +23,6 @@ public class PostController {
         return postService.getById(idPost);
     }
 
-
-
     @PostMapping
     public void save(@RequestBody CreatePostDTO postDTO) {
         if(postDTO.idGroup()==null){
@@ -39,6 +37,10 @@ public class PostController {
         postService.updatePost(idPost, postDTO);
     }
 
+    @DeleteMapping("{/idPost}")
+    public void delete(@PathVariable Integer idPost){
+        postService.deletePost(idPost);
+    }
 
 
 }
