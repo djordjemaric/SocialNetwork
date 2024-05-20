@@ -1,6 +1,7 @@
 package com.socialnetwork.socialnetwork.service;
 
 import com.socialnetwork.socialnetwork.dto.post.CreatePostDTO;
+import com.socialnetwork.socialnetwork.dto.post.GetPostDTO;
 import com.socialnetwork.socialnetwork.dto.post.UpdatePostDTO;
 import com.socialnetwork.socialnetwork.entity.Group;
 import com.socialnetwork.socialnetwork.entity.Post;
@@ -29,6 +30,11 @@ public class PostService {
         this.groupRepository = groupRepository;
         this.jwtService = jwtService;
         this.userRepository = userRepository;
+    }
+
+    public GetPostDTO getById(Integer idPost) {
+//        jwtService.getUser()
+        return null;
     }
 
     public void createPostInGroup(CreatePostDTO postDTO) {
@@ -73,6 +79,7 @@ public class PostService {
         post.setPublic(updatePostDTO.isPublic());
         postRepository.save(post);
     }
+
 
 
 }

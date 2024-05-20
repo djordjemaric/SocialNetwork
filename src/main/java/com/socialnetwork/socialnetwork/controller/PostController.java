@@ -1,6 +1,7 @@
 package com.socialnetwork.socialnetwork.controller;
 
 import com.socialnetwork.socialnetwork.dto.post.CreatePostDTO;
+import com.socialnetwork.socialnetwork.dto.post.GetPostDTO;
 import com.socialnetwork.socialnetwork.dto.post.UpdatePostDTO;
 import com.socialnetwork.socialnetwork.entity.Post;
 import com.socialnetwork.socialnetwork.service.PostService;
@@ -17,6 +18,10 @@ public class PostController {
         this.postService = postService;
     }
 
+    @GetMapping("post/{idPost}")
+    public GetPostDTO getById(@PathVariable Integer idPost){
+        return postService.getById(idPost);
+    }
 
     @PostMapping
     public void save(@RequestBody CreatePostDTO postDTO) {
