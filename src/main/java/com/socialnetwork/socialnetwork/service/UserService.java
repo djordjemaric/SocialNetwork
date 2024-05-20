@@ -18,7 +18,7 @@ public class UserService {
     private final CognitoService cognitoService;
 
     @Autowired
-    public UserService(UserRepository userRepository, CognitoService cognitoService) {
+    public UserService(UserRepository userRepository, CognitoService cognitoService, JwtService jwtService) {
         this.userRepository = userRepository;
         this.cognitoService = cognitoService;
     }
@@ -56,7 +56,6 @@ public class UserService {
     }
 
     public LoginResponse loginUser(String email, String password) {
-
         return cognitoService.loginUser(email, password);
     }
 
