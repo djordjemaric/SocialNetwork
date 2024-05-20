@@ -18,10 +18,14 @@ public class JwtService {
     }
 
     public User getUser(){
+        String userSub = getUserSub();
+        return userRepository.findByUserSub(userSub).orElseThrow(() -> new RuntimeException("User not found"));
+    }
+
+    public String getUserSub(){
         SecurityContext context = SecurityContextHolder.getContext();
         Authentication authentication = context.getAuthentication();
         Jwt jwt = (Jwt) authentication.getPrincipal();
-        String userSub = (String)jwt.getClaim("sub");
-        return userRepository.findByUserSub(userSub).orElseThrow(() -> new RuntimeException("User not found"));
+        return jwt.getClaim("sub");
     }
 }
