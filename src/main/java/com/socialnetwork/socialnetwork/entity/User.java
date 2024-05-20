@@ -25,18 +25,17 @@ public class User {
     @Column(nullable = false, unique = true)
     private String email;
 
-    @NotNull
     @OneToMany(mappedBy = "admin")
     @JsonBackReference
     private List<Group> groups;
 
-    @NotNull
+
     @OneToMany(mappedBy = "member")
     @JsonBackReference
     private List<GroupMember> groupMember;
 
 
-    @NotNull
+
     @OneToMany(mappedBy = "user")
     @JsonBackReference
     private List<GroupRequest> groupRequest;

@@ -5,6 +5,7 @@ import com.socialnetwork.socialnetwork.entity.Group;
 import com.socialnetwork.socialnetwork.entity.GroupRequest;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.bind.annotation.*;
 import com.socialnetwork.socialnetwork.service.GroupService;
 
@@ -82,6 +83,15 @@ public class GroupController {
         } catch (Exception e) {
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("An error occurred while rejecting the request.");
         }
+    }
+
+
+    @ResponseStatus(HttpStatus.CREATED)
+    @Transactional
+    @DeleteMapping( "/{idAdmin}/{idGroup}/{idUser}") // idAdmin, idGroup and idUser that we want to remove
+    public void removeMember (@PathVariable Integer idAdmin, @PathVariable Integer idGroup, @PathVariable Integer idUser)
+    {
+        groupService.removeMember(idAdmin, idGroup, idUser);
     }
 
 
