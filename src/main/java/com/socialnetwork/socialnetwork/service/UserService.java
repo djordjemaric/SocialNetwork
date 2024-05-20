@@ -18,7 +18,7 @@ public class UserService {
     private final CognitoService cognitoService;
 
     @Autowired
-    public UserService(UserRepository userRepository, CognitoService cognitoService, JwtService jwtService) {
+    public UserService(UserRepository userRepository, CognitoService cognitoService) {
         this.userRepository = userRepository;
         this.cognitoService = cognitoService;
     }
