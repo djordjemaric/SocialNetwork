@@ -26,16 +26,25 @@ public class PostService {
     }
 
     public void createPostInGroup(Integer idOwner, CreatePostDTO postDTO) {
+        if((postDTO.text()==null || postDTO.text().trim().isEmpty()) && (postDTO.imgUrl()==null || postDTO.imgUrl().trim().isEmpty())){
+            throw new RuntimeException("Post content cannot be empty!");
+        }
             Group group = groupRepository.findById(postDTO.idGroup()).orElseThrow(
                     ()->new NoSuchElementException("There is no group with the id of "+postDTO.idGroup()));
             postRepository.save(postMapper.createPostDTOtoPostInGroup(idOwner, group, postDTO));
     }
 
     public void createPostOnTimeline(Integer idOwner,CreatePostDTO postDTO){
+        if((postDTO.text()==null || postDTO.text().trim().isEmpty()) && (postDTO.imgUrl()==null || postDTO.imgUrl().trim().isEmpty())){
+            throw new RuntimeException("Post content cannot be empty!");
+        }
         postRepository.save(postMapper.createPostDTOtoPostOnTimeline(idOwner, postDTO));
     }
 
     public void updatePost(Integer idUser, Integer idPost, UpdatePostDTO updatePostDTO){
+        if((updatePostDTO.text()==null || updatePostDTO.text().trim().isEmpty()) && (updatePostDTO.imgUrl()==null || updatePostDTO.imgUrl().trim().isEmpty())){
+            throw new RuntimeException("Post content cannot be empty!");
+        }
         Post post=postRepository.findById(idPost).orElseThrow(()->
                 new NoSuchElementException("There is no post with the id of "+idPost));
         if(!(Objects.equals(post.getOwner().getId(), idUser))){
