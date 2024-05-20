@@ -22,7 +22,7 @@ public class CognitoService {
         this.cognitoIdentityProvider = cognitoIdentityProvider;
     }
 
-    public void registerUser(String username, String email, String password) {
+    public String registerUser(String username, String email, String password) {
         // Set up the AWS Cognito registration request
         SignUpRequest signUpRequest = SignUpRequest.builder().
                 clientId(clientId)
@@ -34,8 +34,8 @@ public class CognitoService {
 
         // Register the user with Amazon Cognito
         try {
-            cognitoIdentityProvider.signUp(signUpRequest);
-
+            SignUpResponse signUpResponse = cognitoIdentityProvider.signUp(signUpRequest);
+            return signUpResponse.userSub();
         } catch (Exception e) {
             throw new RuntimeException("User registration failed: " + e.getMessage(), e);
         }
