@@ -20,7 +20,9 @@ public class SecurityConfiguration {
             return http
                     .csrf(AbstractHttpConfigurer::disable)
                     .authorizeHttpRequests(
-                            auth -> auth.anyRequest().authenticated()
+                            auth -> auth
+                                .requestMatchers("/api/user/login", "/api/user/signup").permitAll()
+                                .anyRequest().authenticated()
                     )
                     .oauth2ResourceServer(oauth2 -> oauth2.jwt(withDefaults()))
                     .sessionManagement(
