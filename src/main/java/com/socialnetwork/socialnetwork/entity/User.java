@@ -2,6 +2,7 @@ package com.socialnetwork.socialnetwork.entity;
 
 import jakarta.persistence.*;
 import jakarta.validation.constraints.Email;
+import jakarta.validation.constraints.NotBlank;
 import lombok.*;
 
 import static jakarta.persistence.GenerationType.IDENTITY;
@@ -20,4 +21,8 @@ public class User {
     @Email
     @Column(nullable = false, unique = true)
     private String email;
+
+    @NotBlank
+    @Column(nullable = false, unique = true)
+    private String userSub;
 }

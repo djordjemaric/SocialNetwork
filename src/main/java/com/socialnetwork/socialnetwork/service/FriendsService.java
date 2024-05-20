@@ -18,20 +18,23 @@ public class FriendsService {
     private final FriendRequestRepository friendRequestRepository;
     private final UserRepository userRepository;
     private final FriendRequestMapper friendRequestMapper;
+    private final JwtService jwtService;
 
-    public FriendsService(FriendsRepository friendsRepository, FriendRequestRepository friendRequestRepository, UserRepository userRepository, FriendRequestMapper friendRequestMapper) {
+    public FriendsService(FriendsRepository friendsRepository, FriendRequestRepository friendRequestRepository, UserRepository userRepository, FriendRequestMapper friendRequestMapper, JwtService jwtService) {
         this.friendsRepository = friendsRepository;
         this.friendRequestRepository = friendRequestRepository;
         this.userRepository = userRepository;
         this.friendRequestMapper = friendRequestMapper;
+        this.jwtService = jwtService;
     }
 
 //    add 404 exception
-    public PreviewFriendRequestDTO createFriendRequest(Integer senderId, SentFriendRequestDTO requestDTO){
+    public PreviewFriendRequestDTO createFriendRequest(SentFriendRequestDTO requestDTO){
         User friend = userRepository.findByEmail(requestDTO.friendsEmail()).orElseThrow(() -> new RuntimeException("User not found"));
 
 //        this should always differ from null, because we get it from JWT payload
-        User currentUser = userRepository.findById(senderId).orElseThrow(() -> new RuntimeException("User not found"));
+        String userSub = jwtService.getUserSub();
+        User currentUser = userRepository.findByUserSub(userSub).orElseThrow(() -> new RuntimeException("User not found"));
 
 //        checking if they are alreaady friends
         if(friendsRepository.areTwoUsersFriends(currentUser.getId(),friend.getId()).isPresent()){
@@ -46,5 +49,4 @@ public class FriendsService {
         FriendRequest savedFriendRequest = friendRequestRepository.save(friendRequestMapper.friendRequestFromUsers(currentUser, friend));
         return friendRequestMapper.entityToPreviewDTO(savedFriendRequest);
     }
-
 }

@@ -22,7 +22,7 @@ public class FriendsController {
 
 //    for now we will get id of the user that sent the request from path, but later will change it to it from JWT
     @GetMapping("/requests")
-    public Object getFriendRequests(@RequestParam("userId") Integer userId){
+    public Object getFriendRequests(){
         return null;
     }
 
@@ -34,8 +34,8 @@ public class FriendsController {
 //    for now we will get id of the user that sent the request from path, but later will change it to it from JWT
     @ResponseStatus(HttpStatus.CREATED)
     @PostMapping("/requests")
-    public PreviewFriendRequestDTO sendFriendRequest(@RequestParam("userId") Integer userId, @RequestBody SentFriendRequestDTO friendRequestDTO){
-        return friendsService.createFriendRequest(userId,friendRequestDTO);
+    public PreviewFriendRequestDTO sendFriendRequest(@RequestBody SentFriendRequestDTO friendRequestDTO){
+        return friendsService.createFriendRequest(friendRequestDTO);
     }
 
     @PostMapping("/requests/{friendRequestId}/accept")

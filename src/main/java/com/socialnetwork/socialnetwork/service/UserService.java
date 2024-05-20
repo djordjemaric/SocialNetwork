@@ -46,10 +46,11 @@ public class UserService {
             throw new FunctionArgumentException("User already exists");
         }
 
-        cognitoService.registerUser(email, email, password);
+        String userSub = cognitoService.registerUser(email, email, password);
 
         User user = new User();
         user.setEmail(email);
+        user.setUserSub(userSub);
         userRepository.save(user);
         return user;
     }
