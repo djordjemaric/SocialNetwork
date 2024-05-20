@@ -1,6 +1,6 @@
 package com.socialnetwork.socialnetwork.controller;
 
-import com.socialnetwork.socialnetwork.dto.friendRequest.DeclinedFriendRequestDTO;
+import com.socialnetwork.socialnetwork.dto.friendRequest.ResolvedFriendRequestDTO;
 import com.socialnetwork.socialnetwork.dto.friendRequest.FriendRequestDTO;
 import com.socialnetwork.socialnetwork.dto.friendRequest.PreviewFriendRequestDTO;
 import com.socialnetwork.socialnetwork.dto.friendRequest.SentFriendRequestDTO;
@@ -24,6 +24,7 @@ public class FriendsController {
 //    Logger logger = LoggerFactory.getLogger(FriendsController.class);
 
 //    for now we will get id of the user that sent the request from path, but later will change it to it from JWT
+    @ResponseStatus(HttpStatus.OK)
     @GetMapping("/requests")
     public List<FriendRequestDTO> getFriendRequests(){
         return friendsService.getAllPendingRequestsForUser();
@@ -35,20 +36,21 @@ public class FriendsController {
     }
 
 //    for now we will get id of the user that sent the request from path, but later will change it to it from JWT
-    @ResponseStatus(HttpStatus.CREATED)
+    @ResponseStatus(HttpStatus.OK)
     @PostMapping("/requests")
     public PreviewFriendRequestDTO sendFriendRequest(@RequestBody SentFriendRequestDTO friendRequestDTO){
         return friendsService.createFriendRequest(friendRequestDTO);
     }
 
-    @ResponseStatus(HttpStatus.CREATED)
+    @ResponseStatus(HttpStatus.OK)
     @PostMapping("/requests/{friendRequestId}/accept")
-    public Friends acceptFriendRequest(@PathVariable Integer friendRequestId){
+    public ResolvedFriendRequestDTO acceptFriendRequest(@PathVariable Integer friendRequestId){
         return friendsService.acceptRequest(friendRequestId);
     }
 
+    @ResponseStatus(HttpStatus.OK)
     @PostMapping("/requests/{friendRequestId}/decline")
-    public DeclinedFriendRequestDTO declineFriendRequest(@PathVariable Integer friendRequestId){
+    public ResolvedFriendRequestDTO declineFriendRequest(@PathVariable Integer friendRequestId){
         return friendsService.declineRequest(friendRequestId);
     }
 

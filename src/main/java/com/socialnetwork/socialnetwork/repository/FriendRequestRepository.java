@@ -15,4 +15,6 @@ public interface FriendRequestRepository extends JpaRepository<FriendRequest, In
 
     @Query(QueryConstants.ALL_PENDING_FOR_USER)
     List<FriendRequest> getPendingForUser(Integer userId);
+
+    Optional<FriendRequest> findByIdAndTo_Id(Integer frId, Integer receiverId);
 }
