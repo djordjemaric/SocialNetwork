@@ -31,15 +31,15 @@ public class Group {
     @JsonManagedReference
     private User admin;
 
-    @NotNull
-    @OneToMany(mappedBy = "group")
-    @JsonBackReference
-    private List<GroupMember> groupMember;
+//    @NotNull
+//    @OneToMany(mappedBy = "group")
+//    @JsonBackReference
+//    private List<GroupMember> groupMember;
 
-    @NotNull
-    @OneToMany(mappedBy = "group")
-    @JsonBackReference
-    private List<GroupRequest> groupRequests;
+
+//    @OneToMany(mappedBy = "group")
+//    @JsonBackReference
+//    private List<GroupRequest> groupRequests;
 
 
     private boolean isPublic;

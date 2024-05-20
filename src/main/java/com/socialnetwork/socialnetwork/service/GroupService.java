@@ -7,8 +7,8 @@ import com.socialnetwork.socialnetwork.entity.GroupRequest;
 import com.socialnetwork.socialnetwork.mapper.GroupMapper;
 import com.socialnetwork.socialnetwork.repository.GroupMemberRepository;
 import com.socialnetwork.socialnetwork.repository.GroupRequestRepository;
-import org.apache.coyote.Request;
-import org.springframework.beans.factory.annotation.Autowired;
+import com.socialnetwork.socialnetwork.repository.UserRepository;
+import org.hibernate.query.sqm.produce.function.FunctionArgumentException;
 import org.springframework.stereotype.Service;
 import com.socialnetwork.socialnetwork.repository.GroupRepository;
 
@@ -23,48 +23,95 @@ public class GroupService {
     private final GroupMemberRepository groupMemberRepository;
     private final GroupMapper groupMapper;
 
+    private final UserRepository userRepository;
 
-    public GroupService(GroupRepository groupRepository, GroupMapper groupMapper,GroupMemberRepository groupMemberRepository,GroupRequestRepository groupRequestRepository) {
+
+    public GroupService(GroupRepository groupRepository, GroupMapper groupMapper, GroupMemberRepository groupMemberRepository, GroupRequestRepository groupRequestRepository, UserRepository userRepository) {
         this.groupRepository = groupRepository;
         this.groupMapper = groupMapper;
         this.groupRequestRepository = groupRequestRepository;
         this.groupMemberRepository = groupMemberRepository;
+        this.userRepository = userRepository;
     }
 
-    public Group save(Integer idUser, CreateGroupDto group) {
-        return groupRepository.save(groupMapper.createDtoToEntity(idUser,group));
+    public Group createGroup(Integer idUser, CreateGroupDto group) {
+
+//        //provera da li user sa tim emailom postoji
+//        if(userRepository.existsByEmail()){
+//            throw new FunctionArgumentException("User with that email does not exists!");
+//        }
+
+        //provera da li postoji grupa sa tim imenom
+        if(groupRepository.existsByName(group.name())){
+            throw new FunctionArgumentException("Group with that name already exists");
+
+        }
+
+        //kreiranje grupe
+        Group createdGroup = groupRepository.save(groupMapper.createDtoToEntity(idUser,group));
+
+        //kreiranje membera za tu grupu
+        groupMemberRepository.save(groupMapper.createGroupMemberEntity(idUser,createdGroup));
+
+        return createdGroup;
     }
 
     public GroupRequest createRequestToJoinGroup(Integer idUser, Integer idGroup) {
-        Optional<Group> group = groupRepository.findById(idGroup);
-        GroupRequest groupRequest = groupMapper.createGroupRequestEntity(idUser,group.orElse(null));
 
-        if(groupRequest.getGroup().isPublic()){
+//        //provera da li user sa tim emailom postoji
+//        if(userRepository.existsByEmail()){
+//            throw new FunctionArgumentException("User with that email does not exists!");
+//        }
 
-            // automatski pusti usr u grupu
-            addUserAsAMemberToGroup(idUser,group.orElse(null));
+        //provera da li postoji grupa sa tim imenom
+        if(!groupRepository.existsById(idGroup)){
+            throw new FunctionArgumentException("Group with that name does not exists");
         }
 
-        return groupRequestRepository.save(groupRequest);
+        Group group = groupRepository.findById(idGroup).orElseThrow(() -> new FunctionArgumentException("Group does not exist!"));
+
+        //provera da li je user vec u toj grupi
+        if(groupMemberRepository.existsByUserIdAndGroupId(idUser,idGroup)){
+            throw new FunctionArgumentException("User is already in that group");
+        }
+
+        GroupRequest groupRequest = groupMapper.createGroupRequestEntity(idUser,group);
+        groupRequest = groupRequestRepository.save(groupRequest);
+
+        return groupRequest;
     }
 
 
-    public GroupMember addUserAsAMemberToGroup(Integer idUser, Group group) {
-        return groupMemberRepository.save(groupMapper.createGroupMemberEntity(idUser,group));
+    public void addUserAsAMemberToPublicGroup(GroupRequest groupRequest) {
+        Integer idUser = groupRequest.getUser().getId();
+        Integer idGroup = groupRequest.getGroup().getId();
+
+        Group group = groupRepository.findById(idGroup).orElseThrow(() -> new FunctionArgumentException("Group does not exist!"));
+        if (group.isPublic()) {
+            GroupMember groupMember = groupMapper.createGroupMemberEntity(idUser,group);
+            groupMemberRepository.save(groupMember);
+            groupRequestRepository.delete(groupRequest);
+        }
+
     }
 
 
 
 
     public List<Group> findByName(String name) {
+
+        if(!groupRepository.existsAllByNameStartingWith(name)){
+            throw new FunctionArgumentException("There are no groups with that name");
+        }
+
         return  groupRepository.findAllByNameStartingWith(name);
     }
 
 
-    public List<GroupRequest> getAllRequestsForGroup(Integer idGroup) {
-
-        return  groupRepository.findById(idGroup).get().getGroupRequests();
-    }
+//    public List<GroupRequest> getAllRequestsForGroup(Integer idGroup) {
+//
+//        return  groupRepository.findById(idGroup).get().getGroupRequests();
+//    }
 
     public GroupMember acceptRequest(Integer IdUser , Integer idGroup) {
 

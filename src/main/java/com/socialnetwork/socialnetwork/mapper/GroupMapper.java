@@ -7,6 +7,9 @@ import com.socialnetwork.socialnetwork.entity.GroupRequest;
 import com.socialnetwork.socialnetwork.entity.User;
 import org.springframework.stereotype.Component;
 
+import java.util.ArrayList;
+import java.util.List;
+
 @Component
 public class GroupMapper {
 
@@ -20,6 +23,8 @@ public class GroupMapper {
             group.setPublic(createGroupDto.isPublic());
             group.setAdmin(usr);
             group.setName(createGroupDto.name());
+//            group.setGroupMember();
+
         return group;
     }
 

@@ -1,10 +1,14 @@
 package com.socialnetwork.socialnetwork.controller;
 
 import com.socialnetwork.socialnetwork.dto.group.CreateGroupDto;
+import com.socialnetwork.socialnetwork.entity.Group;
+import com.socialnetwork.socialnetwork.entity.GroupRequest;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import com.socialnetwork.socialnetwork.service.GroupService;
+
+import java.util.List;
 
 @CrossOrigin
 @RestController
@@ -18,26 +22,33 @@ public class GroupController {
     }
 
 
-
+    @ResponseStatus(HttpStatus.CREATED)
     @PostMapping( "/{idUser}")
-    public ResponseEntity createGroup(@PathVariable Integer idUser, @RequestBody CreateGroupDto createGroupDto) {
-        System.out.println(createGroupDto.isPublic());
-        return ResponseEntity.ok(groupService.save(idUser, createGroupDto));
+    public Group createGroup(@PathVariable Integer idUser, @RequestBody CreateGroupDto createGroupDto) {
+        return groupService.createGroup(idUser, createGroupDto);
     }
 
+    @ResponseStatus(HttpStatus.OK)
+    @GetMapping( "")
+    public List<Group> getGroupsByName(@RequestParam String name) {
+        return groupService.findByName(name);
+    }
 
+    @ResponseStatus(HttpStatus.CREATED)
     @PostMapping( "/{idUser}/{idGroup}")
-    public ResponseEntity createRequestToJoinGroup(@PathVariable Integer idUser,@PathVariable Integer idGroup) {
+    public void createRequestToJoinGroup(@PathVariable Integer idUser, @PathVariable Integer idGroup) {
 
-        return ResponseEntity.ok(groupService.createRequestToJoinGroup(idUser, idGroup));
+        GroupRequest groupRequest = groupService.createRequestToJoinGroup(idUser, idGroup);
+        groupService.addUserAsAMemberToPublicGroup(groupRequest);
+
     }
 
 
-    @GetMapping( "/{idGroup}")
-    public ResponseEntity getAllRequestForGroup(@PathVariable Integer idGroup) {
-
-        return ResponseEntity.ok(groupService.getAllRequestsForGroup(idGroup));
-    }
+//    @GetMapping( "/{idGroup}")
+//    public List<Req> getAllRequestForGroup(@PathVariable Integer idGroup) {
+//
+//        return ResponseEntity.ok(groupService.getAllRequestsForGroup(idGroup));
+//    }
 
     @PostMapping( "/accept/{idUser}/{IdGroup}")
     public ResponseEntity acceptRequest(@PathVariable Integer idUser,@PathVariable Integer idGroup) {
@@ -74,11 +85,6 @@ public class GroupController {
     }
 
 
-    @GetMapping( "")
-    public ResponseEntity getGroupsByName(@RequestParam String name) {
-        // Your logic to get all groups based on the groupId
-        return ResponseEntity.ok(groupService.findByName(name));
-    }
 
 
 
