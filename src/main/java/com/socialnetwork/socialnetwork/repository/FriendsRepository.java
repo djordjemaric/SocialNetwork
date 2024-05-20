@@ -9,7 +9,7 @@ import org.springframework.stereotype.Repository;
 import java.util.Optional;
 
 @Repository
-public interface FriendsRepository extends JpaRepository<FriendRequest,Integer> {
+public interface FriendsRepository extends JpaRepository<Friends,Integer> {
     @Query(QueryConstants.ARE_TWO_USERS_FRIENDS)
     Optional<Friends> areTwoUsersFriends(Integer idUser1, Integer idUser2);
 }
