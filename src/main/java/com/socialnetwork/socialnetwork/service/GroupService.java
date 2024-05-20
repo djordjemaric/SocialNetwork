@@ -33,12 +33,6 @@ public class GroupService {
     public GroupDto createGroup(CreateGroupDto group) {
         User currentUser = jwtService.getUser();
 
-        //provera da li user sa tim emailom postoji
-        if (!userRepository.existsByEmail(currentUser.getEmail())) {
-            System.out.println(currentUser.getEmail());
-            throw new FunctionArgumentException("User with that email does not exists!!");
-        }
-
         //provera da li postoji grupa sa tim imenom
         if (groupRepository.existsByName(group.name())) {
             throw new FunctionArgumentException("Group with that name already exists");
