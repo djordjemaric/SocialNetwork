@@ -10,9 +10,7 @@ import com.socialnetwork.socialnetwork.repository.FriendsRepository;
 import com.socialnetwork.socialnetwork.repository.UserRepository;
 import org.springframework.stereotype.Service;
 
-import java.util.ArrayList;
 import java.util.List;
-import java.util.stream.Collectors;
 
 @Service
 public class FriendsService {
@@ -39,8 +37,8 @@ public class FriendsService {
         User currentUser = this.userRepository.findById(senderId).orElse(null);
 
 //        checking if they are alreaady friends
-        if(this.friendsRepository.areTwoUsersFriends(currentUser.getId(),friend.getId()).isEmpty()){
-
+        if(!this.friendsRepository.areTwoUsersFriends(currentUser.getId(),friend.getId()).isEmpty()){
+            throw new RuntimeException("These users are already friends");
         }
 //        check if there is a existing request between these two
         List<FriendRequest> userRequests = this.friendRequestRepository.getRequestsFromUser(currentUser.getId());
@@ -51,7 +49,8 @@ public class FriendsService {
         }
 
 //      Create and return a request
-        return this.friendRequestMapper.entityToPreviewDTO(this.friendRequestRepository.save(this.friendRequestMapper.friendRequestFromUsers(currentUser, friend)));
+        FriendRequest savedFriendRequest = this.friendRequestRepository.save(this.friendRequestMapper.friendRequestFromUsers(currentUser, friend));
+        return this.friendRequestMapper.entityToPreviewDTO(savedFriendRequest);
     }
 
 }

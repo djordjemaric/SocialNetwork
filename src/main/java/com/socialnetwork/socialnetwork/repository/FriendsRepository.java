@@ -11,6 +11,6 @@ import java.util.Optional;
 
 @Repository
 public interface FriendsRepository extends JpaRepository<FriendRequest,Integer> {
-    @Query("SELECT fr FROM Friends fr WHERE (fr.friendTo.id = :idUser1 OR fr.friend.id = :idUser2) OR (fr.friendTo.id = :idUser2 OR fr.friend.id = :idUser1)")
+    @Query(QueryConstants.ARE_TWO_USERS_FRIENDS)
     Optional<Friends> areTwoUsersFriends(Integer idUser1, Integer idUser2);
 }

@@ -1,6 +1,5 @@
 package com.socialnetwork.socialnetwork.controller;
 
-import com.socialnetwork.socialnetwork.dto.friendRequest.AcceptRequestDTO;
 import com.socialnetwork.socialnetwork.dto.friendRequest.PreviewFriendRequestDTO;
 import com.socialnetwork.socialnetwork.dto.friendRequest.SentFriendRequestDTO;
 import com.socialnetwork.socialnetwork.service.FriendsService;

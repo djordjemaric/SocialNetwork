@@ -10,6 +10,8 @@ import java.util.List;
 
 @Repository
 public interface FriendRequestRepository extends JpaRepository<FriendRequest, Integer> {
-    @Query("SELECT fr FROM FriendRequest fr WHERE fr.from.id = :userId OR fr.to.id = :userId")
+
+
+    @Query(QueryConstants.ALL_REQUESTS_FROM_USER)
     List<FriendRequest> getRequestsFromUser(Integer userId);
 }
