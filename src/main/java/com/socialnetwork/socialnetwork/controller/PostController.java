@@ -18,17 +18,17 @@ public class PostController {
     }
 
 
-    @PostMapping("/{idOwner}")
-    public void save(@PathVariable Integer idOwner, @RequestBody CreatePostDTO postDTO) {
+    @PostMapping
+    public void save(@RequestBody CreatePostDTO postDTO) {
         if(postDTO.idGroup()==null){
-            postService.createPostOnTimeline(idOwner, postDTO);
+            postService.createPostOnTimeline(postDTO);
         }else{
-            postService.createPostInGroup(idOwner, postDTO);
+            postService.createPostInGroup(postDTO);
         }
     }
 
-    @PutMapping("post/{idUser}/{idPost}")
-    public void update(@PathVariable Integer idUser, @PathVariable Integer idPost, @RequestBody UpdatePostDTO postDTO){
-        postService.updatePost(idUser, idPost, postDTO);
+    @PutMapping("post/{idPost}")
+    public void update(@PathVariable Integer idPost, @RequestBody UpdatePostDTO postDTO){
+        postService.updatePost(idPost, postDTO);
     }
 }
