@@ -38,9 +38,6 @@ public class PostService {
     }
 
     public void createPostInGroup(CreatePostDTO postDTO) {
-        if ((postDTO.text() == null || postDTO.text().trim().isEmpty()) && (postDTO.imgUrl() == null || postDTO.imgUrl().trim().isEmpty())) {
-            throw new RuntimeException("Post content cannot be empty!");
-        }
         User user = jwtService.getUser();
         if (!userRepository.existsByEmail(user.getEmail())) {
             throw new NoSuchElementException("User with the email of " + user.getEmail() + " is not present in the database.");
@@ -51,9 +48,6 @@ public class PostService {
     }
 
     public void createPostOnTimeline(CreatePostDTO postDTO) {
-        if ((postDTO.text() == null || postDTO.text().trim().isEmpty()) && (postDTO.imgUrl() == null || postDTO.imgUrl().trim().isEmpty())) {
-            throw new RuntimeException("Post content cannot be empty!");
-        }
         User user = jwtService.getUser();
         if (!userRepository.existsByEmail(user.getEmail())) {
             throw new NoSuchElementException("User with the email of " + user.getEmail() + " is not present in the database.");
@@ -62,9 +56,6 @@ public class PostService {
     }
 
     public void updatePost(Integer idPost, UpdatePostDTO updatePostDTO) {
-        if ((updatePostDTO.text() == null || updatePostDTO.text().trim().isEmpty()) && (updatePostDTO.imgUrl() == null || updatePostDTO.imgUrl().trim().isEmpty())) {
-            throw new RuntimeException("Post content cannot be empty!");
-        }
         User user = jwtService.getUser();
         if (!userRepository.existsByEmail(user.getEmail())) {
             throw new NoSuchElementException("User with the email of " + user.getEmail() + " is not present in the database.");
@@ -79,7 +70,6 @@ public class PostService {
         post.setPublic(updatePostDTO.isPublic());
         postRepository.save(post);
     }
-
 
 
 }

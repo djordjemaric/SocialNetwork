@@ -23,6 +23,8 @@ public class PostController {
         return postService.getById(idPost);
     }
 
+
+
     @PostMapping
     public void save(@RequestBody CreatePostDTO postDTO) {
         if(postDTO.idGroup()==null){
@@ -36,4 +38,7 @@ public class PostController {
     public void update(@PathVariable Integer idPost, @RequestBody UpdatePostDTO postDTO){
         postService.updatePost(idPost, postDTO);
     }
+
+
+
 }
