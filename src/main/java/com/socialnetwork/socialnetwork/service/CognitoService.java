@@ -35,6 +35,7 @@ public class CognitoService {
         // Register the user with Amazon Cognito
         try {
             SignUpResponse signUpResponse = cognitoIdentityProvider.signUp(signUpRequest);
+            System.out.println(signUpResponse);
             return signUpResponse.userSub();
         } catch (Exception e) {
             throw new RuntimeException("User registration failed: " + e.getMessage(), e);
