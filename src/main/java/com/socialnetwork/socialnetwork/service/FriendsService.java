@@ -10,15 +10,14 @@ import com.socialnetwork.socialnetwork.repository.FriendsRepository;
 import com.socialnetwork.socialnetwork.repository.UserRepository;
 import org.springframework.stereotype.Service;
 
-import java.util.List;
 
 @Service
 public class FriendsService {
 
-    private FriendsRepository friendsRepository;
-    private FriendRequestRepository friendRequestRepository;
-    private UserRepository userRepository;
-    private FriendRequestMapper friendRequestMapper;
+    private final FriendsRepository friendsRepository;
+    private final FriendRequestRepository friendRequestRepository;
+    private final UserRepository userRepository;
+    private final FriendRequestMapper friendRequestMapper;
 
     public FriendsService(FriendsRepository friendsRepository, FriendRequestRepository friendRequestRepository, UserRepository userRepository, FriendRequestMapper friendRequestMapper) {
         this.friendsRepository = friendsRepository;
@@ -29,28 +28,23 @@ public class FriendsService {
 
 //    add 404 exception
     public PreviewFriendRequestDTO createFriendRequest(Integer senderId, SentFriendRequestDTO requestDTO){
-        User friend = this.userRepository.findByEmail(requestDTO.friendsEmail()).orElse(null);
-        if(friend == null){
-            throw new RuntimeException("User not found");
-        }
+        User friend = userRepository.findByEmail(requestDTO.friendsEmail()).orElseThrow(() -> new RuntimeException("User not found"));
+
 //        this should always differ from null, because we get it from JWT payload
-        User currentUser = this.userRepository.findById(senderId).orElse(null);
+        User currentUser = userRepository.findById(senderId).orElse(null);
 
 //        checking if they are alreaady friends
-        if(!this.friendsRepository.areTwoUsersFriends(currentUser.getId(),friend.getId()).isEmpty()){
+        if(friendsRepository.areTwoUsersFriends(currentUser.getId(),friend.getId()).isPresent()){
             throw new RuntimeException("These users are already friends");
         }
 //        check if there is a existing request between these two
-        List<FriendRequest> userRequests = this.friendRequestRepository.getRequestsFromUser(currentUser.getId());
-        if(!userRequests.stream().filter(req -> req.getFrom().getId().equals(friend.getId())).toList().isEmpty() ||
-                !userRequests.stream().filter(req -> req.getTo().getId().equals(friend.getId())).toList().isEmpty()
-        ){
+        if(friendRequestRepository.doesRequestExistsBetweenUsers(currentUser.getId(), friend.getId()).isPresent()){
             throw new RuntimeException("There is already a pending request between these users");
         }
 
 //      Create and return a request
-        FriendRequest savedFriendRequest = this.friendRequestRepository.save(this.friendRequestMapper.friendRequestFromUsers(currentUser, friend));
-        return this.friendRequestMapper.entityToPreviewDTO(savedFriendRequest);
+        FriendRequest savedFriendRequest = friendRequestRepository.save(friendRequestMapper.friendRequestFromUsers(currentUser, friend));
+        return friendRequestMapper.entityToPreviewDTO(savedFriendRequest);
     }
 
 }

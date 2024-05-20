@@ -11,7 +11,7 @@ import java.util.List;
 @RequestMapping("/api/friends")
 public class FriendsController {
 
-    private FriendsService friendsService;
+    private final FriendsService friendsService;
 
     public FriendsController(FriendsService friendsService) {
         this.friendsService = friendsService;
@@ -33,7 +33,7 @@ public class FriendsController {
 //    for now we will get id of the user that sent the request from path, but later will change it to it from JWT
     @PostMapping("/requests")
     public PreviewFriendRequestDTO sendFriendRequest(@RequestParam("userId") Integer userId, @RequestBody SentFriendRequestDTO friendRequestDTO){
-        return this.friendsService.createFriendRequest(userId,friendRequestDTO);
+        return friendsService.createFriendRequest(userId,friendRequestDTO);
     }
 
     @PostMapping("/requests/{friendRequestId}/accept")
