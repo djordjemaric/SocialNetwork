@@ -32,9 +32,8 @@ public class FriendsService {
     public PreviewFriendRequestDTO createFriendRequest(SentFriendRequestDTO requestDTO){
         User friend = userRepository.findByEmail(requestDTO.friendsEmail()).orElseThrow(() -> new RuntimeException("User not found"));
 
-//        this should always differ from null, because we get it from JWT payload
-        String userSub = jwtService.getUserSub();
-        User currentUser = userRepository.findByUserSub(userSub).orElseThrow(() -> new RuntimeException("User not found"));
+//        extracting user from JwtService
+        User currentUser = jwtService.getUser();
 
 //        checking if they are alreaady friends
         if(friendsRepository.areTwoUsersFriends(currentUser.getId(),friend.getId()).isPresent()){
