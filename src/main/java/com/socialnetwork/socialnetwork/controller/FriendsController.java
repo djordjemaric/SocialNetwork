@@ -3,6 +3,7 @@ package com.socialnetwork.socialnetwork.controller;
 import com.socialnetwork.socialnetwork.dto.friendRequest.PreviewFriendRequestDTO;
 import com.socialnetwork.socialnetwork.dto.friendRequest.SentFriendRequestDTO;
 import com.socialnetwork.socialnetwork.service.FriendsService;
+import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
@@ -31,6 +32,7 @@ public class FriendsController {
     }
 
 //    for now we will get id of the user that sent the request from path, but later will change it to it from JWT
+    @ResponseStatus(HttpStatus.CREATED)
     @PostMapping("/requests")
     public PreviewFriendRequestDTO sendFriendRequest(@RequestParam("userId") Integer userId, @RequestBody SentFriendRequestDTO friendRequestDTO){
         return friendsService.createFriendRequest(userId,friendRequestDTO);
