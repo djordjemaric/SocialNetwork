@@ -10,6 +10,8 @@ import com.socialnetwork.socialnetwork.repository.FriendsRepository;
 import com.socialnetwork.socialnetwork.repository.UserRepository;
 import org.springframework.stereotype.Service;
 
+import java.util.List;
+
 
 @Service
 public class FriendsService {
@@ -47,5 +49,9 @@ public class FriendsService {
 //      Create and return a request
         FriendRequest savedFriendRequest = friendRequestRepository.save(friendRequestMapper.friendRequestFromUsers(currentUser, friend));
         return friendRequestMapper.entityToPreviewDTO(savedFriendRequest);
+    }
+
+    public List<User> searchFriends(String searchTerm){
+        return null;
     }
 }
