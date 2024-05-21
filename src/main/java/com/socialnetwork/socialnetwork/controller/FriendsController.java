@@ -2,6 +2,7 @@ package com.socialnetwork.socialnetwork.controller;
 
 import com.socialnetwork.socialnetwork.dto.friendRequest.PreviewFriendRequestDTO;
 import com.socialnetwork.socialnetwork.dto.friendRequest.SentFriendRequestDTO;
+import com.socialnetwork.socialnetwork.dto.user.PreviewUserDTO;
 import com.socialnetwork.socialnetwork.entity.User;
 import com.socialnetwork.socialnetwork.service.FriendsService;
 import com.socialnetwork.socialnetwork.service.JwtService;
@@ -31,8 +32,9 @@ public class FriendsController {
         return null;
     }
 
+    @ResponseStatus(HttpStatus.OK)
     @GetMapping("/search")
-    public List<User> searchFriends(@RequestParam("searchTerm") String searchTerm){
+    public List<PreviewUserDTO> searchFriends(@RequestParam("searchTerm") String searchTerm){
         return friendsService.searchFriends(searchTerm);
     }
 

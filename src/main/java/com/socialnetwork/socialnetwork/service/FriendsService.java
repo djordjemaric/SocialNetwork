@@ -2,6 +2,7 @@ package com.socialnetwork.socialnetwork.service;
 
 import com.socialnetwork.socialnetwork.dto.friendRequest.PreviewFriendRequestDTO;
 import com.socialnetwork.socialnetwork.dto.friendRequest.SentFriendRequestDTO;
+import com.socialnetwork.socialnetwork.dto.user.PreviewUserDTO;
 import com.socialnetwork.socialnetwork.entity.FriendRequest;
 import com.socialnetwork.socialnetwork.entity.User;
 import com.socialnetwork.socialnetwork.mapper.FriendRequestMapper;
@@ -51,7 +52,11 @@ public class FriendsService {
         return friendRequestMapper.entityToPreviewDTO(savedFriendRequest);
     }
 
-    public List<User> searchFriends(String searchTerm){
-        return null;
+    public List<PreviewUserDTO> searchFriends(String searchTerm){
+        User currentUser = jwtService.getUser();
+        List<User> foundFriends = friendsRepository.findUserFriendsWithSearch(currentUser.getId(), searchTerm);
+        return foundFriends.stream()
+                .map(friend -> new PreviewUserDTO(friend.getId(), friend.getEmail()))
+                .toList();
     }
 }
