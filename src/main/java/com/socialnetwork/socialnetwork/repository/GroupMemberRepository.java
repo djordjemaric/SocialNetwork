@@ -6,6 +6,8 @@ import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.stereotype.Repository;
 
+import java.util.List;
+
 @Repository
 public interface GroupMemberRepository extends JpaRepository<GroupMember, Integer> {
 
@@ -15,4 +17,8 @@ public interface GroupMemberRepository extends JpaRepository<GroupMember, Intege
 
     @Query(value = queryText)
     boolean existsByUserIdAndGroupId(Integer idUser,Integer idGroup);
+
+
+
+    List<GroupMember> findAllByGroup(Group group);
 }

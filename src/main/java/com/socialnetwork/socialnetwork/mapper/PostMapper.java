@@ -1,6 +1,7 @@
 package com.socialnetwork.socialnetwork.mapper;
 
 import com.socialnetwork.socialnetwork.dto.post.CreatePostDTO;
+import com.socialnetwork.socialnetwork.dto.post.PostDto;
 import com.socialnetwork.socialnetwork.entity.Group;
 import com.socialnetwork.socialnetwork.entity.Post;
 import com.socialnetwork.socialnetwork.entity.User;
@@ -8,6 +9,10 @@ import org.springframework.stereotype.Component;
 
 @Component
 public class PostMapper {
+
+    public PostDto entityToPostDto(Post post){
+        return new PostDto(post.getText(), post.getImgUrl());
+    }
 
     public Post createPostDTOtoPostInGroup(Integer idOwner, Group group, CreatePostDTO postDTO){
         Post post=new Post();
