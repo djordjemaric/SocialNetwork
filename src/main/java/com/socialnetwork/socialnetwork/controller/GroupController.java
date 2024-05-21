@@ -5,7 +5,6 @@ import org.springframework.web.bind.annotation.*;
 import com.socialnetwork.socialnetwork.service.GroupService;
 
 
-@CrossOrigin
 @RestController
 @RequestMapping("/api/groups")
 public class GroupController {
@@ -17,9 +16,9 @@ public class GroupController {
     }
 
     @ResponseStatus(HttpStatus.OK)
-    @DeleteMapping("/delete/{idUser}/{idGroup}")
-    public void deleteGroup(@PathVariable Integer idUser, @PathVariable Integer idGroup) {
-        groupService.deleteGroup(idUser,idGroup);
+    @DeleteMapping("/{idGroup}")
+    public void deleteGroup(@PathVariable Integer idGroup) {
+        groupService.deleteGroup(idGroup);
     }
 
 }
