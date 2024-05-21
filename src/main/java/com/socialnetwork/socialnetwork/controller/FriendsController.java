@@ -37,7 +37,7 @@ public class FriendsController {
     }
 
 //    for now we will get id of the user that sent the request from path, but later will change it to it from JWT
-    @ResponseStatus(HttpStatus.OK)
+    @ResponseStatus(HttpStatus.CREATED)
     @PostMapping("/requests")
     public PreviewFriendRequestDTO sendFriendRequest(@RequestBody SentFriendRequestDTO friendRequestDTO){
         return friendsService.createFriendRequest(friendRequestDTO);
