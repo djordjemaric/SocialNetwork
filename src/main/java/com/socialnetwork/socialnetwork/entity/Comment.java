@@ -26,7 +26,7 @@ public class Comment {
     private String text;
 
     @CreationTimestamp
-    private LocalDateTime dateTimeAtCreation;
+    private LocalDateTime creationDateTime;
 
     @NotNull
     @ManyToOne
