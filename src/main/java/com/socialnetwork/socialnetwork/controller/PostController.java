@@ -18,28 +18,28 @@ public class PostController {
         this.postService = postService;
     }
 
-    @GetMapping("post/{idPost}")
-    public GetPostDTO getById(@PathVariable Integer idPost){
-        return postService.getById(idPost);
+    @GetMapping("/{id}")
+    public GetPostDTO getById(@PathVariable Integer id) {
+        return postService.getById(id);
     }
 
     @PostMapping
     public void save(@RequestBody CreatePostDTO postDTO) {
-        if(postDTO.idGroup()==null){
+        if (postDTO.idGroup() == null) {
             postService.createPostOnTimeline(postDTO);
-        }else{
+        } else {
             postService.createPostInGroup(postDTO);
         }
     }
 
-    @PutMapping("post/{idPost}")
-    public void update(@PathVariable Integer idPost, @RequestBody UpdatePostDTO postDTO){
-        postService.updatePost(idPost, postDTO);
+    @PutMapping("/{id}")
+    public void update(@PathVariable Integer id, @RequestBody UpdatePostDTO postDTO) {
+        postService.updatePost(id, postDTO);
     }
 
-    @DeleteMapping("/{idPost}")
-    public void delete(@PathVariable Integer idPost){
-        postService.deletePost(idPost);
+    @DeleteMapping("/{id}")
+    public void delete(@PathVariable Integer id) {
+        postService.deletePost(id);
     }
 
 
