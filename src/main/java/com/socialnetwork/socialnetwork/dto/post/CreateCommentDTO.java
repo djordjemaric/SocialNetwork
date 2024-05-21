@@ -1,15 +1,13 @@
 package com.socialnetwork.socialnetwork.dto.post;
 
 
-public record CreateCommentDTO(String text,
+import jakarta.validation.constraints.NotBlank;
+import jakarta.validation.constraints.NotNull;
+
+public record CreateCommentDTO(@NotBlank
+                               String text,
+                               @NotNull
                                Integer idPost,
+                               @NotNull
                                Integer idCommOwner) {
-
-    public Integer getIdOwner() {
-        return idCommOwner;
-    }
-
-    public Integer getIdPost() {
-        return idPost;
-    }
 }

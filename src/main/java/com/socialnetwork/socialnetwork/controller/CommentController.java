@@ -18,8 +18,8 @@ public class CommentController {
     }
 
 
-    @PostMapping("/")
-    public void save(@RequestBody User owner,@RequestBody CreateCommentDTO commentDTO) {
-        commentService.createComment(owner, commentDTO);
+    @PostMapping()
+    public void save(@RequestBody CreateCommentDTO commentDTO) {
+        commentService.createComment(commentDTO);
     }
 }
