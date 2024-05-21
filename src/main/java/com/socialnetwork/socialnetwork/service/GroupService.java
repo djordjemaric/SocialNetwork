@@ -47,13 +47,13 @@ public class GroupService {
         return groupMapper.entityToGroupDto(createdGroup);
     }
 
-    public void leaveGroup(String userSub, Integer idGroup) {
+    public void leaveGroup(Integer idGroup) {
         Group group = groupRepository.findById(idGroup).orElseThrow(() -> new FunctionArgumentException("Group does not exist"));
-        User user = userRepository.findByUserSub(userSub).orElseThrow(() -> new FunctionArgumentException("User does not exist"));
+        User user = jwtService.getUser();
         if (group.getAdmin().getId().equals(user.getId())) {
             throw new FunctionArgumentException("Admin can't leave the group");
         }
-        GroupMember groupMember = groupMemberRepository.findGroupMemberByMember(user).orElseThrow(() -> new FunctionArgumentException("User is not member of group"));
+        GroupMember groupMember = groupMemberRepository.findByMember(user).orElseThrow(() -> new FunctionArgumentException("User is not member of group"));
         groupMemberRepository.delete(groupMember);
     }
 

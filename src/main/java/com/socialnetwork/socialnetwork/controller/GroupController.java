@@ -15,11 +15,9 @@ import com.socialnetwork.socialnetwork.service.GroupService;
 public class GroupController {
 
     private final GroupService groupService;
-    private final JwtService jwtService;
 
-    public GroupController(GroupService groupService, JwtService jwtService) {
+    public GroupController(GroupService groupService) {
         this.groupService = groupService;
-        this.jwtService = jwtService;
     }
 
 
@@ -29,10 +27,10 @@ public class GroupController {
         return groupService.createGroup(createGroupDto);
     }
 
-    @DeleteMapping("/leave/{idGroup}")
-    public ResponseEntity<String> leaveGroup(@PathVariable Integer idGroup) {
-        String userSub = jwtService.getUserSub();
-        groupService.leaveGroup(userSub, idGroup);
-        return ResponseEntity.ok("User left group successfully.");
+    @DeleteMapping("/{idGroup}/leave")
+    @ResponseStatus(HttpStatus.OK)
+    public void leaveGroup(@PathVariable Integer idGroup) {
+        groupService.leaveGroup(idGroup);
+
     }
 }
