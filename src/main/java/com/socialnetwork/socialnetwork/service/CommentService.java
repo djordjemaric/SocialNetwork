@@ -24,11 +24,12 @@ public class CommentService {
         this.commentMapper = commentMapper;
         this.jwtService = jwtService;
     }
+//space after comma, before/after + in Exception, before/after ->
+public void createComment(CreateCommentDTO commentDTO) {
+    Post post = postRepository.findById(commentDTO.idPost()).orElseThrow(
+            () -> new NoSuchElementException("There is no post with the id of " + commentDTO.idPost()));
+    User owner = jwtService.getUser();
+    commentRepository.save(commentMapper.createCommentDTOtoComment(owner, post, commentDTO));
+}
 
-    public void createComment(CreateCommentDTO commentDTO) {
-        Post post = postRepository.findById(commentDTO.idPost()).orElseThrow(
-                ()->new NoSuchElementException("There is no post with the id of "+commentDTO.idPost()));
-        User owner = jwtService.getUser();
-        commentRepository.save(commentMapper.createCommentDTOtoComment(owner,post, commentDTO));
-    }
 }
