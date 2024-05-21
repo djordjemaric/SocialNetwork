@@ -4,7 +4,6 @@ import com.socialnetwork.socialnetwork.dto.GroupDto;
 import com.socialnetwork.socialnetwork.dto.group.CreateGroupDto;
 import com.socialnetwork.socialnetwork.service.GroupService;
 import org.springframework.http.HttpStatus;
-import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.bind.annotation.*;
 
 @RestController
@@ -25,8 +24,7 @@ public class GroupController {
     }
 
     @ResponseStatus(HttpStatus.OK)
-    @Transactional
-    @DeleteMapping( "/{idGroup}/{idUser}") // idGroup and idUser that we want to remove
+    @DeleteMapping( "/{idGroup}/members/{idUser}") // idGroup and idUser that we want to remove
     public void removeMember (@PathVariable Integer idGroup, @PathVariable Integer idUser)
     {
         groupService.removeMember(idGroup, idUser);

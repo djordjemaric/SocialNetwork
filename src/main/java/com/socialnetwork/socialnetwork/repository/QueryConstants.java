@@ -15,4 +15,11 @@ public class QueryConstants {
             "AND u.id != :userId";
 
     public static final String ALL_PENDING_FOR_USER = "SELECT fr FROM FriendRequest fr WHERE fr.to.id = :userId";
+
+    public static final String ADMIN_AND_GROUP_ID = "SELECT CASE " +
+            "WHEN count(*) > 0 THEN TRUE " +
+            "ELSE FALSE END " +
+            "FROM Group g WHERE (g.admin.id = :idAdmin AND g.id = :idGroup)";
+
+
 }

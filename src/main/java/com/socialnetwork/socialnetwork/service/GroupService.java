@@ -10,8 +10,9 @@ import com.socialnetwork.socialnetwork.repository.GroupMemberRepository;
 import com.socialnetwork.socialnetwork.repository.GroupRepository;
 import org.hibernate.query.sqm.produce.function.FunctionArgumentException;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
-import java.util.Objects;
+import java.util.NoSuchElementException;
 
 
 @Service
@@ -46,25 +47,25 @@ public class GroupService {
         return groupMapper.entityToGroupDto(createdGroup);
     }
 
+    @Transactional
      public void removeMember (Integer idGroup, Integer idUser){
 
         // need to check if the group with that admin and group id exists
         // need to check if the user is in the group and if he is the admin
         // need to remove user from GroupMember table
         User admin = jwtService.getUser();
-        if (groupRepository.existsByAdminIdAndGroupId(admin.getId(), idGroup)) {
-            if (groupMemberRepository.existsByUserIdAndGroupId(idUser, idGroup)) {
-                if (!Objects.equals(admin.getId(), idUser)){
-                    groupMemberRepository.deleteGroupMemberByGroupIdAndMemberId(idGroup, idUser);
-                } else {
-                    throw new FunctionArgumentException("Can't remove an admin from the group!");
-                }
-            } else {
-                throw new FunctionArgumentException("User with that is not in this group");
+        if (!groupRepository.existsByAdminIdAndGroupId(admin.getId(), idGroup)) {
+            throw new NoSuchElementException("There are no groups with that id: "
+                                            + idGroup + " and that admin: " + admin.getEmail());
             }
-        } else {
-            throw new FunctionArgumentException("There are no groups with that tuple (IdAdmin, IdGroup)");
-        }
+        if (admin.getId().equals(idUser)) {
+            throw new RuntimeException("Can't remove an admin from the group!");
+            }
+        if (!groupMemberRepository.existsByUserIdAndGroupId(idUser, idGroup)) {
+            throw new NoSuchElementException("User with that id: " + idUser
+                                            + " is not in this group: " + idGroup);
+            }
+        groupMemberRepository.deleteGroupMemberByGroupIdAndMemberId(idGroup, idUser);
     }
 
 
