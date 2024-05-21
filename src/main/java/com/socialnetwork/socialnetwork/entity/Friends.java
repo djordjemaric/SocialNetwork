@@ -1,6 +1,5 @@
 package com.socialnetwork.socialnetwork.entity;
 
-import com.fasterxml.jackson.annotation.JsonBackReference;
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
@@ -20,12 +19,10 @@ public class Friends {
     private Integer id;
 
     @ManyToOne
-    @JsonBackReference
     @JoinColumn(name = "id_friend1")
     private User friendTo;
 
     @ManyToOne
-    @JsonBackReference
     @JoinColumn(name = "id_friend2")
     private User friend;
 }

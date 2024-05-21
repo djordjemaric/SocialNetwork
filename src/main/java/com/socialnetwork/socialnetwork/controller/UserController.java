@@ -2,8 +2,8 @@ package com.socialnetwork.socialnetwork.controller;
 
 import com.socialnetwork.socialnetwork.dto.LoginResponse;
 import com.socialnetwork.socialnetwork.dto.UserRequest;
-import com.socialnetwork.socialnetwork.entity.User;
 import com.socialnetwork.socialnetwork.service.UserService;
+import com.socialnetwork.socialnetwork.entity.User;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
