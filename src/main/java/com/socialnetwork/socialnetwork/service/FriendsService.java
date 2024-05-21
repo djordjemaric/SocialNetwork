@@ -3,6 +3,7 @@ package com.socialnetwork.socialnetwork.service;
 import com.socialnetwork.socialnetwork.dto.friendRequest.PreviewFriendRequestDTO;
 import com.socialnetwork.socialnetwork.dto.friendRequest.SentFriendRequestDTO;
 import com.socialnetwork.socialnetwork.entity.FriendRequest;
+import com.socialnetwork.socialnetwork.entity.Friends;
 import com.socialnetwork.socialnetwork.entity.User;
 import com.socialnetwork.socialnetwork.mapper.FriendRequestMapper;
 import com.socialnetwork.socialnetwork.repository.FriendRequestRepository;
@@ -47,5 +48,17 @@ public class FriendsService {
 //      Create and return a request
         FriendRequest savedFriendRequest = friendRequestRepository.save(friendRequestMapper.friendRequestFromUsers(currentUser, friend));
         return friendRequestMapper.entityToPreviewDTO(savedFriendRequest);
+    }
+
+    public void deleteFriend(Integer friendId){
+        User friend = userRepository.findById(friendId).
+                orElseThrow(() -> new RuntimeException("Bad request"));
+
+        User currentUser = jwtService.getUser();
+        Friends friendsEntity = friendsRepository.areTwoUsersFriends(currentUser.getId(), friendId).
+                orElseThrow(() -> new RuntimeException("Bad request"));
+
+        friendsRepository.deleteById(friendsEntity.getId());
+
     }
 }
