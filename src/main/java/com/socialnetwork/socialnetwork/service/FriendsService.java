@@ -51,7 +51,7 @@ public class FriendsService {
         return friendRequestMapper.entityToPreviewDTO(savedFriendRequest);
     }
 
-    public DeletedFriendDTO deleteFriend(Integer friendId){
+    public void deleteFriend(Integer friendId){
         User friend = userRepository.findById(friendId).
                 orElseThrow(() -> new RuntimeException("Bad request"));
 
@@ -61,6 +61,5 @@ public class FriendsService {
 
         friendsRepository.deleteById(friendsEntity.getId());
 
-        return new DeletedFriendDTO("Successfully deleted friendship with: " + friend.getEmail());
     }
 }

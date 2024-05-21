@@ -55,7 +55,7 @@ public class FriendsController {
 
     @ResponseStatus(HttpStatus.OK)
     @DeleteMapping("/{id}")
-    public DeletedFriendDTO deleteFriend(@PathVariable Integer id){
-        return friendsService.deleteFriend(id);
+    public void deleteFriend(@PathVariable Integer id){
+        friendsService.deleteFriend(id);
     }
 }
