@@ -1,9 +1,12 @@
 package com.socialnetwork.socialnetwork.service;
 
+import com.socialnetwork.socialnetwork.dto.CreateGroupDto;
+import com.socialnetwork.socialnetwork.dto.GroupDto;
 import com.socialnetwork.socialnetwork.entity.Group;
 import com.socialnetwork.socialnetwork.entity.GroupMember;
 import com.socialnetwork.socialnetwork.entity.GroupRequest;
 import com.socialnetwork.socialnetwork.entity.User;
+import com.socialnetwork.socialnetwork.mapper.GroupMapper;
 import com.socialnetwork.socialnetwork.repository.GroupMemberRepository;
 import com.socialnetwork.socialnetwork.repository.GroupRequestRepository;
 import com.socialnetwork.socialnetwork.repository.UserRepository;
@@ -17,16 +20,33 @@ public class GroupService {
     private final GroupRequestRepository groupRequestRepository;
     private final GroupMemberRepository groupMemberRepository;
     private final UserRepository userRepository;
-
+    private final GroupMapper groupMapper;
     private final JwtService jwtService;
 
-    public GroupService(GroupRepository groupRepository, GroupMemberRepository groupMemberRepository, GroupRequestRepository groupRequestRepository, UserRepository userRepository, JwtService jwtService) {
+    public GroupService(GroupRepository groupRepository, GroupMemberRepository groupMemberRepository,GroupMapper groupMapper, GroupRequestRepository groupRequestRepository, UserRepository userRepository, JwtService jwtService) {
         this.groupRepository = groupRepository;
         this.groupRequestRepository = groupRequestRepository;
         this.groupMemberRepository = groupMemberRepository;
         this.userRepository = userRepository;
+        this.groupMapper = groupMapper;
         this.jwtService = jwtService;
 
+    }
+    public GroupDto createGroup(CreateGroupDto group) {
+        User currentUser = jwtService.getUser();
+
+        //provera da li postoji grupa sa tim imenom
+        if (groupRepository.existsByName(group.name())) {
+            throw new FunctionArgumentException("Group with that name already exists");
+        }
+
+        //kreiranje grupe
+        Group createdGroup = groupRepository.save(groupMapper.dtoToEntity(currentUser, group));
+
+        //dodavanje admina kao membera u tu grupu
+        groupMemberRepository.save(new GroupMember(null, currentUser, createdGroup));
+
+        return groupMapper.entityToGroupDto(createdGroup);
     }
 
     public GroupRequest createRequestToJoinGroup(Integer idGroup) {
