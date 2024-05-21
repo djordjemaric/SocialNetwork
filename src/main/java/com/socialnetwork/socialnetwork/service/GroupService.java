@@ -1,5 +1,7 @@
 package com.socialnetwork.socialnetwork.service;
 
+import com.socialnetwork.socialnetwork.dto.group.CreateGroupDto;
+import com.socialnetwork.socialnetwork.dto.group.GroupDto;
 import com.socialnetwork.socialnetwork.dto.group.GroupMemberDto;
 import com.socialnetwork.socialnetwork.dto.group.GroupRequestDto;
 import com.socialnetwork.socialnetwork.entity.Group;
@@ -37,6 +39,22 @@ public class GroupService {
         this.userRepository = userRepository;
         this.jwtService = jwtService;
 
+    }
+    public GroupDto createGroup(CreateGroupDto group) {
+        User currentUser = jwtService.getUser();
+
+        //provera da li postoji grupa sa tim imenom
+        if (groupRepository.existsByName(group.name())) {
+            throw new FunctionArgumentException("Group with that name already exists");
+        }
+
+        //kreiranje grupe
+        Group createdGroup = groupRepository.save(groupMapper.dtoToEntity(currentUser, group));
+
+        //dodavanje admina kao membera u tu grupu
+        groupMemberRepository.save(new GroupMember(null, currentUser, createdGroup));
+
+        return groupMapper.entityToGroupDto(createdGroup);
     }
 
     public List<GroupRequestDto> getAllRequestsForGroup(Integer idGroup) {

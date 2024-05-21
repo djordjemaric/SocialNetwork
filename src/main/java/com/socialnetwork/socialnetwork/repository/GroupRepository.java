@@ -10,5 +10,6 @@ import java.util.List;
 public interface GroupRepository extends JpaRepository<Group, Integer> {
     boolean existsByIdAndAdminId(Integer idGroup,Integer idAdmin);
 
+    boolean existsByName(String email);
 
 }
