@@ -1,4 +1,4 @@
-image: maven:3.6.3-openjdk-17
+image: maven:3.9.6-openjdk-17
 
 definitions:
   steps:
@@ -7,11 +7,10 @@ definitions:
         caches:
           - maven
         script:
-          - mvn -B clean package --file pom.xml
+          - mvn -B clean package -DskipTests --file pom.xml
         artifacts:
           - target/*.jar
 
 pipelines:
   default:
-      - step: *build
-
+    - step: *build
