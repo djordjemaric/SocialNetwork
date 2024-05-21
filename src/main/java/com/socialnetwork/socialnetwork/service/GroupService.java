@@ -7,10 +7,10 @@ import com.socialnetwork.socialnetwork.entity.GroupMember;
 import com.socialnetwork.socialnetwork.entity.User;
 import com.socialnetwork.socialnetwork.mapper.GroupMapper;
 import com.socialnetwork.socialnetwork.repository.GroupMemberRepository;
+import com.socialnetwork.socialnetwork.repository.GroupRepository;
 import com.socialnetwork.socialnetwork.repository.UserRepository;
 import org.hibernate.query.sqm.produce.function.FunctionArgumentException;
 import org.springframework.stereotype.Service;
-import com.socialnetwork.socialnetwork.repository.GroupRepository;
 
 @Service
 public class GroupService {
@@ -45,6 +45,16 @@ public class GroupService {
         groupMemberRepository.save(new GroupMember(null, currentUser, createdGroup));
 
         return groupMapper.entityToGroupDto(createdGroup);
+    }
+
+    public void leaveGroup(Integer idGroup) {
+        Group group = groupRepository.findById(idGroup).orElseThrow(() -> new FunctionArgumentException("Group does not exist"));
+        User user = jwtService.getUser();
+        if (group.getAdmin().getId().equals(user.getId())) {
+            throw new FunctionArgumentException("Admin can't leave the group");
+        }
+        GroupMember groupMember = groupMemberRepository.findByMember(user).orElseThrow(() -> new FunctionArgumentException("User is not member of group"));
+        groupMemberRepository.delete(groupMember);
     }
 
 }

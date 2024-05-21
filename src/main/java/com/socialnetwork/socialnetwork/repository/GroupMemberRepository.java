@@ -1,10 +1,12 @@
 package com.socialnetwork.socialnetwork.repository;
 
-import com.socialnetwork.socialnetwork.entity.Group;
 import com.socialnetwork.socialnetwork.entity.GroupMember;
+import com.socialnetwork.socialnetwork.entity.User;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.stereotype.Repository;
+
+import java.util.Optional;
 
 @Repository
 public interface GroupMemberRepository extends JpaRepository<GroupMember, Integer> {
@@ -15,4 +17,6 @@ public interface GroupMemberRepository extends JpaRepository<GroupMember, Intege
 
     @Query(value = queryText)
     boolean existsByUserIdAndGroupId(Integer idUser,Integer idGroup);
+
+    Optional<GroupMember> findByMember(User member);
 }
