@@ -13,6 +13,5 @@ definitions:
 
 pipelines:
   default:
-    - parallel:
-        - step: *build
+      - step: *build
 
