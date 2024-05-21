@@ -1,10 +1,13 @@
 package com.socialnetwork.socialnetwork.entity;
 
 import jakarta.persistence.*;
+import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
 import lombok.*;
 
 import java.util.Set;
+
+import java.util.List;
 
 
 @Entity
@@ -27,13 +30,16 @@ public class Group {
     @JoinColumn(name = "id_admin")
     private User admin;
 
+
     private boolean isPublic;
 
-    @OneToMany(mappedBy = "group", cascade = CascadeType.ALL, orphanRemoval = true)
+    @OneToMany(mappedBy = "group")
     private Set<GroupMember> members;
 
-    @OneToMany(mappedBy = "group", cascade = CascadeType.ALL, orphanRemoval = true)
+    @OneToMany(mappedBy = "group")
     private Set<GroupRequest> requests;
 
 
+    @OneToMany(mappedBy = "group")
+    private List<Post> posts;
 }
