@@ -9,6 +9,8 @@ import java.util.List;
 
 @Repository
 public interface GroupRepository extends JpaRepository<Group, Integer> {
+
+    boolean existsByName(String name);
     List<Group> findAllByNameStartingWith(String name);
 
     boolean existsAllByNameStartingWith(String name);
