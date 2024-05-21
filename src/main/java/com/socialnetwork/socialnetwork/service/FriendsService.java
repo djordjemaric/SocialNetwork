@@ -4,6 +4,7 @@ import com.socialnetwork.socialnetwork.dto.friendRequest.ResolvedFriendRequestDT
 import com.socialnetwork.socialnetwork.dto.friendRequest.FriendRequestDTO;
 import com.socialnetwork.socialnetwork.dto.friendRequest.PreviewFriendRequestDTO;
 import com.socialnetwork.socialnetwork.dto.friendRequest.SentFriendRequestDTO;
+import com.socialnetwork.socialnetwork.dto.user.PreviewUserDTO;
 import com.socialnetwork.socialnetwork.entity.FriendRequest;
 import com.socialnetwork.socialnetwork.entity.Friends;
 import com.socialnetwork.socialnetwork.entity.User;
@@ -59,6 +60,14 @@ public class FriendsService {
         return friendRequestMapper.entityToPreviewDTO(savedFriendRequest);
     }
 
+    public List<PreviewUserDTO> searchFriends(String searchTerm) {
+        User currentUser = jwtService.getUser();
+        List<User> foundFriends = friendsRepository.findUserFriendsWithSearch(currentUser.getId(), searchTerm);
+        return foundFriends.stream()
+                .map(friend -> new PreviewUserDTO(friend.getId(), friend.getEmail()))
+                .toList();
+    }
+
     public List<FriendRequestDTO> getAllPendingRequestsForUser(){
         User currentUser = jwtService.getUser();
         return friendRequestRepository.getPendingForUser(currentUser.getId())
@@ -93,7 +102,7 @@ public class FriendsService {
     }
 
     public void deleteFriend(Integer friendId){
-        User friend = userRepository.findById(friendId).
+        userRepository.findById(friendId).
                 orElseThrow(() -> new RuntimeException("Bad request"));
 
         User currentUser = jwtService.getUser();
@@ -101,5 +110,6 @@ public class FriendsService {
                 orElseThrow(() -> new RuntimeException("Bad request"));
 
         friendsRepository.deleteById(friendsEntity.getId());
+
     }
 }
