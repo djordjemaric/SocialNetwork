@@ -1,6 +1,6 @@
 package com.socialnetwork.socialnetwork.repository;
 
-import com.socialnetwork.socialnetwork.dto.group.GroupDto;
+
 import com.socialnetwork.socialnetwork.entity.Group;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.stereotype.Repository;
