@@ -7,10 +7,10 @@ import com.socialnetwork.socialnetwork.entity.GroupMember;
 import com.socialnetwork.socialnetwork.entity.User;
 import com.socialnetwork.socialnetwork.mapper.GroupMapper;
 import com.socialnetwork.socialnetwork.repository.GroupMemberRepository;
+import com.socialnetwork.socialnetwork.repository.GroupRepository;
 import com.socialnetwork.socialnetwork.repository.UserRepository;
 import org.hibernate.query.sqm.produce.function.FunctionArgumentException;
 import org.springframework.stereotype.Service;
-import com.socialnetwork.socialnetwork.repository.GroupRepository;
 
 @Service
 public class GroupService {
