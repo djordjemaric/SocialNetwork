@@ -2,6 +2,7 @@ package com.socialnetwork.socialnetwork.service;
 
 import com.socialnetwork.socialnetwork.dto.friendRequest.PreviewFriendRequestDTO;
 import com.socialnetwork.socialnetwork.dto.friendRequest.SentFriendRequestDTO;
+import com.socialnetwork.socialnetwork.dto.user.PreviewUserDTO;
 import com.socialnetwork.socialnetwork.entity.FriendRequest;
 import com.socialnetwork.socialnetwork.entity.Friends;
 import com.socialnetwork.socialnetwork.entity.User;
@@ -10,6 +11,8 @@ import com.socialnetwork.socialnetwork.repository.FriendRequestRepository;
 import com.socialnetwork.socialnetwork.repository.FriendsRepository;
 import com.socialnetwork.socialnetwork.repository.UserRepository;
 import org.springframework.stereotype.Service;
+
+import java.util.List;
 
 
 @Service
@@ -50,6 +53,14 @@ public class FriendsService {
         return friendRequestMapper.entityToPreviewDTO(savedFriendRequest);
     }
 
+    public List<PreviewUserDTO> searchFriends(String searchTerm) {
+        User currentUser = jwtService.getUser();
+        List<User> foundFriends = friendsRepository.findUserFriendsWithSearch(currentUser.getId(), searchTerm);
+        return foundFriends.stream()
+                .map(friend -> new PreviewUserDTO(friend.getId(), friend.getEmail()))
+                .toList();
+    }
+
     public void deleteFriend(Integer friendId){
         User friend = userRepository.findById(friendId).
                 orElseThrow(() -> new RuntimeException("Bad request"));
@@ -59,6 +70,5 @@ public class FriendsService {
                 orElseThrow(() -> new RuntimeException("Bad request"));
 
         friendsRepository.deleteById(friendsEntity.getId());
-
     }
 }

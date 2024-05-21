@@ -2,6 +2,8 @@ package com.socialnetwork.socialnetwork.controller;
 
 import com.socialnetwork.socialnetwork.dto.friendRequest.PreviewFriendRequestDTO;
 import com.socialnetwork.socialnetwork.dto.friendRequest.SentFriendRequestDTO;
+import com.socialnetwork.socialnetwork.dto.user.PreviewUserDTO;
+import com.socialnetwork.socialnetwork.entity.User;
 import com.socialnetwork.socialnetwork.service.FriendsService;
 import com.socialnetwork.socialnetwork.service.JwtService;
 import org.springframework.http.HttpStatus;
@@ -30,9 +32,10 @@ public class FriendsController {
         return null;
     }
 
+    @ResponseStatus(HttpStatus.OK)
     @GetMapping("/search")
-    public List<Object> searchFriends(@RequestParam("searchTerm") String searchTerm){
-        return null;
+    public List<PreviewUserDTO> searchFriends(@RequestParam("searchTerm") String searchTerm){
+        return friendsService.searchFriends(searchTerm);
     }
 
 //    for now we will get id of the user that sent the request from path, but later will change it to it from JWT
