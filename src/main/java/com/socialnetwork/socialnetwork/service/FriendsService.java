@@ -4,6 +4,7 @@ import com.socialnetwork.socialnetwork.dto.friendRequest.PreviewFriendRequestDTO
 import com.socialnetwork.socialnetwork.dto.friendRequest.SentFriendRequestDTO;
 import com.socialnetwork.socialnetwork.dto.user.PreviewUserDTO;
 import com.socialnetwork.socialnetwork.entity.FriendRequest;
+import com.socialnetwork.socialnetwork.entity.Friends;
 import com.socialnetwork.socialnetwork.entity.User;
 import com.socialnetwork.socialnetwork.mapper.FriendRequestMapper;
 import com.socialnetwork.socialnetwork.repository.FriendRequestRepository;
@@ -52,11 +53,21 @@ public class FriendsService {
         return friendRequestMapper.entityToPreviewDTO(savedFriendRequest);
     }
 
-    public List<PreviewUserDTO> searchFriends(String searchTerm){
+    public List<PreviewUserDTO> searchFriends(String searchTerm) {
         User currentUser = jwtService.getUser();
         List<User> foundFriends = friendsRepository.findUserFriendsWithSearch(currentUser.getId(), searchTerm);
         return foundFriends.stream()
                 .map(friend -> new PreviewUserDTO(friend.getId(), friend.getEmail()))
                 .toList();
+    }
+    public void deleteFriend(Integer friendId){
+        User friend = userRepository.findById(friendId).
+                orElseThrow(() -> new RuntimeException("Bad request"));
+
+        User currentUser = jwtService.getUser();
+        Friends friendsEntity = friendsRepository.areTwoUsersFriends(currentUser.getId(), friendId).
+                orElseThrow(() -> new RuntimeException("Bad request"));
+
+        friendsRepository.deleteById(friendsEntity.getId());
     }
 }
