@@ -53,8 +53,9 @@ public class FriendsController {
         return null;
     }
 
-    @DeleteMapping("/{friendId}")
-    public DeletedFriendDTO deleteFriend(@PathVariable Integer friendId){
-        return friendsService.deleteFriend(friendId);
+    @ResponseStatus(HttpStatus.OK)
+    @DeleteMapping("/{id}")
+    public DeletedFriendDTO deleteFriend(@PathVariable Integer id){
+        return friendsService.deleteFriend(id);
     }
 }
