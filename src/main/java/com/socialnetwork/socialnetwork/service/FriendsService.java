@@ -46,6 +46,10 @@ public class FriendsService {
 //        extracting user from JwtService
         User currentUser = jwtService.getUser();
 
+        if(currentUser.getId().equals(friend.getId())){
+            throw new RuntimeException("Can't send request to yourself");
+        }
+
 //        checking if they are alreaady friends
         if(friendsRepository.areTwoUsersFriends(currentUser.getId(),friend.getId()).isPresent()){
             throw new RuntimeException("These users are already friends");
