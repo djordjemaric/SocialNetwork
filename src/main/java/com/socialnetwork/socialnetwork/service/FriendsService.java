@@ -60,6 +60,7 @@ public class FriendsService {
                 .map(friend -> new PreviewUserDTO(friend.getId(), friend.getEmail()))
                 .toList();
     }
+
     public void deleteFriend(Integer friendId){
         User friend = userRepository.findById(friendId).
                 orElseThrow(() -> new RuntimeException("Bad request"));
