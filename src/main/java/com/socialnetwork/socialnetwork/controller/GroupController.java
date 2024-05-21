@@ -20,7 +20,7 @@ public class GroupController {
 
 
     @ResponseStatus(HttpStatus.OK)
-    @GetMapping("/find")
+    @GetMapping
     public List<GroupDto> getGroupsByName(@RequestParam String name) {
         return groupService.findByName(name);
     }
