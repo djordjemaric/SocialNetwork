@@ -25,6 +25,7 @@ public class PostService {
     private final FriendsRepository friendsRepository;
     private final GroupMemberRepository groupMemberRepository;
 
+
     public PostService(PostRepository postRepository, PostMapper postMapper, GroupRepository groupRepository, JwtService jwtService, UserRepository userRepository, FriendsRepository friendsRepository, GroupMemberRepository groupMemberRepository) {
         this.postRepository = postRepository;
         this.postMapper = postMapper;
@@ -35,16 +36,8 @@ public class PostService {
         this.groupMemberRepository = groupMemberRepository;
     }
 
-    private User validateAndGetUser() {
-        User user = jwtService.getUser();
-        if (!userRepository.existsByEmail(user.getEmail())) {
-            throw new NoSuchElementException("User with the email of " + user.getEmail() + " is not present in the database.");
-        }
-        return user;
-    }
-
     public GetPostDTO getById(Integer idPost) {
-        User user = validateAndGetUser();
+        User user = jwtService.getUser();
         Post post = postRepository.findById(idPost).orElseThrow(
                 () -> new NoSuchElementException("The post with the id of " + idPost + " is not present in the database."));
         if (!post.isPublic() && post.getGroup() != null) {
@@ -65,19 +58,19 @@ public class PostService {
     }
 
     public void createPostInGroup(CreatePostDTO postDTO) {
-        User user = validateAndGetUser();
+        User user = jwtService.getUser();
         Group group = groupRepository.findById(postDTO.idGroup()).orElseThrow(
                 () -> new NoSuchElementException("There is no group with the id of " + postDTO.idGroup()));
         postRepository.save(postMapper.createPostDTOtoPostInGroup(user.getId(), group, postDTO));
     }
 
     public void createPostOnTimeline(CreatePostDTO postDTO) {
-        User user = validateAndGetUser();
+        User user = jwtService.getUser();
         postRepository.save(postMapper.createPostDTOtoPostOnTimeline(user.getId(), postDTO));
     }
 
     public void updatePost(Integer idPost, UpdatePostDTO updatePostDTO) {
-        User user = validateAndGetUser();
+        User user = jwtService.getUser();
         Post post = postRepository.findById(idPost).orElseThrow(() ->
                 new NoSuchElementException("There is no post with the id of " + idPost));
         if (!(Objects.equals(post.getOwner().getId(), user.getId()))) {
