@@ -15,6 +15,7 @@ public class GroupController {
         this.groupService = groupService;
     }
 
+
     @ResponseStatus(HttpStatus.OK)
     @DeleteMapping("/{idGroup}")
     public void deleteGroup(@PathVariable Integer idGroup) {
