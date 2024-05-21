@@ -81,7 +81,7 @@ public class FriendsService {
         return new ResolvedFriendRequestDTO("Successfully became friends with: " + friendsEntity.getFriend().getEmail());
     }
 
-    public ResolvedFriendRequestDTO declineRequest(Integer friendRequestId){
+    public ResolvedFriendRequestDTO declineRequest(Integer friendRequestId) {
         User currentUser = jwtService.getUser();
 
         FriendRequest friendRequest = friendRequestRepository.findByIdAndTo_Id(friendRequestId, currentUser.getId())
@@ -89,6 +89,17 @@ public class FriendsService {
 
         friendRequestRepository.deleteById(friendRequestId);
 
-        return new ResolvedFriendRequestDTO( "Successfully declined a request with: " + friendRequest.getFrom().getEmail());
+        return new ResolvedFriendRequestDTO("Successfully declined a request with: " + friendRequest.getFrom().getEmail());
+    }
+
+    public void deleteFriend(Integer friendId){
+        User friend = userRepository.findById(friendId).
+                orElseThrow(() -> new RuntimeException("Bad request"));
+
+        User currentUser = jwtService.getUser();
+        Friends friendsEntity = friendsRepository.areTwoUsersFriends(currentUser.getId(), friendId).
+                orElseThrow(() -> new RuntimeException("Bad request"));
+
+        friendsRepository.deleteById(friendsEntity.getId());
     }
 }
