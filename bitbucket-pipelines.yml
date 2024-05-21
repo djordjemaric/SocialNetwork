@@ -12,5 +12,6 @@ definitions:
           - target/*.jar
 
 pipelines:
-  default:
-    - step: *build
+  branches:
+    master:
+      - step: *build
