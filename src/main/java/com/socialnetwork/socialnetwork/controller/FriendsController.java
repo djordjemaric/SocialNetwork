@@ -2,6 +2,7 @@ package com.socialnetwork.socialnetwork.controller;
 
 import com.socialnetwork.socialnetwork.dto.friendRequest.PreviewFriendRequestDTO;
 import com.socialnetwork.socialnetwork.dto.friendRequest.SentFriendRequestDTO;
+import com.socialnetwork.socialnetwork.dto.friends.DeletedFriendDTO;
 import com.socialnetwork.socialnetwork.service.FriendsService;
 import com.socialnetwork.socialnetwork.service.JwtService;
 import org.springframework.http.HttpStatus;
@@ -53,6 +54,7 @@ public class FriendsController {
     }
 
     @DeleteMapping("/{friendId}")
-    public void deleteFriend(@PathVariable Integer friendId){
+    public DeletedFriendDTO deleteFriend(@PathVariable Integer friendId){
+        return friendsService.deleteFriend(friendId);
     }
 }
