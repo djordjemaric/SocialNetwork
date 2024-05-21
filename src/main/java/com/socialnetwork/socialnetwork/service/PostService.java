@@ -35,16 +35,22 @@ public class PostService {
         this.groupMemberRepository = groupMemberRepository;
     }
 
-    public GetPostDTO getById(Integer idPost) {
+    private User validateAndGetUser() {
         User user = jwtService.getUser();
         if (!userRepository.existsByEmail(user.getEmail())) {
             throw new NoSuchElementException("User with the email of " + user.getEmail() + " is not present in the database.");
         }
+        return user;
+    }
+
+    public GetPostDTO getById(Integer idPost) {
+        User user = validateAndGetUser();
         Post post = postRepository.findById(idPost).orElseThrow(
                 () -> new NoSuchElementException("The post with the id of " + idPost + " is not present in the database."));
         if (!post.isPublic() && post.getGroup() != null) {
-            Friends friends = friendsRepository.areTwoUsersFriends(post.getOwner().getId(), user.getId())
-                    .orElseThrow(() -> new RuntimeException("You cannot see the post because you are not friends with the post owner."));
+            if (friendsRepository.areTwoUsersFriends(post.getOwner().getId(), user.getId()).isEmpty()) {
+                throw new RuntimeException("You cannot see the post because you are not friends with the post owner.");
+            }
         }
         if (post.getGroup() != null && !(post.getGroup().isPublic())) {
             if (!(groupMemberRepository.existsByUserIdAndGroupId(user.getId(), post.getGroup().getId()))) {
@@ -59,28 +65,19 @@ public class PostService {
     }
 
     public void createPostInGroup(CreatePostDTO postDTO) {
-        User user = jwtService.getUser();
-        if (!userRepository.existsByEmail(user.getEmail())) {
-            throw new NoSuchElementException("User with the email of " + user.getEmail() + " is not present in the database.");
-        }
+        User user = validateAndGetUser();
         Group group = groupRepository.findById(postDTO.idGroup()).orElseThrow(
                 () -> new NoSuchElementException("There is no group with the id of " + postDTO.idGroup()));
         postRepository.save(postMapper.createPostDTOtoPostInGroup(user.getId(), group, postDTO));
     }
 
     public void createPostOnTimeline(CreatePostDTO postDTO) {
-        User user = jwtService.getUser();
-        if (!userRepository.existsByEmail(user.getEmail())) {
-            throw new NoSuchElementException("User with the email of " + user.getEmail() + " is not present in the database.");
-        }
+        User user = validateAndGetUser();
         postRepository.save(postMapper.createPostDTOtoPostOnTimeline(user.getId(), postDTO));
     }
 
     public void updatePost(Integer idPost, UpdatePostDTO updatePostDTO) {
-        User user = jwtService.getUser();
-        if (!userRepository.existsByEmail(user.getEmail())) {
-            throw new NoSuchElementException("User with the email of " + user.getEmail() + " is not present in the database.");
-        }
+        User user = validateAndGetUser();
         Post post = postRepository.findById(idPost).orElseThrow(() ->
                 new NoSuchElementException("There is no post with the id of " + idPost));
         if (!(Objects.equals(post.getOwner().getId(), user.getId()))) {
