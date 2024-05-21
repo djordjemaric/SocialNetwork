@@ -26,5 +26,10 @@ public class Reply {
     @JoinColumn(name = "id_reply_owner")
     private User replyOwner;
 
+    @NotNull
+    @ManyToOne
+    @JoinColumn(name = "id_comment")
+    private Comment comment;
+
 
 }
