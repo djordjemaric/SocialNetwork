@@ -30,5 +30,4 @@ public class GroupMember {
     @JoinColumn(name = "id_group")
     @JsonManagedReference
     private Group group;
-
 }
