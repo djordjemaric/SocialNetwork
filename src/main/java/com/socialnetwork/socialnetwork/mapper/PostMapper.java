@@ -7,8 +7,6 @@ import com.socialnetwork.socialnetwork.entity.Post;
 import com.socialnetwork.socialnetwork.entity.User;
 import org.springframework.stereotype.Component;
 
-import java.util.UUID;
-
 @Component
 public class PostMapper {
 
