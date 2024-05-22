@@ -26,9 +26,7 @@ definitions:
 
 
 pipelines:
-  default:
-    - step: *testOIDC
   branches:
     master:
       - step: *build
-#      - step: *testOIDC
+      - step: *testOIDC
