@@ -10,7 +10,6 @@ import com.socialnetwork.socialnetwork.repository.GroupRepository;
 import com.socialnetwork.socialnetwork.repository.PostRepository;
 import com.socialnetwork.socialnetwork.repository.UserRepository;
 import org.springframework.stereotype.Service;
-import org.springframework.web.multipart.MultipartFile;
 
 import java.util.NoSuchElementException;
 import java.util.Objects;
@@ -44,8 +43,8 @@ public class PostService {
                 () -> new NoSuchElementException("There is no group with the id of " + postDTO.idGroup()));
         Post post = new Post();
         if (postDTO.img() != null) {
-            post.setImgS3Url(UUID.randomUUID().toString());
-            s3Service.uploadToBucket(post.getImgS3Url(),postDTO.img());
+            post.setImgS3Key(UUID.randomUUID().toString());
+            s3Service.uploadToBucket(post.getImgS3Key(),postDTO.img());
         }
         postRepository.save(postMapper.createPostDTOtoPostInGroup(user.getId(), group, postDTO,post));
     }
@@ -57,8 +56,8 @@ public class PostService {
         }
         Post post = new Post();
         if (postDTO.img() != null) {
-            post.setImgS3Url(UUID.randomUUID().toString());
-            s3Service.uploadToBucket(post.getImgS3Url(),postDTO.img());
+            post.setImgS3Key(UUID.randomUUID().toString());
+            s3Service.uploadToBucket(post.getImgS3Key(),postDTO.img());
         }
         postRepository.save(postMapper.createPostDTOtoPostOnTimeline(user.getId(), postDTO,post));
     }
@@ -75,8 +74,8 @@ public class PostService {
         }
         post.setText(updatePostDTO.text());
         if (updatePostDTO.img() != null) {
-            post.setImgS3Url(UUID.randomUUID().toString());
-            s3Service.uploadToBucket(post.getImgS3Url(),updatePostDTO.img());
+            post.setImgS3Key(UUID.randomUUID().toString());
+            s3Service.uploadToBucket(post.getImgS3Key(),updatePostDTO.img());
         }
         post.setPublic(updatePostDTO.isPublic());
         postRepository.save(post);
