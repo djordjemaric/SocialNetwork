@@ -40,7 +40,7 @@ public class PostService {
         Group group = groupRepository.findById(postDTO.idGroup()).orElseThrow(
                 () -> new NoSuchElementException("There is no group with the id of " + postDTO.idGroup()));
 
-        String imgS3Key = "";
+        String imgS3Key = null;
         if (postDTO.img() != null) {
             imgS3Key = s3Service.uploadToBucket(postDTO.img());
         }
