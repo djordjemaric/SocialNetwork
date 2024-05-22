@@ -60,39 +60,37 @@ public class GroupService {
 
         Group group = groupRepository.findById(idGroup).orElseThrow(() -> new FunctionArgumentException("Group does not exist!"));
 
-        if (group.isPublic()) {
-            return addUserAsAMemberToPublicGroup(idGroup);
-        }
-
-        //provera da li je user vec u toj grupi
-        if (groupMemberRepository.existsByUserIdAndGroupId(currentUser.getId(), idGroup)) {
-            throw new FunctionArgumentException("User is already in that group");
-        }
-
-        //provera da li je user vec u toj grupi
+        //provera da li postoji taj request
         if (groupRequestRepository.existsByUserIdAndGroupId(currentUser.getId(), idGroup)) {
             throw new FunctionArgumentException("Request already exist");
         }
 
-        GroupRequest groupRequest = groupRequestRepository.save(new GroupRequest(null, currentUser, group));
-
-
-        return new GroupRequest_MemberDto(groupRequest.getId(), currentUser, group, "Created request!");
-    }
-
-    public GroupRequest_MemberDto addUserAsAMemberToPublicGroup(Integer idGroup) {
-        User currentUser = jwtService.getUser();
-
-        Group group = groupRepository.findById(idGroup).orElseThrow(() -> new FunctionArgumentException("Group does not exist!"));
-
         //provera da li je user vec u toj grupi
         if (groupMemberRepository.existsByUserIdAndGroupId(currentUser.getId(), idGroup)) {
             throw new FunctionArgumentException("User is already in that group");
         }
-        GroupMember groupMember = groupMemberRepository.save(new GroupMember(null, currentUser, group));
 
+        //ako je grupa public dodajemo usera
+        if (group.isPublic()) {
+            return addUserAsAMemberToPublicGroup(currentUser, group);
+        }
 
-        return new GroupRequest_MemberDto(groupMember.getId(), currentUser, group, "User added as a member!");
+        return addUserAsAMemberToPrivateGroup(currentUser, group);
+    }
+
+    public GroupRequest_MemberDto addUserAsAMemberToPrivateGroup(User user, Group group) {
+
+        GroupRequest groupRequest = groupRequestRepository.save(new GroupRequest(null, user, group));
+
+        return new GroupRequest_MemberDto(groupRequest.getId(), user, group, "Created request!");
+
+    }
+
+    public GroupRequest_MemberDto addUserAsAMemberToPublicGroup(User user, Group group) {
+
+        GroupMember groupMember = groupMemberRepository.save(new GroupMember(null, user, group));
+
+        return new GroupRequest_MemberDto(groupMember.getId(), user, group, "User added as a member!");
 
     }
 
@@ -107,7 +105,7 @@ public class GroupService {
     }
 
     @Transactional
-     public void removeMember (Integer idGroup, Integer idUser){
+    public void removeMember(Integer idGroup, Integer idUser) {
 
         // need to check if the group with that admin and group id exists
         // need to check if the user is in the group and if he is the admin
@@ -115,15 +113,15 @@ public class GroupService {
         User admin = jwtService.getUser();
         if (!groupRepository.existsByAdminIdAndGroupId(admin.getId(), idGroup)) {
             throw new NoSuchElementException("There are no groups with that id: "
-                                            + idGroup + " and that admin: " + admin.getEmail());
-            }
+                    + idGroup + " and that admin: " + admin.getEmail());
+        }
         if (admin.getId().equals(idUser)) {
             throw new RuntimeException("Can't remove an admin from the group!");
-            }
+        }
         if (!groupMemberRepository.existsByUserIdAndGroupId(idUser, idGroup)) {
             throw new NoSuchElementException("User with that id: " + idUser
-                                            + " is not in this group: " + idGroup);
-            }
+                    + " is not in this group: " + idGroup);
+        }
         groupMemberRepository.deleteGroupMemberByGroupIdAndMemberId(idGroup, idUser);
     }
 
