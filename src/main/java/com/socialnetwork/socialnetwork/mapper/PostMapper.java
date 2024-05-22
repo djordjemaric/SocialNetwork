@@ -18,11 +18,8 @@ public class PostMapper {
         this.s3Service = s3Service;
     }
 
-    public Post createPostDTOtoPostInGroup(Integer idOwner, Group group, String imgS3Key, CreatePostDTO postDTO){
+    public Post createPostDTOtoPostInGroup(User owner, Group group, String imgS3Key, CreatePostDTO postDTO){
         Post post = new Post();
-
-        User owner=new User();
-        owner.setId(idOwner);
 
         post.setGroup(group);
         post.setPublic(group.isPublic());
@@ -30,16 +27,12 @@ public class PostMapper {
         post.setOwner(owner);
         post.setImgS3Key(imgS3Key);
 
-
         return post;
     }
 
-    public Post createPostDTOtoPostOnTimeline(Integer idOwner, String imgS3Key, CreatePostDTO postDTO){
+    public Post createPostDTOtoPostOnTimeline(User owner, String imgS3Key, CreatePostDTO postDTO){
 
         Post post = new Post();
-
-        User owner=new User();
-        owner.setId(idOwner);
 
         post.setPublic(postDTO.isPublic());
         post.setText(postDTO.text());
@@ -59,7 +52,7 @@ public class PostMapper {
     }
 
     public PostDTO postToPostDTO(Post post) {
-    String groupName = "";
+    String groupName = null;
     if (post.getGroup() != null) {
         groupName = post.getGroup().getName();
     }

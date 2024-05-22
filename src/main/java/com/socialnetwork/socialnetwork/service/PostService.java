@@ -9,6 +9,7 @@ import com.socialnetwork.socialnetwork.entity.User;
 import com.socialnetwork.socialnetwork.mapper.PostMapper;
 import com.socialnetwork.socialnetwork.repository.GroupRepository;
 import com.socialnetwork.socialnetwork.repository.PostRepository;
+import com.socialnetwork.socialnetwork.repository.UserRepository;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 
@@ -45,7 +46,7 @@ public class PostService {
                 () -> new NoSuchElementException("There is no group with the id of " + postDTO.idGroup()));
 
         String imgS3Key = uploadImageAndGetKey(postDTO.img());
-        Post post = postMapper.createPostDTOtoPostInGroup(user.getId(), group, imgS3Key, postDTO);
+        Post post = postMapper.createPostDTOtoPostInGroup(user, group, imgS3Key, postDTO);
         post = postRepository.save(post);
         return postMapper.postToPostDTO(post);
     }
@@ -53,7 +54,7 @@ public class PostService {
     public PostDTO createPostOnTimeline(CreatePostDTO postDTO) {
         User user = jwtService.getUser();
         String imgS3Key = uploadImageAndGetKey(postDTO.img());
-        Post post = postMapper.createPostDTOtoPostOnTimeline(user.getId(), imgS3Key, postDTO);
+        Post post = postMapper.createPostDTOtoPostOnTimeline(user, imgS3Key, postDTO);
         post = postRepository.save(post);
         return postMapper.postToPostDTO(post);
     }
