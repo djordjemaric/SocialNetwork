@@ -1,5 +1,6 @@
 package com.socialnetwork.socialnetwork.controller;
 
+import com.socialnetwork.socialnetwork.dto.post.CommentDTO;
 import com.socialnetwork.socialnetwork.dto.post.CreateCommentDTO;
 import com.socialnetwork.socialnetwork.dto.post.CreatePostDTO;
 import com.socialnetwork.socialnetwork.dto.post.UpdatePostDTO;
@@ -8,6 +9,7 @@ import com.socialnetwork.socialnetwork.entity.Post;
 import com.socialnetwork.socialnetwork.service.CommentService;
 import com.socialnetwork.socialnetwork.service.PostService;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.*;
 
 @RestController
@@ -37,9 +39,12 @@ public class PostController {
         postService.updatePost(idPost, postDTO);
     }
 
+    @ResponseStatus(HttpStatus.CREATED)
     @PostMapping("/{postId}/comments")
-    public Comment saveComment(@PathVariable Integer idPost, @RequestBody CreateCommentDTO commentDTO) {
-        return commentService.createComment(idPost, commentDTO);
+    public CommentDTO saveComment(@PathVariable Integer idPost, @RequestBody CreateCommentDTO commentDTO) {
+        return commentService.createComment(idPost,commentDTO);
+
     }
 
-}
+
+    }
