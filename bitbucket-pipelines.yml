@@ -1,5 +1,7 @@
 image: maven:3.9.6-amazoncorretto-17
 
+
+
 definitions:
   steps:
     - step: &build
@@ -11,7 +13,19 @@ definitions:
         artifacts:
           - target/*.jar
 
+
+
 pipelines:
+  default:
+    - step:
+        name: Testing aws openID connect
+        oidc: true
+        script:
+          - export eu-central-1
+          - export AWS_ROLE_ARN=arn:aws:iam::211125711045:role/bitbucket_oidc_role
+          - export AWS_WEB_IDENTITY_TOKEN_FILE=$(pwd)/web-identity-token
+          - echo $BITBUCKET_STEP_OIDC_TOKEN > $(pwd)/web-identity-token
+          - aws s3 ls
   branches:
     master:
       - step: *build
