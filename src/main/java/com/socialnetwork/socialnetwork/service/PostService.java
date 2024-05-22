@@ -1,6 +1,7 @@
 package com.socialnetwork.socialnetwork.service;
 
 import com.socialnetwork.socialnetwork.dto.post.CreatePostDTO;
+import com.socialnetwork.socialnetwork.dto.post.PostDTO;
 import com.socialnetwork.socialnetwork.dto.post.UpdatePostDTO;
 import com.socialnetwork.socialnetwork.entity.Group;
 import com.socialnetwork.socialnetwork.entity.Post;
@@ -8,7 +9,6 @@ import com.socialnetwork.socialnetwork.entity.User;
 import com.socialnetwork.socialnetwork.mapper.PostMapper;
 import com.socialnetwork.socialnetwork.repository.GroupRepository;
 import com.socialnetwork.socialnetwork.repository.PostRepository;
-import com.socialnetwork.socialnetwork.repository.UserRepository;
 import org.springframework.stereotype.Service;
 
 import java.util.NoSuchElementException;
@@ -31,7 +31,7 @@ public class PostService {
         this.s3Service = s3Service;
     }
 
-    public void createPostInGroup(CreatePostDTO postDTO) {
+    public PostDTO createPostInGroup(CreatePostDTO postDTO) {
         User user = jwtService.getUser();
 
         Group group = groupRepository.findById(postDTO.idGroup()).orElseThrow(
@@ -42,21 +42,22 @@ public class PostService {
             imgS3Key = s3Service.uploadToBucket(postDTO.img());
         }
         Post post = postMapper.createPostDTOtoPostInGroup(user.getId(), group, imgS3Key, postDTO);
-
-        postRepository.save(post);
+        post = postRepository.save(post);
+        return postMapper.postToPostDTO(post);
     }
 
-    public void createPostOnTimeline(CreatePostDTO postDTO) {
+    public PostDTO createPostOnTimeline(CreatePostDTO postDTO) {
         User user = jwtService.getUser();
         String imgS3Key = null;
         if (postDTO.img() != null) {
             imgS3Key = s3Service.uploadToBucket(postDTO.img());
         }
         Post post = postMapper.createPostDTOtoPostOnTimeline(user.getId(), imgS3Key, postDTO);
-        postRepository.save(post);
+        post = postRepository.save(post);
+        return postMapper.postToPostDTO(post);
     }
 
-    public void updatePost(Integer idPost, UpdatePostDTO updatePostDTO) {
+    public PostDTO updatePost(Integer idPost, UpdatePostDTO updatePostDTO) {
         User user = jwtService.getUser();
 
         Post post = postRepository.findById(idPost).orElseThrow(() ->
@@ -72,6 +73,7 @@ public class PostService {
             imgS3Key = s3Service.uploadToBucket(updatePostDTO.img());
         }
         post = postMapper.updatePostDTOtoPost(updatePostDTO, imgS3Key, post);
-        postRepository.save(post);
+        post = postRepository.save(post);
+        return postMapper.postToPostDTO(post);
     }
 }

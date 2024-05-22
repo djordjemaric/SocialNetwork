@@ -6,10 +6,17 @@ import com.socialnetwork.socialnetwork.dto.post.UpdatePostDTO;
 import com.socialnetwork.socialnetwork.entity.Group;
 import com.socialnetwork.socialnetwork.entity.Post;
 import com.socialnetwork.socialnetwork.entity.User;
+import com.socialnetwork.socialnetwork.service.S3Service;
 import org.springframework.stereotype.Component;
 
 @Component
 public class PostMapper {
+
+    private final S3Service s3Service;
+
+    public PostMapper(S3Service s3Service) {
+        this.s3Service = s3Service;
+    }
 
     public Post createPostDTOtoPostInGroup(Integer idOwner, Group group, String imgS3Key, CreatePostDTO postDTO){
         Post post = new Post();
@@ -51,15 +58,19 @@ public class PostMapper {
         return post;
     }
 
-    public PostDTO postToPostDTO(Post post, String imageUrl) {
+    public PostDTO postToPostDTO(Post post) {
     String groupName = "";
     if (post.getGroup() != null) {
         groupName = post.getGroup().getName();
     }
+        String imgURL = "";
+        if (post.getImgS3Key() != null) {
+            imgURL = s3Service.createPresignedDownloadUrl(post.getImgS3Key());
+        }
     return new PostDTO(
             post.getId(),
             post.getText(),
-            imageUrl,
+            imgURL,
             post.getOwner().getEmail(),
             groupName,
             post.getComments());
