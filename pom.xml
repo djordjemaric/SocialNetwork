@@ -126,6 +126,11 @@
 			<artifactId>junit</artifactId>
 			<scope>test</scope>
 		</dependency>
+		<dependency>
+			<groupId>org.jacoco</groupId>
+			<artifactId>jacoco-maven-plugin</artifactId>
+			<version>0.8.12</version>
+		</dependency>
 	</dependencies>
 
 	<build>
@@ -149,5 +154,21 @@
 			</plugin>
 		</plugins>
 	</build>
+
+	<reporting>
+		<plugins>
+		  <plugin>
+			<groupId>org.jacoco</groupId>
+			<artifactId>jacoco-maven-plugin</artifactId>
+			<reportSets>
+			  <reportSet>
+				<reports>
+				  <report>report</report>
+				</reports>
+			  </reportSet>
+			</reportSets>
+		  </plugin>
+		</plugins>
+  	</reporting>
 
 </project>

@@ -12,11 +12,13 @@ definitions:
           - target/*.jar
 
     - step: &test
-        name: Run Tests
+        name: Run Tests and Generate Coverage Report
         caches:
           - maven
         script:
-          - mvn -B test -Dtest=GroupControllerTests,GroupServiceTests --file pom.xml
+          - mvn -B test jacoco:report -Dtest=GroupControllerTests,GroupServiceTests --file pom.xml
+        artifacts:
+          - target/site/jacoco/*
 
 pipelines:
   default:
