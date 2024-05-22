@@ -2,12 +2,10 @@ package com.socialnetwork.socialnetwork.controller;
 
 import com.socialnetwork.socialnetwork.dto.GroupDto;
 import com.socialnetwork.socialnetwork.dto.group.CreateGroupDto;
-import com.socialnetwork.socialnetwork.dto.post.PostDto;
-import com.socialnetwork.socialnetwork.entity.Group;
-import com.socialnetwork.socialnetwork.entity.Post;
+import com.socialnetwork.socialnetwork.dto.post.PostDTO;
+import com.socialnetwork.socialnetwork.service.GroupService;
 import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.*;
-import com.socialnetwork.socialnetwork.service.GroupService;
 
 import java.util.List;
 
@@ -29,11 +27,23 @@ public class GroupController {
         return groupService.createGroup(createGroupDto);
     }
 
+    @DeleteMapping("/{idGroup}/leave")
+    @ResponseStatus(HttpStatus.OK)
+    public void leaveGroup(@PathVariable Integer idGroup) {
+        groupService.leaveGroup(idGroup);
+    }
 
     @ResponseStatus(HttpStatus.OK)
-    @GetMapping("/posts/{idGroup}")
-    public List<PostDto> getAllPostsByGroupId(@PathVariable Integer idGroup) {
-        return groupService.getAllPostsByGroupId(idGroup);
+    @DeleteMapping( "/{idGroup}/members/{idUser}") // idGroup and idUser that we want to remove
+    public void removeMember (@PathVariable Integer idGroup, @PathVariable Integer idUser)
+    {
+        groupService.removeMember(idGroup, idUser);
+    }
+
+    @ResponseStatus(HttpStatus.OK)
+    @GetMapping("/{id}/posts")
+    public List<PostDTO> getAllPostsByGroupId(@PathVariable Integer id) {
+        return groupService.getAllPostsByGroupId(id);
     }
 
 }

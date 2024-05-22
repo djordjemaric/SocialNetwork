@@ -56,7 +56,6 @@ public class UserService {
     }
 
     public LoginResponse loginUser(String email, String password) {
-
         return cognitoService.loginUser(email, password);
     }
 

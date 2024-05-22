@@ -1,6 +1,5 @@
 package com.socialnetwork.socialnetwork.repository;
 
-import com.socialnetwork.socialnetwork.entity.FriendRequest;
 import com.socialnetwork.socialnetwork.entity.Friends;
 import com.socialnetwork.socialnetwork.entity.User;
 import org.springframework.data.jpa.repository.JpaRepository;
