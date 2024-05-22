@@ -28,19 +28,19 @@ public class GroupController {
     }
 
     @ResponseStatus(HttpStatus.OK)
-    @GetMapping( "/requests/{idGroup}")
+    @GetMapping( "/{idGroup}/requests")
     public List<GroupRequestDto> getAllRequestForGroup(@PathVariable Integer idGroup) {
         return groupService.getAllRequestsForGroup(idGroup);
     }
 
     @ResponseStatus(HttpStatus.CREATED)
-    @PostMapping( "/accept/{idUser}/{idGroup}")
+    @PostMapping( "/{idUser}/{idGroup}/accept")
     public GroupMemberDto acceptRequest(@PathVariable Integer idUser, @PathVariable Integer idGroup) {
         return groupService.acceptRequest(idUser,idGroup);
     }
 
     @ResponseStatus(HttpStatus.OK)
-    @PostMapping("/reject/{idUser}/{idGroup}")
+    @PostMapping("/{idUser}/{idGroup}/reject")
     public void rejectRequest(@PathVariable Integer idUser,@PathVariable Integer idGroup) {
         groupService.rejectRequest(idUser,idGroup);
     }
