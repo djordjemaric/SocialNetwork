@@ -39,6 +39,9 @@ public class PostService {
         User user = jwtService.getUser();
         Group group = groupRepository.findById(postDTO.idGroup()).orElseThrow(
                 () -> new NoSuchElementException("There is no group with the id of " + postDTO.idGroup()));
+        if (!groupMemberRepository.existsByUserIdAndGroupId(user.getId(), postDTO.idGroup())) {
+            throw new RuntimeException("You cannot create post because you are not a member of this group.");
+        }
         Post post = new Post();
         if (postDTO.img() != null) {
             post.setImgS3Url(UUID.randomUUID().toString());
@@ -46,7 +49,7 @@ public class PostService {
         }
         Post createdPost = postRepository.save(postMapper.createPostDTOtoPostInGroup(user.getId(), group, postDTO, post));
         String imgURL = "";
-        if (post.getImgS3Url() != null) {
+        if (createdPost.getImgS3Url() != null) {
             imgURL = s3Service.createPresignedDownloadUrl(createdPost.getImgS3Url());
         }
         return postMapper.postToPostDTO(createdPost, imgURL);
