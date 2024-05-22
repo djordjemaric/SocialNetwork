@@ -1,9 +1,9 @@
 package com.socialnetwork.socialnetwork.controller;
 
-import com.socialnetwork.socialnetwork.dto.CreateGroupDto;
-import com.socialnetwork.socialnetwork.dto.GroupDto;
+import com.socialnetwork.socialnetwork.dto.group.CreateGroupDto;
+import com.socialnetwork.socialnetwork.dto.group.GroupDto;
 import com.socialnetwork.socialnetwork.service.GroupService;
-import com.socialnetwork.socialnetwork.dto.GroupRequest_MemberDto;
+import com.socialnetwork.socialnetwork.dto.group.GroupRequest_MemberDto;
 import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.*;
 

@@ -1,4 +1,4 @@
-package com.socialnetwork.socialnetwork.dto;
+package com.socialnetwork.socialnetwork.dto.group;
 
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
