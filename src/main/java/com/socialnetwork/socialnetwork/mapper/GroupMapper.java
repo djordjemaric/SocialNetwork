@@ -3,8 +3,6 @@ package com.socialnetwork.socialnetwork.mapper;
 import com.socialnetwork.socialnetwork.dto.GroupDto;
 import com.socialnetwork.socialnetwork.dto.group.CreateGroupDto;
 import com.socialnetwork.socialnetwork.entity.Group;
-import com.socialnetwork.socialnetwork.entity.GroupMember;
-
 import com.socialnetwork.socialnetwork.entity.User;
 import org.springframework.stereotype.Component;
 

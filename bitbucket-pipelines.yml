@@ -1,0 +1,17 @@
+image: maven:3.9.6-amazoncorretto-17
+
+definitions:
+  steps:
+    - step: &build
+        name: Build the application
+        caches:
+          - maven
+        script:
+          - mvn -B clean package -DskipTests --file pom.xml
+        artifacts:
+          - target/*.jar
+
+pipelines:
+  branches:
+    master:
+      - step: *build

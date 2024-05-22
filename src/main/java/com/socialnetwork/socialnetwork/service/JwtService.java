@@ -19,7 +19,8 @@ public class JwtService {
 
     public User getUser(){
         String userSub = getUserSub();
-        return userRepository.findByUserSub(userSub).orElseThrow(() -> new RuntimeException("User not found"));
+        return userRepository.findByUserSub(userSub)
+                .orElseThrow(() -> new RuntimeException("User not found"));
     }
 
     public String getUserSub(){
