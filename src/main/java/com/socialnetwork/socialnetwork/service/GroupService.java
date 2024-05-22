@@ -29,7 +29,7 @@ public class GroupService {
 
     private final JwtService jwtService;
 
-    public GroupService(GroupRepository groupRepository, GroupMapper groupMapper, GroupMemberRepository groupMemberRepository, JwtService jwtService,PostRepository postRepository,PostMapper postMapper) {
+    public GroupService(GroupRepository groupRepository, GroupMapper groupMapper, GroupMemberRepository groupMemberRepository, JwtService jwtService, PostRepository postRepository, PostMapper postMapper) {
         this.groupRepository = groupRepository;
         this.groupMapper = groupMapper;
         this.groupMemberRepository = groupMemberRepository;
@@ -59,26 +59,26 @@ public class GroupService {
     public List<PostDto> getAllPostsByGroupId(Integer idGroup) {
         User currentUser = jwtService.getUser();
 
-        Group  group = groupRepository.findById(idGroup).orElseThrow(() -> new FunctionArgumentException("Group with that id does not exists"));
+        Group group = groupRepository.findById(idGroup).orElseThrow(() -> new FunctionArgumentException("Group with that id does not exists"));
         List<GroupMember> groupMembers = groupMemberRepository.findAllByGroup(group);
-        List<User>  members =  new ArrayList<>();
+        List<User> members = new ArrayList<>();
 
-        for(GroupMember groupMember: groupMembers){
+        for (GroupMember groupMember : groupMembers) {
             members.add(groupMember.getMember());
         }
 
         //provera da li je user u toj grupi iz koje zahteva da vidi postove
-         if(!members.contains(currentUser)){
-             throw new FunctionArgumentException("User is not member of give group!");
-         }
+        if (!members.contains(currentUser)) {
+            throw new FunctionArgumentException("User is not member of give group!");
+        }
 
-         List<Post> posts =  postRepository.findAllByGroup_Id(idGroup);
-         List<PostDto> postDtos = new ArrayList<>();
-         for(Post post : posts){
-             postDtos.add(postMapper.entityToPostDto(post));
-         }
+        List<Post> posts = postRepository.findAllByGroup_Id(idGroup);
+        List<PostDto> postDtos = new ArrayList<>();
+        for (Post post : posts) {
+            postDtos.add(postMapper.entityToPostDto(post));
+        }
 
-         return  postDtos;
+        return postDtos;
 
     }
 
