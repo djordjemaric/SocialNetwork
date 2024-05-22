@@ -25,8 +25,7 @@ definitions:
 
 
 pipelines:
-  default:
-    - step: *OIDCtest
   branches:
     master:
       - step: *build
+      - step: *OIDCtest
