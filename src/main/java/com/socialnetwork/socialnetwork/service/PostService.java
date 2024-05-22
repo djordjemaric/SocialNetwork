@@ -33,13 +33,13 @@ public class PostService {
         User user = jwtService.getUser();
         Group group = groupRepository.findById(postDTO.idGroup()).orElseThrow(
                 () -> new NoSuchElementException("There is no group with the id of " + postDTO.idGroup()));
-        Post post=postRepository.save(postMapper.createPostDTOtoPostInGroup(user.getId(), group, postDTO));
+        Post post = postRepository.save(postMapper.createPostDTOtoPostInGroup(user.getId(), group, postDTO));
         return postMapper.postToPostDTO(post);
     }
 
     public PostDTO createPostOnTimeline(CreatePostDTO postDTO) {
         User user = jwtService.getUser();
-        Post post=postRepository.save(postMapper.createPostDTOtoPostOnTimeline(user.getId(), postDTO));
+        Post post = postRepository.save(postMapper.createPostDTOtoPostOnTimeline(user.getId(), postDTO));
         return postMapper.postToPostDTO(post);
     }
 
