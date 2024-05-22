@@ -31,5 +31,11 @@ public class S3Service {
         }
     }
 
+    public void deleteFromBucket(String key) {
+        s3Template.deleteObject(bucketName, key);
+    }
+
+
+
 
 }

@@ -74,6 +74,9 @@ public class PostService {
         }
         post.setText(updatePostDTO.text());
         if (updatePostDTO.img() != null) {
+            if (post.getImgS3Key() != null) {
+                s3Service.deleteFromBucket(post.getImgS3Key());
+            }
             post.setImgS3Key(UUID.randomUUID().toString());
             s3Service.uploadToBucket(post.getImgS3Key(), updatePostDTO.img());
         }
