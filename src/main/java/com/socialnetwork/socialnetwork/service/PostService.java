@@ -23,18 +23,14 @@ public class PostService {
     private final JwtService jwtService;
     private final UserRepository userRepository;
     private final S3Service s3Service;
-    private final FriendsRepository friendsRepository;
-    private final GroupMemberRepository groupMemberRepository;
 
-    public PostService(PostRepository postRepository, PostMapper postMapper, GroupRepository groupRepository, JwtService jwtService, UserRepository userRepository, S3Service s3Service, FriendsRepository friendsRepository, GroupMemberRepository groupMemberRepository) {
+    public PostService(PostRepository postRepository, PostMapper postMapper, GroupRepository groupRepository, JwtService jwtService, UserRepository userRepository, S3Service s3Service) {
         this.postRepository = postRepository;
         this.postMapper = postMapper;
         this.groupRepository = groupRepository;
         this.jwtService = jwtService;
         this.userRepository = userRepository;
         this.s3Service = s3Service;
-        this.friendsRepository = friendsRepository;
-        this.groupMemberRepository = groupMemberRepository;
     }
 
     public PostDTO createPostInGroup(CreatePostDTO postDTO) {
