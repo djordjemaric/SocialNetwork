@@ -1,6 +1,6 @@
 package com.socialnetwork.socialnetwork.service;
 
-import com.socialnetwork.socialnetwork.dto.GroupDto;
+import com.socialnetwork.socialnetwork.dto.group.GroupDto;
 import com.socialnetwork.socialnetwork.dto.group.CreateGroupDto;
 import com.socialnetwork.socialnetwork.dto.post.PostDTO;
 import com.socialnetwork.socialnetwork.entity.Group;

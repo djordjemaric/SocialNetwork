@@ -1,4 +1,4 @@
-package com.socialnetwork.socialnetwork.dto;
+package com.socialnetwork.socialnetwork.dto.group;
 
 public record GroupDto ( String name,
                          String adminEmail,
