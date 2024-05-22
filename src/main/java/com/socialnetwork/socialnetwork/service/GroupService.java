@@ -62,19 +62,19 @@ public class GroupService {
         User currentUser = jwtService.getUser();
 
         //provera da li postoji grupa sa tim id-jem
-        if(!groupRepository.existsById(idGroup)){
+        if (!groupRepository.existsById(idGroup)) {
             throw new FunctionArgumentException("Group with that id does not exists");
         }
 
         //provera da li je user member te grupe
-        if (!groupMemberRepository.existsByUserIdAndGroupId(currentUser.getId(), idGroup)){
+        if (!groupMemberRepository.existsByUserIdAndGroupId(currentUser.getId(), idGroup)) {
             throw new FunctionArgumentException("User is not member of give group!");
         }
 
         List<Post> posts = postRepository.findAllByGroup_Id(idGroup);
 
         return posts.stream()
-                .map(post -> new PostDTO(post.getId(),post.getText(),post.getImgUrl(),post.getOwner().getEmail(),post.getGroup().getName(),post.getComments()))
+                .map(post -> new PostDTO(post.getId(), post.getText(), post.getImgUrl(), post.getOwner().getEmail(), post.getGroup().getName(), post.getComments()))
                 .toList();
 
     }
