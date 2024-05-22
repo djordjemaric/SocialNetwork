@@ -26,7 +26,7 @@ public class PostController {
         }
     }
 
-    @PutMapping("post/{idPost}")
+    @PutMapping("{idPost}")
     public void update(@PathVariable Integer idPost, @ModelAttribute UpdatePostDTO postDTO){
         postService.updatePost(idPost, postDTO);
     }

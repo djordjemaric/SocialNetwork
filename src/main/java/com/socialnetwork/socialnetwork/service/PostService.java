@@ -36,51 +36,45 @@ public class PostService {
 
     public void createPostInGroup(CreatePostDTO postDTO) {
         User user = jwtService.getUser();
-        if (!userRepository.existsByEmail(user.getEmail())) {
-            throw new NoSuchElementException("User with the email of " + user.getEmail() + " is not present in the database.");
-        }
+
         Group group = groupRepository.findById(postDTO.idGroup()).orElseThrow(
                 () -> new NoSuchElementException("There is no group with the id of " + postDTO.idGroup()));
-        Post post = new Post();
+
+        String imgS3Key = "";
         if (postDTO.img() != null) {
-            post.setImgS3Key(UUID.randomUUID().toString());
-            s3Service.uploadToBucket(post.getImgS3Key(), postDTO.img());
+            imgS3Key = s3Service.uploadToBucket(postDTO.img());
         }
-        postRepository.save(postMapper.createPostDTOtoPostInGroup(user.getId(), group, postDTO, post));
+        Post post = postMapper.createPostDTOtoPostInGroup(user.getId(), group, imgS3Key, postDTO);
+
+        postRepository.save(post);
     }
 
     public void createPostOnTimeline(CreatePostDTO postDTO) {
         User user = jwtService.getUser();
-        if (!userRepository.existsByEmail(user.getEmail())) {
-            throw new NoSuchElementException("User with the email of " + user.getEmail() + " is not present in the database.");
-        }
-        Post post = new Post();
+        String imgS3Key = null;
         if (postDTO.img() != null) {
-            post.setImgS3Key(UUID.randomUUID().toString());
-            s3Service.uploadToBucket(post.getImgS3Key(), postDTO.img());
+            imgS3Key = s3Service.uploadToBucket(postDTO.img());
         }
-        postRepository.save(postMapper.createPostDTOtoPostOnTimeline(user.getId(), postDTO, post));
+        Post post = postMapper.createPostDTOtoPostOnTimeline(user.getId(), imgS3Key, postDTO);
+        postRepository.save(post);
     }
 
     public void updatePost(Integer idPost, UpdatePostDTO updatePostDTO) {
         User user = jwtService.getUser();
-        if (!userRepository.existsByEmail(user.getEmail())) {
-            throw new NoSuchElementException("User with the email of " + user.getEmail() + " is not present in the database.");
-        }
+
         Post post = postRepository.findById(idPost).orElseThrow(() ->
                 new NoSuchElementException("There is no post with the id of " + idPost));
         if (!(Objects.equals(post.getOwner().getId(), user.getId()))) {
             throw new RuntimeException("User is not the owner!");
         }
-        post.setText(updatePostDTO.text());
+        String imgS3Key = null;
         if (updatePostDTO.img() != null) {
             if (post.getImgS3Key() != null) {
-                s3Service.deleteFromBucket(post.getImgS3Key());
+                   s3Service.deleteFromBucket(post.getImgS3Key());
             }
-            post.setImgS3Key(UUID.randomUUID().toString());
-            s3Service.uploadToBucket(post.getImgS3Key(), updatePostDTO.img());
+            imgS3Key = s3Service.uploadToBucket(updatePostDTO.img());
         }
-        post.setPublic(updatePostDTO.isPublic());
+        post = postMapper.updatePostDTOtoPost(updatePostDTO, imgS3Key, post);
         postRepository.save(post);
     }
 }
