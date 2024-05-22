@@ -1,4 +1,4 @@
-image: maven:3.9.6-amazoncorretto-17
+image: maven:3.9.6-openjdk-17
 
 definitions:
   steps:
@@ -11,7 +11,14 @@ definitions:
         artifacts:
           - target/*.jar
 
+    - step: &test
+        name: Run Tests
+        caches:
+          - maven
+        script:
+          - mvn -B test -Dtest=GroupControllerTests,GroupServiceTests --file pom.xml
+
 pipelines:
-  branches:
-    master:
-      - step: *build
+  default:
+    - step: *build
+    - step: *test
