@@ -1,7 +1,7 @@
 package com.socialnetwork.socialnetwork.controller;
 
-import com.socialnetwork.socialnetwork.dto.group.GroupDto;
-import com.socialnetwork.socialnetwork.dto.group.CreateGroupDto;
+import com.socialnetwork.socialnetwork.dto.group.GroupDTO;
+import com.socialnetwork.socialnetwork.dto.group.CreateGroupDTO;
 import com.socialnetwork.socialnetwork.dto.post.PostDTO;
 import com.socialnetwork.socialnetwork.service.GroupService;
 import org.springframework.http.HttpStatus;
@@ -23,7 +23,7 @@ public class GroupController {
 
     @ResponseStatus(HttpStatus.CREATED)
     @PostMapping
-    public GroupDto createGroup(@RequestBody CreateGroupDto createGroupDto) {
+    public GroupDTO createGroup(@RequestBody CreateGroupDTO createGroupDto) {
         return groupService.createGroup(createGroupDto);
     }
 

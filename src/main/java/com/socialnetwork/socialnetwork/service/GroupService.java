@@ -1,7 +1,7 @@
 package com.socialnetwork.socialnetwork.service;
 
-import com.socialnetwork.socialnetwork.dto.group.CreateGroupDto;
-import com.socialnetwork.socialnetwork.dto.group.GroupDto;
+import com.socialnetwork.socialnetwork.dto.group.CreateGroupDTO;
+import com.socialnetwork.socialnetwork.dto.group.GroupDTO;
 import com.socialnetwork.socialnetwork.dto.post.PostDTO;
 import com.socialnetwork.socialnetwork.entity.Group;
 import com.socialnetwork.socialnetwork.entity.GroupMember;
@@ -16,7 +16,6 @@ import org.hibernate.query.sqm.produce.function.FunctionArgumentException;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import java.util.ArrayList;
 import java.util.List;
 import java.util.NoSuchElementException;
 
@@ -40,7 +39,7 @@ public class GroupService {
         this.jwtService = jwtService;
     }
 
-    public GroupDto createGroup(CreateGroupDto group) {
+    public GroupDTO createGroup(CreateGroupDTO group) {
         User currentUser = jwtService.getUser();
 
         //provera da li postoji grupa sa tim imenom
