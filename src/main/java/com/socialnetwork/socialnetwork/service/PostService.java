@@ -39,7 +39,7 @@ public class PostService {
         User user = jwtService.getUser();
         Post post = postRepository.findById(idPost).orElseThrow(
                 () -> new NoSuchElementException("The post with the id of " + idPost + " is not present in the database."));
-        if (!post.isPublic() && post.getGroup() != null) {
+        if (!post.isPublic() && post.getGroup() == null) {
             if (friendsRepository.areTwoUsersFriends(post.getOwner().getId(), user.getId()).isEmpty()) {
                 throw new RuntimeException("You cannot see the post because you are not friends with the post owner.");
             }
