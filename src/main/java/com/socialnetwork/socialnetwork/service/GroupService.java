@@ -26,7 +26,7 @@ public class GroupService {
 
     private final JwtService jwtService;
 
-    prvice(GroupRepository groupRepository, GroupMapper groupMapper, GroupMemberRepository groupMemberRepository, UserRepository userRepository, JwtService jwtService) {ublic GroupSe
+    public GroupService(GroupRepository groupRepository, GroupMapper groupMapper, GroupMemberRepository groupMemberRepository, UserRepository userRepository, JwtService jwtService) {
         this.groupRepository = groupRepository;
         this.groupMapper = groupMapper;
         this.groupMemberRepository = groupMemberRepository;

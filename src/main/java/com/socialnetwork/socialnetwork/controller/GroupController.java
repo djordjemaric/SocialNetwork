@@ -5,7 +5,6 @@ import com.socialnetwork.socialnetwork.dto.group.CreateGroupDto;
 import com.socialnetwork.socialnetwork.service.GroupService;
 import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.*;
-import com.socialnetwork.socialnetwork.service.GroupService;
 
 
 @RestController
