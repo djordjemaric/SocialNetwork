@@ -4,6 +4,7 @@ import com.socialnetwork.socialnetwork.dto.post.CreatePostDTO;
 import com.socialnetwork.socialnetwork.dto.post.PostDTO;
 import com.socialnetwork.socialnetwork.dto.post.UpdatePostDTO;
 import com.socialnetwork.socialnetwork.service.PostService;
+import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.*;
 
 @RestController
@@ -17,6 +18,7 @@ public class PostController {
     }
 
 
+    @ResponseStatus(HttpStatus.CREATED)
     @PostMapping
     public PostDTO save(@RequestBody CreatePostDTO postDTO) {
         if (postDTO.idGroup() == null) {
@@ -25,6 +27,7 @@ public class PostController {
         return postService.createPostInGroup(postDTO);
     }
 
+    @ResponseStatus(HttpStatus.OK)
     @PutMapping("/{id}")
     public PostDTO update(@PathVariable Integer id, @RequestBody UpdatePostDTO postDTO) {
         return postService.updatePost(id, postDTO);
