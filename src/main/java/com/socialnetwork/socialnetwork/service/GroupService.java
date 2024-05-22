@@ -65,7 +65,7 @@ public class GroupService {
             throw new FunctionArgumentException("User is already in that group");
         }
 
-        GroupRequest groupRequest =  groupRequestRepository.save(new GroupRequest(null, currentUser, group));
+        GroupRequest groupRequest = groupRequestRepository.save(new GroupRequest(null, currentUser, group));
 
 
         return new GroupRequest_MemberDto(groupRequest.getId(), currentUser, group, "Created request!");
@@ -80,7 +80,7 @@ public class GroupService {
         if (groupMemberRepository.existsByUserIdAndGroupId(currentUser.getId(), idGroup)) {
             throw new FunctionArgumentException("User is already in that group");
         }
-        GroupMember groupMember =  groupMemberRepository.save(new GroupMember(null, currentUser, group));
+        GroupMember groupMember = groupMemberRepository.save(new GroupMember(null, currentUser, group));
 
 
         return new GroupRequest_MemberDto(groupMember.getId(), currentUser, group, "User added as a member!");
