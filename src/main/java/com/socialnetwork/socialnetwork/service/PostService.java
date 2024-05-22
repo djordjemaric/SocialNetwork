@@ -1,9 +1,8 @@
 package com.socialnetwork.socialnetwork.service;
 
 import com.socialnetwork.socialnetwork.dto.post.CreatePostDTO;
-import com.socialnetwork.socialnetwork.dto.post.GetPostDTO;
+import com.socialnetwork.socialnetwork.dto.post.PostDTO;
 import com.socialnetwork.socialnetwork.dto.post.UpdatePostDTO;
-import com.socialnetwork.socialnetwork.entity.Friends;
 import com.socialnetwork.socialnetwork.entity.Group;
 import com.socialnetwork.socialnetwork.entity.Post;
 import com.socialnetwork.socialnetwork.entity.User;
@@ -36,7 +35,7 @@ public class PostService {
         this.groupMemberRepository = groupMemberRepository;
     }
 
-    public GetPostDTO getById(Integer idPost) {
+    public PostDTO getById(Integer idPost) {
         User user = jwtService.getUser();
         Post post = postRepository.findById(idPost).orElseThrow(
                 () -> new NoSuchElementException("The post with the id of " + idPost + " is not present in the database."));

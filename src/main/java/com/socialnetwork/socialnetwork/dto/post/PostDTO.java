@@ -4,7 +4,8 @@ import com.socialnetwork.socialnetwork.entity.Comment;
 
 import java.util.List;
 
-public record GetPostDTO (
+public record PostDTO(
+        Integer id,
         String text,
         String imgUrl,
         String userEmail,
