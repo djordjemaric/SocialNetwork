@@ -9,13 +9,12 @@ import static com.socialnetwork.socialnetwork.repository.QueryConstants.ADMIN_AN
 
 @Repository
 public interface GroupRepository extends JpaRepository<Group, Integer> {
-    boolean existsByIdAndAdminId(Integer idGroup,Integer idAdmin);
     Group findByIdAndAdminId(Integer idGroup, Integer idAdmin);
 
     boolean existsByName(String email);
 
-    @Query( value = ADMIN_AND_GROUP_TUPLE_EXISTS)
-    boolean existsByAdminIdAndGroupId(Integer idAdmin,Integer idGroup);
+    @Query(value = ADMIN_AND_GROUP_TUPLE_EXISTS)
+    boolean existsByAdminIdAndGroupId(Integer idAdmin, Integer idGroup);
 
 
 }
