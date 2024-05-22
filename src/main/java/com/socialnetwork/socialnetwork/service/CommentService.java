@@ -1,6 +1,7 @@
 package com.socialnetwork.socialnetwork.service;
 
 import com.socialnetwork.socialnetwork.dto.post.CreateCommentDTO;
+import com.socialnetwork.socialnetwork.entity.Comment;
 import com.socialnetwork.socialnetwork.entity.Post;
 import com.socialnetwork.socialnetwork.entity.User;
 import com.socialnetwork.socialnetwork.mapper.CommentMapper;
@@ -24,12 +25,12 @@ public class CommentService {
         this.commentMapper = commentMapper;
         this.jwtService = jwtService;
     }
-//space after comma, before/after + in Exception, before/after ->
-public void createComment(CreateCommentDTO commentDTO) {
-    Post post = postRepository.findById(commentDTO.idPost()).orElseThrow(
-            () -> new NoSuchElementException("There is no post with the id of " + commentDTO.idPost()));
+
+    public Comment createComment(Integer idPost, CreateCommentDTO commentDTO) {
+    Post post = postRepository.findById(idPost).orElseThrow(
+            () -> new NoSuchElementException("There is no post with the id of " + idPost));
     User owner = jwtService.getUser();
-    commentRepository.save(commentMapper.createCommentDTOtoComment(owner, post, commentDTO));
-}
+        Comment comment = commentMapper.createCommentDTOtoComment(owner, post, commentDTO);
+        return commentRepository.save(comment);}
 
 }

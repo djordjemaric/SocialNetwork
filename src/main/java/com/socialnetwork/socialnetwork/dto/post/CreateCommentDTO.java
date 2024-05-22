@@ -5,9 +5,4 @@ import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
 
 public record CreateCommentDTO(@NotBlank
-                               String text,
-                               @NotNull
-                               Integer idPost,
-                               @NotNull
-                               Integer idCommOwner) {
-}
+                               String text) {}
