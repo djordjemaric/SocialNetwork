@@ -1,4 +1,4 @@
-image: maven:3.9.6-amazoncorretto-17
+image: maven:3.9.6-amazoncorretto-17-debian
 
 
 
@@ -21,7 +21,8 @@ pipelines:
         name: Testing aws openID connect
         oidc: true
         script:
-          - sudo yum install awscli -y
+          - apt-get update
+          - apt-get install awscli -y
           - export AWS_REGION=eu-central-1
           - export AWS_ROLE_ARN=arn:aws:iam::211125711045:role/bitbucket_oidc_role
           - export AWS_WEB_IDENTITY_TOKEN_FILE=$(pwd)/web-identity-token
