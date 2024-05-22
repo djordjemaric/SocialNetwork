@@ -22,7 +22,7 @@ public class PostService {
     private final JwtService jwtService;
 
 
-    public PostService(PostRepository postRepository, PostMapper postMapper, GroupRepository groupRepository, JwtService jwtService, UserRepository userRepository, FriendsRepository friendsRepository, GroupMemberRepository groupMemberRepository) {
+    public PostService(PostRepository postRepository, PostMapper postMapper, GroupRepository groupRepository, JwtService jwtService) {
         this.postRepository = postRepository;
         this.postMapper = postMapper;
         this.groupRepository = groupRepository;
