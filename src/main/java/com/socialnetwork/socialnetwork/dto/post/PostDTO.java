@@ -11,4 +11,5 @@ public record PostDTO(
         String userEmail,
         String groupName,
         List<Comment> comments) {
+
 }
