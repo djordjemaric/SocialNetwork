@@ -20,7 +20,6 @@ public class PostService {
     private final PostMapper postMapper;
     private final GroupRepository groupRepository;
     private final JwtService jwtService;
-    private final UserRepository userRepository;
     private final FriendsRepository friendsRepository;
     private final GroupMemberRepository groupMemberRepository;
 
@@ -30,7 +29,6 @@ public class PostService {
         this.postMapper = postMapper;
         this.groupRepository = groupRepository;
         this.jwtService = jwtService;
-        this.userRepository = userRepository;
         this.friendsRepository = friendsRepository;
         this.groupMemberRepository = groupMemberRepository;
     }
