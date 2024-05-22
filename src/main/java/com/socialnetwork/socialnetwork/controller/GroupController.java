@@ -2,10 +2,9 @@ package com.socialnetwork.socialnetwork.controller;
 
 import com.socialnetwork.socialnetwork.dto.GroupDto;
 import com.socialnetwork.socialnetwork.dto.group.CreateGroupDto;
-import com.socialnetwork.socialnetwork.entity.Group;
+import com.socialnetwork.socialnetwork.service.GroupService;
 import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.*;
-import com.socialnetwork.socialnetwork.service.GroupService;
 
 
 @RestController
@@ -25,5 +24,10 @@ public class GroupController {
         return groupService.createGroup(createGroupDto);
     }
 
+    @DeleteMapping("/{idGroup}/leave")
+    @ResponseStatus(HttpStatus.OK)
+    public void leaveGroup(@PathVariable Integer idGroup) {
+        groupService.leaveGroup(idGroup);
 
+    }
 }
