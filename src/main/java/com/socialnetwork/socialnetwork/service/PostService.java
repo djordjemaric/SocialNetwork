@@ -10,6 +10,7 @@ import com.socialnetwork.socialnetwork.mapper.PostMapper;
 import com.socialnetwork.socialnetwork.repository.GroupRepository;
 import com.socialnetwork.socialnetwork.repository.PostRepository;
 import org.springframework.stereotype.Service;
+import org.springframework.web.multipart.MultipartFile;
 
 import java.util.NoSuchElementException;
 import java.util.Objects;
@@ -30,6 +31,12 @@ public class PostService {
         this.jwtService = jwtService;
         this.s3Service = s3Service;
     }
+    private String uploadImageAndGetKey(MultipartFile image) {
+        if (image != null) {
+            return s3Service.uploadToBucket(image);
+        }
+        return null;
+    }
 
     public PostDTO createPostInGroup(CreatePostDTO postDTO) {
         User user = jwtService.getUser();
@@ -37,10 +44,7 @@ public class PostService {
         Group group = groupRepository.findById(postDTO.idGroup()).orElseThrow(
                 () -> new NoSuchElementException("There is no group with the id of " + postDTO.idGroup()));
 
-        String imgS3Key = null;
-        if (postDTO.img() != null) {
-            imgS3Key = s3Service.uploadToBucket(postDTO.img());
-        }
+        String imgS3Key = uploadImageAndGetKey(postDTO.img());
         Post post = postMapper.createPostDTOtoPostInGroup(user.getId(), group, imgS3Key, postDTO);
         post = postRepository.save(post);
         return postMapper.postToPostDTO(post);
@@ -48,10 +52,7 @@ public class PostService {
 
     public PostDTO createPostOnTimeline(CreatePostDTO postDTO) {
         User user = jwtService.getUser();
-        String imgS3Key = null;
-        if (postDTO.img() != null) {
-            imgS3Key = s3Service.uploadToBucket(postDTO.img());
-        }
+        String imgS3Key = uploadImageAndGetKey(postDTO.img());
         Post post = postMapper.createPostDTOtoPostOnTimeline(user.getId(), imgS3Key, postDTO);
         post = postRepository.save(post);
         return postMapper.postToPostDTO(post);
@@ -65,13 +66,12 @@ public class PostService {
         if (!(Objects.equals(post.getOwner().getId(), user.getId()))) {
             throw new RuntimeException("User is not the owner!");
         }
-        String imgS3Key = null;
-        if (updatePostDTO.img() != null) {
-            if (post.getImgS3Key() != null) {
-                   s3Service.deleteFromBucket(post.getImgS3Key());
-            }
-            imgS3Key = s3Service.uploadToBucket(updatePostDTO.img());
+
+        if (updatePostDTO.img() != null && post.getImgS3Key() != null) {
+           s3Service.deleteFromBucket(post.getImgS3Key());
         }
+
+        String imgS3Key = uploadImageAndGetKey(updatePostDTO.img());
         post = postMapper.updatePostDTOtoPost(updatePostDTO, imgS3Key, post);
         post = postRepository.save(post);
         return postMapper.postToPostDTO(post);
