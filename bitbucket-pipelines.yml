@@ -16,7 +16,7 @@ definitions:
         caches:
           - maven
         script:
-          - mvn -B test jacoco:report -Dtest=GroupControllerTests,GroupServiceTests --file pom.xml
+          - mvn -B jacoco:prepare-agent test jacoco:report -Dtest=GroupControllerTests,GroupServiceTests --file pom.xml
         artifacts:
           - target/site/jacoco/*
 
