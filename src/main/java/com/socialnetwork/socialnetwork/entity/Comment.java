@@ -6,7 +6,9 @@ import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
+import org.hibernate.annotations.CreationTimestamp;
 
+import java.time.LocalDateTime;
 import java.util.List;
 
 @Entity
@@ -23,6 +25,9 @@ public class Comment {
     @NotNull
     private String text;
 
+    @CreationTimestamp
+    private LocalDateTime creationDateTime;
+
     @NotNull
     @ManyToOne
     @JoinColumn(name = "id_comm_owner")
@@ -31,5 +36,11 @@ public class Comment {
     @OneToMany
     @JoinColumn(name = "id_comment")
     private List<Reply> replies;
+
+    @NotNull
+    @ManyToOne
+    @JoinColumn(name = "id_post")
+    private Post post;
+
 
 }
