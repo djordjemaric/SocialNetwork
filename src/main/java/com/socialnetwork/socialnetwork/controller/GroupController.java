@@ -28,6 +28,13 @@ public class GroupController {
     @ResponseStatus(HttpStatus.OK)
     public void leaveGroup(@PathVariable Integer idGroup) {
         groupService.leaveGroup(idGroup);
-
     }
+
+    @ResponseStatus(HttpStatus.OK)
+    @DeleteMapping( "/{idGroup}/members/{idUser}") // idGroup and idUser that we want to remove
+    public void removeMember (@PathVariable Integer idGroup, @PathVariable Integer idUser)
+    {
+        groupService.removeMember(idGroup, idUser);
+    }
+
 }
