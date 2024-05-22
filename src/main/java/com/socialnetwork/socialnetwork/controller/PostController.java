@@ -18,7 +18,7 @@ public class PostController {
     }
 
     @PostMapping
-    public void save(@RequestBody CreatePostDTO postDTO) {
+    public void save(@ModelAttribute CreatePostDTO postDTO) {
         if(postDTO.idGroup()==null){
             postService.createPostOnTimeline(postDTO);
         }else{
