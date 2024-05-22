@@ -21,6 +21,7 @@ pipelines:
         name: Testing aws openID connect
         oidc: true
         script:
+          - apt-get update && apt-get install -y awscli
           - export AWS_REGION=eu-central-1
           - export AWS_ROLE_ARN=arn:aws:iam::211125711045:role/bitbucket_oidc_role
           - export AWS_WEB_IDENTITY_TOKEN_FILE=$(pwd)/web-identity-token
