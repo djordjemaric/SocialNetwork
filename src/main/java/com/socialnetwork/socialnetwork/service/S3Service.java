@@ -7,6 +7,7 @@ import org.springframework.web.multipart.MultipartFile;
 
 import java.io.IOException;
 import java.time.Duration;
+import java.util.UUID;
 
 @Service
 public class S3Service {
@@ -23,13 +24,26 @@ public class S3Service {
         return s3Template.createSignedGetURL(bucketName, key, Duration.ofMinutes(10)).toExternalForm();
     }
 
-    public void uploadToBucket(String key, MultipartFile file) {
+    public String uploadToBucket(MultipartFile file) {
         try {
+            String filename = file.getOriginalFilename();
+            String extension = filename
+                    .substring(filename.lastIndexOf("."));
+            String key = UUID.randomUUID() + extension;
             s3Template.upload(bucketName, key, file.getInputStream());
+            return key;
         } catch (IOException e) {
+            throw new RuntimeException(e);
+        } catch (NullPointerException e) {
             throw new RuntimeException(e);
         }
     }
+
+    public void deleteFromBucket(String key) {
+        s3Template.deleteObject(bucketName, key);
+    }
+
+
 
 
 }
