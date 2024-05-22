@@ -57,4 +57,20 @@ public class PostService {
         return postMapper.postToPostDTO(post);
     }
 
+    public void deletePost(Integer idPost) {
+        Post post = postRepository.findById(idPost).orElseThrow(() ->
+                new NoSuchElementException("There is no post with the id of " + idPost));
+        User user = jwtService.getUser();
+        if (post.getGroup() != null) {
+            if (Objects.equals(post.getGroup().getAdmin().getId(), user.getId())) {
+                postRepository.deleteById(idPost);
+                return;
+            }
+        }
+        if (Objects.equals(user.getId(), post.getOwner().getId())) {
+            postRepository.deleteById(idPost);
+            return;
+        }
+        throw new RuntimeException("You don't have the permission to delete the post.");
+    }
 }
