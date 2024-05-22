@@ -1,10 +1,12 @@
 package com.socialnetwork.socialnetwork.controller;
 
 import com.socialnetwork.socialnetwork.dto.post.CreatePostDTO;
+import com.socialnetwork.socialnetwork.dto.post.PostDTO;
 import com.socialnetwork.socialnetwork.dto.post.UpdatePostDTO;
 import com.socialnetwork.socialnetwork.entity.Post;
 import com.socialnetwork.socialnetwork.service.PostService;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.*;
 
 @RestController
@@ -18,10 +20,10 @@ public class PostController {
     }
 
     @PostMapping
-    public void save(@RequestBody CreatePostDTO postDTO) {
-        if(postDTO.idGroup()==null){
+    public void save(@ModelAttribute CreatePostDTO postDTO) {
+        if (postDTO.idGroup() == null){
             postService.createPostOnTimeline(postDTO);
-        }else{
+        } else{
             postService.createPostInGroup(postDTO);
         }
     }
@@ -29,6 +31,12 @@ public class PostController {
     @PutMapping("post/{idPost}")
     public void update(@PathVariable Integer idPost, @RequestBody UpdatePostDTO postDTO){
         postService.updatePost(idPost, postDTO);
+    }
+
+    @ResponseStatus(HttpStatus.OK)
+    @GetMapping("/{id}")
+    public PostDTO getById(@PathVariable Integer id) {
+        return postService.getById(id);
     }
 
 
