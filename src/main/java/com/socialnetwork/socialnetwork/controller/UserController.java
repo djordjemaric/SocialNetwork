@@ -4,13 +4,12 @@ import com.socialnetwork.socialnetwork.dto.LoginResponse;
 import com.socialnetwork.socialnetwork.dto.UserRequest;
 import com.socialnetwork.socialnetwork.service.UserService;
 import com.socialnetwork.socialnetwork.entity.User;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
 
 @RestController
-@RequestMapping(path = "api/user")
+@RequestMapping(path = "api/users")
 public class UserController {
     private final UserService userService;
 
