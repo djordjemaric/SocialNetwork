@@ -1,8 +1,8 @@
 package com.socialnetwork.socialnetwork.service;
 
-import com.socialnetwork.socialnetwork.dto.group.CreateGroupDto;
-import com.socialnetwork.socialnetwork.dto.group.GroupDto;
-import com.socialnetwork.socialnetwork.dto.group.GroupRequest_MemberDto;
+import com.socialnetwork.socialnetwork.dto.group.CreateGroupDTO;
+import com.socialnetwork.socialnetwork.dto.group.GroupDTO;
+import com.socialnetwork.socialnetwork.dto.group.GroupRequest_MemberDTO;
 import com.socialnetwork.socialnetwork.entity.Group;
 import com.socialnetwork.socialnetwork.entity.GroupMember;
 import com.socialnetwork.socialnetwork.entity.GroupRequest;
@@ -38,7 +38,7 @@ public class GroupService {
 
     }
 
-    public GroupDto createGroup(CreateGroupDto group) {
+    public GroupDTO createGroup(CreateGroupDTO group) {
         User currentUser = jwtService.getUser();
 
         //provera da li postoji grupa sa tim imenom
@@ -55,7 +55,7 @@ public class GroupService {
         return groupMapper.entityToGroupDto(createdGroup);
     }
 
-    public GroupRequest_MemberDto createRequestToJoinGroup(Integer idGroup) {
+    public GroupRequest_MemberDTO createRequestToJoinGroup(Integer idGroup) {
         User currentUser = jwtService.getUser();
 
         Group group = groupRepository.findById(idGroup).orElseThrow(() -> new FunctionArgumentException("Group does not exist!"));
@@ -78,19 +78,19 @@ public class GroupService {
         return addUserAsAMemberToPrivateGroup(currentUser, group);
     }
 
-    public GroupRequest_MemberDto addUserAsAMemberToPrivateGroup(User user, Group group) {
+    public GroupRequest_MemberDTO addUserAsAMemberToPrivateGroup(User user, Group group) {
 
         GroupRequest groupRequest = groupRequestRepository.save(new GroupRequest(null, user, group));
 
-        return new GroupRequest_MemberDto(groupRequest.getId(), user, group, "Created request!");
+        return new GroupRequest_MemberDTO(groupRequest.getId(), user, group, "Created request!");
 
     }
 
-    public GroupRequest_MemberDto addUserAsAMemberToPublicGroup(User user, Group group) {
+    public GroupRequest_MemberDTO addUserAsAMemberToPublicGroup(User user, Group group) {
 
         GroupMember groupMember = groupMemberRepository.save(new GroupMember(null, user, group));
 
-        return new GroupRequest_MemberDto(groupMember.getId(), user, group, "User added as a member!");
+        return new GroupRequest_MemberDTO(groupMember.getId(), user, group, "User added as a member!");
 
     }
 
