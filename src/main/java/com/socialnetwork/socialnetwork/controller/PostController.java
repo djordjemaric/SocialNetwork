@@ -1,7 +1,6 @@
 package com.socialnetwork.socialnetwork.controller;
 
 import com.socialnetwork.socialnetwork.dto.post.CreatePostDTO;
-import com.socialnetwork.socialnetwork.dto.post.PostDTO;
 import com.socialnetwork.socialnetwork.dto.post.UpdatePostDTO;
 import com.socialnetwork.socialnetwork.service.PostService;
 import org.springframework.web.bind.annotation.*;
@@ -16,10 +15,6 @@ public class PostController {
         this.postService = postService;
     }
 
-    @GetMapping("/{id}")
-    public PostDTO getById(@PathVariable Integer id) {
-        return postService.getById(id);
-    }
 
     @PostMapping
     public void save(@RequestBody CreatePostDTO postDTO) {
@@ -34,11 +29,5 @@ public class PostController {
     public void update(@PathVariable Integer id, @RequestBody UpdatePostDTO postDTO) {
         postService.updatePost(id, postDTO);
     }
-
-    @DeleteMapping("/{id}")
-    public void delete(@PathVariable Integer id) {
-        postService.deletePost(id);
-    }
-
 
 }

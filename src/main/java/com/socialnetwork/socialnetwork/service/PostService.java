@@ -19,9 +19,6 @@ public class PostService {
     private final PostMapper postMapper;
     private final GroupRepository groupRepository;
     private final JwtService jwtService;
-    private final UserRepository userRepository;
-    private final FriendsRepository friendsRepository;
-    private final GroupMemberRepository groupMemberRepository;
 
 
     public PostService(PostRepository postRepository, PostMapper postMapper, GroupRepository groupRepository, JwtService jwtService, UserRepository userRepository, FriendsRepository friendsRepository, GroupMemberRepository groupMemberRepository) {
@@ -29,9 +26,6 @@ public class PostService {
         this.postMapper = postMapper;
         this.groupRepository = groupRepository;
         this.jwtService = jwtService;
-        this.userRepository = userRepository;
-        this.friendsRepository = friendsRepository;
-        this.groupMemberRepository = groupMemberRepository;
     }
 
     public void createPostInGroup(CreatePostDTO postDTO) {
@@ -59,21 +53,4 @@ public class PostService {
         postRepository.save(post);
     }
 
-
-    public void deletePost(Integer idPost) {
-        Post post = postRepository.findById(idPost).orElseThrow(() ->
-                new NoSuchElementException("There is no post with the id of " + idPost));
-        User user = jwtService.getUser();
-        if (post.getGroup() != null) {
-            if (Objects.equals(post.getGroup().getAdmin().getId(), user.getId())) {
-                postRepository.deleteById(idPost);
-                return;
-            }
-        }
-        if (Objects.equals(user.getId(), post.getOwner().getId())) {
-            postRepository.deleteById(idPost);
-            return;
-        }
-        throw new RuntimeException("You don't have the permission to delete the post.");
-    }
 }
