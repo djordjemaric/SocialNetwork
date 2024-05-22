@@ -18,7 +18,7 @@ public class PostMapper {
         post.setGroup(group);
         post.setPublic(group.isPublic());
         post.setText(postDTO.text());
-        post.setImgUrl(postDTO.imgUrl());
+//        post.setImgUrl(postDTO.imgUrl());
         post.setOwner(owner);
 
         return post;
@@ -32,7 +32,7 @@ public class PostMapper {
 
         post.setPublic(postDTO.isPublic());
         post.setText(postDTO.text());
-        post.setImgUrl(postDTO.imgUrl());
+//        post.setImgUrl(postDTO.imgUrl());
         post.setOwner(owner);
 
         return post;

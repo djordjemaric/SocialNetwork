@@ -10,9 +10,11 @@ import com.socialnetwork.socialnetwork.repository.GroupRepository;
 import com.socialnetwork.socialnetwork.repository.PostRepository;
 import com.socialnetwork.socialnetwork.repository.UserRepository;
 import org.springframework.stereotype.Service;
+import org.springframework.web.multipart.MultipartFile;
 
 import java.util.NoSuchElementException;
 import java.util.Objects;
+import java.util.UUID;
 
 @Service
 public class PostService {
@@ -22,13 +24,15 @@ public class PostService {
     private final GroupRepository groupRepository;
     private final JwtService jwtService;
     private final UserRepository userRepository;
+    private final S3Service s3Service;
 
-    public PostService(PostRepository postRepository, PostMapper postMapper, GroupRepository groupRepository, JwtService jwtService, UserRepository userRepository) {
+    public PostService(PostRepository postRepository, PostMapper postMapper, GroupRepository groupRepository, JwtService jwtService, UserRepository userRepository, S3Service s3Service) {
         this.postRepository = postRepository;
         this.postMapper = postMapper;
         this.groupRepository = groupRepository;
         this.jwtService = jwtService;
         this.userRepository = userRepository;
+        this.s3Service = s3Service;
     }
 
     public void createPostInGroup(CreatePostDTO postDTO) {
@@ -60,9 +64,15 @@ public class PostService {
             throw new RuntimeException("User is not the owner!");
         }
         post.setText(updatePostDTO.text());
-        post.setImgUrl(updatePostDTO.imgUrl());
+//        post.setImgUrl(updatePostDTO.imgUrl());
         post.setPublic(updatePostDTO.isPublic());
         postRepository.save(post);
+    }
+
+    public String uploadImage(MultipartFile file) {
+        String key = UUID.randomUUID().toString();
+        s3Service.uploadToBucket(key, file);
+        return key;
     }
 
 
