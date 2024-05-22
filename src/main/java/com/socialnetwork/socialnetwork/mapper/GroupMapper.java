@@ -1,7 +1,7 @@
 package com.socialnetwork.socialnetwork.mapper;
 
-import com.socialnetwork.socialnetwork.dto.group.CreateGroupDto;
-import com.socialnetwork.socialnetwork.dto.group.GroupDto;
+import com.socialnetwork.socialnetwork.dto.group.CreateGroupDTO;
+import com.socialnetwork.socialnetwork.dto.group.GroupDTO;
 import com.socialnetwork.socialnetwork.entity.Group;
 import com.socialnetwork.socialnetwork.entity.User;
 import org.springframework.stereotype.Component;
@@ -9,7 +9,7 @@ import org.springframework.stereotype.Component;
 
 @Component
 public class GroupMapper {
-    public Group dtoToEntity(User user, CreateGroupDto createGroupDto) {
+    public Group dtoToEntity(User user, CreateGroupDTO createGroupDto) {
         Group group = new Group();
         group.setPublic(createGroupDto.isPublic());
         group.setAdmin(user);
@@ -17,8 +17,8 @@ public class GroupMapper {
         return group;
     }
 
-    public GroupDto entityToGroupDto(Group group) {
-        return new GroupDto(group.getName(),
+    public GroupDTO entityToGroupDto(Group group) {
+        return new GroupDTO(group.getName(),
                 group.getAdmin().getEmail(),
                 group.isPublic(),
                 group.getId());
