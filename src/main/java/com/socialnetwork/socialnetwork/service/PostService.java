@@ -1,6 +1,7 @@
 package com.socialnetwork.socialnetwork.service;
 
 import com.socialnetwork.socialnetwork.dto.post.CreatePostDTO;
+import com.socialnetwork.socialnetwork.dto.post.PostDTO;
 import com.socialnetwork.socialnetwork.dto.post.UpdatePostDTO;
 import com.socialnetwork.socialnetwork.entity.Group;
 import com.socialnetwork.socialnetwork.entity.Post;
@@ -32,6 +33,27 @@ public class PostService {
         this.userRepository = userRepository;
         this.friendsRepository = friendsRepository;
         this.groupMemberRepository = groupMemberRepository;
+    }
+
+    public PostDTO getById(Integer idPost) {
+        User user = jwtService.getUser();
+        Post post = postRepository.findById(idPost).orElseThrow(
+                () -> new NoSuchElementException("The post with the id of " + idPost + " is not present in the database."));
+        if (!post.isPublic() && post.getGroup() != null) {
+            if (friendsRepository.areTwoUsersFriends(post.getOwner().getId(), user.getId()).isEmpty()) {
+                throw new RuntimeException("You cannot see the post because you are not friends with the post owner.");
+            }
+        }
+        if (post.getGroup() != null && !(post.getGroup().isPublic())) {
+            if (!(groupMemberRepository.existsByUserIdAndGroupId(user.getId(), post.getGroup().getId()))) {
+                throw new RuntimeException("You cannot see the post because you are not a member of the "
+                        + post.getGroup().getName() + " group.");
+            }
+        }
+        if (post.getImgUrl() != null) {
+            //figure out the aws s3
+        }
+        return postMapper.postToPostDTO(post);
     }
 
     public void createPostInGroup(CreatePostDTO postDTO) {
