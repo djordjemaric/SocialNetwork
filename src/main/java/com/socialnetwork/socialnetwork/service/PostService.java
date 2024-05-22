@@ -21,17 +21,15 @@ public class PostService {
     private final PostMapper postMapper;
     private final GroupRepository groupRepository;
     private final JwtService jwtService;
-    private final UserRepository userRepository;
     private final S3Service s3Service;
     private final FriendsRepository friendsRepository;
     private final GroupMemberRepository groupMemberRepository;
 
-    public PostService(PostRepository postRepository, PostMapper postMapper, GroupRepository groupRepository, JwtService jwtService, UserRepository userRepository, S3Service s3Service, FriendsRepository friendsRepository, GroupMemberRepository groupMemberRepository) {
+    public PostService(PostRepository postRepository, PostMapper postMapper, GroupRepository groupRepository, JwtService jwtService, S3Service s3Service, FriendsRepository friendsRepository, GroupMemberRepository groupMemberRepository) {
         this.postRepository = postRepository;
         this.postMapper = postMapper;
         this.groupRepository = groupRepository;
         this.jwtService = jwtService;
-        this.userRepository = userRepository;
         this.s3Service = s3Service;
         this.friendsRepository = friendsRepository;
         this.groupMemberRepository = groupMemberRepository;
@@ -39,9 +37,6 @@ public class PostService {
 
     public PostDTO createPostInGroup(CreatePostDTO postDTO) {
         User user = jwtService.getUser();
-        if (!userRepository.existsByEmail(user.getEmail())) {
-            throw new NoSuchElementException("User with the email of " + user.getEmail() + " is not present in the database.");
-        }
         Group group = groupRepository.findById(postDTO.idGroup()).orElseThrow(
                 () -> new NoSuchElementException("There is no group with the id of " + postDTO.idGroup()));
         Post post = new Post();
@@ -59,9 +54,6 @@ public class PostService {
 
     public PostDTO createPostOnTimeline(CreatePostDTO postDTO) {
         User user = jwtService.getUser();
-        if (!userRepository.existsByEmail(user.getEmail())) {
-            throw new NoSuchElementException("User with the email of " + user.getEmail() + " is not present in the database.");
-        }
         Post post = new Post();
         if (postDTO.img() != null) {
             post.setImgS3Url(UUID.randomUUID().toString());
@@ -77,9 +69,6 @@ public class PostService {
 
     public PostDTO updatePost(Integer idPost, UpdatePostDTO updatePostDTO) {
         User user = jwtService.getUser();
-        if (!userRepository.existsByEmail(user.getEmail())) {
-            throw new NoSuchElementException("User with the email of " + user.getEmail() + " is not present in the database.");
-        }
         Post post = postRepository.findById(idPost).orElseThrow(() ->
                 new NoSuchElementException("There is no post with the id of " + idPost));
         if (!(Objects.equals(post.getOwner().getId(), user.getId()))) {
