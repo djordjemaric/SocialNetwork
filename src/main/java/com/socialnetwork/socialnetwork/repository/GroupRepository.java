@@ -16,8 +16,6 @@ public interface GroupRepository extends JpaRepository<Group, Integer> {
     boolean existsByName(String name);
     List<Group> findAllByNameStartingWith(String name);
 
-    boolean existsAllByNameStartingWith(String name);
-
     @Query( value = ADMIN_AND_GROUP_TUPLE_EXISTS)
     boolean existsByAdminIdAndGroupId(Integer idAdmin,Integer idGroup);
 

@@ -53,19 +53,11 @@ public class GroupService {
 
     public List<GroupDto> findByName(String name) {
 
-        //provera da li postoji/e grupa/e koje pocinju sa tim imenom
-        if (!groupRepository.existsAllByNameStartingWith(name)) {
-            throw new FunctionArgumentException("There are no groups with that name");
-        }
-
         List<Group> groups = groupRepository.findAllByNameStartingWith(name);
-        List<GroupDto> groupDtos = new ArrayList<>();
 
-        for (Group gr : groups) {
-            groupDtos.add(groupMapper.entityToGroupDto(gr));
-        }
-
-        return groupDtos;
+        return groups.stream()
+                .map(group -> new GroupDto(group.getName(),group.getAdmin().getEmail(),group.isPublic(),group.getId()))
+                .toList();
     }
 
 
