@@ -1,9 +1,9 @@
 package com.socialnetwork.socialnetwork.controller;
 
-import com.socialnetwork.socialnetwork.dto.group.CreateGroupDto;
-import com.socialnetwork.socialnetwork.dto.group.GroupDto;
-import com.socialnetwork.socialnetwork.dto.group.GroupMemberDto;
-import com.socialnetwork.socialnetwork.dto.group.GroupRequestDto;
+import com.socialnetwork.socialnetwork.dto.group.CreateGroupDTO;
+import com.socialnetwork.socialnetwork.dto.group.GroupDTO;
+import com.socialnetwork.socialnetwork.dto.group.GroupMemberDTO;
+import com.socialnetwork.socialnetwork.dto.group.GroupRequestDTO;
 import com.socialnetwork.socialnetwork.service.GroupService;
 import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.*;
@@ -23,19 +23,20 @@ public class GroupController {
 
     @ResponseStatus(HttpStatus.CREATED)
     @PostMapping
-    public GroupDto createGroup(@RequestBody CreateGroupDto createGroupDto) {
+    public GroupDTO createGroup(@RequestBody CreateGroupDTO createGroupDto) {
         return groupService.createGroup(createGroupDto);
     }
 
     @ResponseStatus(HttpStatus.OK)
     @GetMapping( "/{idGroup}/requests")
-    public List<GroupRequestDto> getAllRequestForGroup(@PathVariable Integer idGroup) {
+    public List<GroupRequestDTO> getAllRequestForGroup(@PathVariable Integer idGroup) {
+        System.out.println(idGroup);
         return groupService.getAllRequestsForGroup(idGroup);
     }
 
     @ResponseStatus(HttpStatus.CREATED)
     @PostMapping( "/{idUser}/{idGroup}/accept")
-    public GroupMemberDto acceptRequest(@PathVariable Integer idUser, @PathVariable Integer idGroup) {
+    public GroupMemberDTO acceptRequest(@PathVariable Integer idUser, @PathVariable Integer idGroup) {
         return groupService.acceptRequest(idUser,idGroup);
     }
 

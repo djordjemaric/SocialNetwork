@@ -1,9 +1,9 @@
 package com.socialnetwork.socialnetwork.dto.group;
 
-public record GroupMemberDto( String memberEmail,
+public record GroupRequestDTO(String userEmail,
                               String groupName,
-                              Integer idMember,
+                              Integer idUser,
                               Integer idGroup
 
-) {
+){
 }

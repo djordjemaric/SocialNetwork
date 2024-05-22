@@ -1,9 +1,9 @@
 package com.socialnetwork.socialnetwork.mapper;
 
-import com.socialnetwork.socialnetwork.dto.group.CreateGroupDto;
-import com.socialnetwork.socialnetwork.dto.group.GroupDto;
-import com.socialnetwork.socialnetwork.dto.group.GroupMemberDto;
-import com.socialnetwork.socialnetwork.dto.group.GroupRequestDto;
+import com.socialnetwork.socialnetwork.dto.group.CreateGroupDTO;
+import com.socialnetwork.socialnetwork.dto.group.GroupDTO;
+import com.socialnetwork.socialnetwork.dto.group.GroupMemberDTO;
+import com.socialnetwork.socialnetwork.dto.group.GroupRequestDTO;
 import com.socialnetwork.socialnetwork.entity.Group;
 import com.socialnetwork.socialnetwork.entity.GroupMember;
 import com.socialnetwork.socialnetwork.entity.GroupRequest;
@@ -13,7 +13,7 @@ import org.springframework.stereotype.Component;
 
 @Component
 public class GroupMapper {
-    public Group dtoToEntity(User user, CreateGroupDto createGroupDto) {
+    public Group dtoToEntity(User user, CreateGroupDTO createGroupDto) {
 
         Group group = new Group();
         group.setPublic(createGroupDto.isPublic());
@@ -24,25 +24,25 @@ public class GroupMapper {
         return group;
     }
 
-    public GroupDto entityToGroupDto(Group group) {
+    public GroupDTO entityToGroupDto(Group group) {
 
-        return new GroupDto(group.getName(),
+        return new GroupDTO(group.getName(),
                 group.getAdmin().getEmail(),
                 group.isPublic(),
                 group.getId());
     }
 
-    public GroupMemberDto groupMemberToGroupMemberDto (GroupMember groupMember){
+    public GroupMemberDTO groupMemberToGroupMemberDto (GroupMember groupMember){
 
-        return new GroupMemberDto(groupMember.getMember().getEmail(),
+        return new GroupMemberDTO(groupMember.getMember().getEmail(),
                 groupMember.getGroup().getName(),
                 groupMember.getMember().getId(),
                 groupMember.getGroup().getId());
     }
 
-    public GroupRequestDto groupRequestToGroupRequestDto (GroupRequest groupRequest){
+    public GroupRequestDTO groupRequestToGroupRequestDto (GroupRequest groupRequest){
 
-        return new GroupRequestDto(groupRequest.getUser().getEmail(),
+        return new GroupRequestDTO(groupRequest.getUser().getEmail(),
                 groupRequest.getGroup().getName(),
                 groupRequest.getUser().getId(),
                 groupRequest.getGroup().getId());
