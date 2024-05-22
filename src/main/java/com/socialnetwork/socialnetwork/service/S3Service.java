@@ -23,17 +23,12 @@ public class S3Service {
         return s3Template.createSignedGetURL(bucketName, key, Duration.ofMinutes(10)).toExternalForm();
     }
 
-    public String uploadToBucket(MultipartFile file) {
-        String key = file.getOriginalFilename();
-        if (key == null || key.isEmpty()) {
-            throw new IllegalArgumentException("File name cannot be null or empty");
-        }
+    public void uploadToBucket(String key, MultipartFile file) {
         try {
             s3Template.upload(bucketName, key, file.getInputStream());
         } catch (IOException e) {
             throw new RuntimeException(e);
         }
-        return key;
     }
 
 

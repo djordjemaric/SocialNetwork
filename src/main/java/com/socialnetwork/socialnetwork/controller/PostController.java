@@ -20,7 +20,7 @@ public class PostController {
 
     @ResponseStatus(HttpStatus.CREATED)
     @PostMapping
-    public PostDTO save(@RequestBody CreatePostDTO postDTO) {
+    public PostDTO save(@ModelAttribute CreatePostDTO postDTO) {
         if (postDTO.idGroup() == null) {
             return postService.createPostOnTimeline(postDTO);
         }

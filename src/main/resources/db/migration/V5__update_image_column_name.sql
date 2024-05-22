@@ -1,0 +1,1 @@
+ALTER TABLE post RENAME COLUMN img_url to img_s3_key;
