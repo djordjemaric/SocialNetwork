@@ -2,6 +2,7 @@ package com.socialnetwork.socialnetwork.controller;
 
 import com.socialnetwork.socialnetwork.dto.CreateGroupDto;
 import com.socialnetwork.socialnetwork.dto.GroupDto;
+import com.socialnetwork.socialnetwork.dto.GroupRequest_MemberDto;
 import com.socialnetwork.socialnetwork.entity.GroupRequest;
 import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.*;
@@ -26,11 +27,10 @@ public class GroupController {
 
 
     @ResponseStatus(HttpStatus.CREATED)
-    @PostMapping( "/join/{idGroup}")
-    public void createRequestToJoinGroup(@PathVariable Integer idGroup) {
-        GroupRequest groupRequest = groupService.createRequestToJoinGroup(idGroup);
-        groupService.addUserAsAMemberToPublicGroup(groupRequest);
+    @PostMapping( "/{id}/join")
+    public GroupRequest_MemberDto createRequestToJoinGroup(@PathVariable Integer id) {
 
+        return groupService.createRequestToJoinGroup(id);
     }
 
 }
