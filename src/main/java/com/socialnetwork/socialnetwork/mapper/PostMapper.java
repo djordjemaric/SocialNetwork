@@ -9,8 +9,8 @@ import org.springframework.stereotype.Component;
 @Component
 public class PostMapper {
 
-    public Post createPostDTOtoPostInGroup(Integer idOwner, Group group, CreatePostDTO postDTO){
-        Post post=new Post();
+    public Post createPostDTOtoPostInGroup(Integer idOwner, Group group, CreatePostDTO postDTO,Post post){
+//        Post post=new Post();
 
         User owner=new User();
         owner.setId(idOwner);
@@ -24,8 +24,8 @@ public class PostMapper {
         return post;
     }
 
-    public Post createPostDTOtoPostOnTimeline(Integer idOwner, CreatePostDTO postDTO){
-        Post post=new Post();
+    public Post createPostDTOtoPostOnTimeline(Integer idOwner, CreatePostDTO postDTO, Post post){
+//        Post post=new Post();
 
         User owner=new User();
         owner.setId(idOwner);

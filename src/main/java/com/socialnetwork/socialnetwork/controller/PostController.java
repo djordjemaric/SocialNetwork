@@ -17,9 +17,6 @@ public class PostController {
         this.postService = postService;
     }
 
-
-
-
     @PostMapping
     public void save(@RequestBody CreatePostDTO postDTO) {
         if(postDTO.idGroup()==null){

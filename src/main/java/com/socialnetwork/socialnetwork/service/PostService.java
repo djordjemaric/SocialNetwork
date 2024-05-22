@@ -42,7 +42,12 @@ public class PostService {
         }
         Group group = groupRepository.findById(postDTO.idGroup()).orElseThrow(
                 () -> new NoSuchElementException("There is no group with the id of " + postDTO.idGroup()));
-        postRepository.save(postMapper.createPostDTOtoPostInGroup(user.getId(), group, postDTO));
+        Post post = new Post();
+        if (postDTO.img() != null) {
+            post.setImgS3Url(UUID.randomUUID().toString());
+            s3Service.uploadToBucket(post.getImgS3Url(),postDTO.img());
+        }
+        postRepository.save(postMapper.createPostDTOtoPostInGroup(user.getId(), group, postDTO,post));
     }
 
     public void createPostOnTimeline(CreatePostDTO postDTO) {
@@ -50,7 +55,12 @@ public class PostService {
         if (!userRepository.existsByEmail(user.getEmail())) {
             throw new NoSuchElementException("User with the email of " + user.getEmail() + " is not present in the database.");
         }
-        postRepository.save(postMapper.createPostDTOtoPostOnTimeline(user.getId(), postDTO));
+        Post post = new Post();
+        if (postDTO.img() != null) {
+            post.setImgS3Url(UUID.randomUUID().toString());
+            s3Service.uploadToBucket(post.getImgS3Url(),postDTO.img());
+        }
+        postRepository.save(postMapper.createPostDTOtoPostOnTimeline(user.getId(), postDTO,post));
     }
 
     public void updatePost(Integer idPost, UpdatePostDTO updatePostDTO) {
@@ -64,18 +74,11 @@ public class PostService {
             throw new RuntimeException("User is not the owner!");
         }
         post.setText(updatePostDTO.text());
-//        post.setImgUrl(updatePostDTO.imgUrl());
+        if (updatePostDTO.img() != null) {
+            post.setImgS3Url(UUID.randomUUID().toString());
+            s3Service.uploadToBucket(post.getImgS3Url(),updatePostDTO.img());
+        }
         post.setPublic(updatePostDTO.isPublic());
         postRepository.save(post);
     }
-
-    public String uploadImage(MultipartFile file) {
-        String key = UUID.randomUUID().toString();
-        s3Service.uploadToBucket(key, file);
-        return key;
-    }
-
-
-
-
 }
