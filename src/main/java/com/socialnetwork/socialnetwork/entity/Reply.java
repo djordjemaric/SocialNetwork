@@ -1,6 +1,5 @@
 package com.socialnetwork.socialnetwork.entity;
 
-import com.fasterxml.jackson.annotation.JsonManagedReference;
 import jakarta.persistence.*;
 import jakarta.validation.constraints.NotNull;
 import lombok.AllArgsConstructor;
@@ -13,21 +12,19 @@ import lombok.Setter;
 @Setter
 @NoArgsConstructor
 @AllArgsConstructor
-public class GroupMember {
+public class Reply {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Integer id;
 
     @NotNull
-    @ManyToOne
-    @JoinColumn(name = "id_member")
-    @JsonManagedReference
-    private User member;
+    private String text;
 
     @NotNull
     @ManyToOne
-    @JoinColumn(name = "id_group")
-    @JsonManagedReference
-    private Group group;
+    @JoinColumn(name = "id_reply_owner")
+    private User replyOwner;
+
+
 }
