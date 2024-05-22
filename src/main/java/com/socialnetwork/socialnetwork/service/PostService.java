@@ -44,9 +44,9 @@ public class PostService {
         Post post = new Post();
         if (postDTO.img() != null) {
             post.setImgS3Key(UUID.randomUUID().toString());
-            s3Service.uploadToBucket(post.getImgS3Key(),postDTO.img());
+            s3Service.uploadToBucket(post.getImgS3Key(), postDTO.img());
         }
-        postRepository.save(postMapper.createPostDTOtoPostInGroup(user.getId(), group, postDTO,post));
+        postRepository.save(postMapper.createPostDTOtoPostInGroup(user.getId(), group, postDTO, post));
     }
 
     public void createPostOnTimeline(CreatePostDTO postDTO) {
@@ -57,9 +57,9 @@ public class PostService {
         Post post = new Post();
         if (postDTO.img() != null) {
             post.setImgS3Key(UUID.randomUUID().toString());
-            s3Service.uploadToBucket(post.getImgS3Key(),postDTO.img());
+            s3Service.uploadToBucket(post.getImgS3Key(), postDTO.img());
         }
-        postRepository.save(postMapper.createPostDTOtoPostOnTimeline(user.getId(), postDTO,post));
+        postRepository.save(postMapper.createPostDTOtoPostOnTimeline(user.getId(), postDTO, post));
     }
 
     public void updatePost(Integer idPost, UpdatePostDTO updatePostDTO) {
@@ -75,7 +75,7 @@ public class PostService {
         post.setText(updatePostDTO.text());
         if (updatePostDTO.img() != null) {
             post.setImgS3Key(UUID.randomUUID().toString());
-            s3Service.uploadToBucket(post.getImgS3Key(),updatePostDTO.img());
+            s3Service.uploadToBucket(post.getImgS3Key(), updatePostDTO.img());
         }
         post.setPublic(updatePostDTO.isPublic());
         postRepository.save(post);

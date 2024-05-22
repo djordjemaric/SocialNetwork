@@ -9,8 +9,7 @@ import org.springframework.stereotype.Component;
 @Component
 public class PostMapper {
 
-    public Post createPostDTOtoPostInGroup(Integer idOwner, Group group, CreatePostDTO postDTO,Post post){
-//        Post post=new Post();
+    public Post createPostDTOtoPostInGroup(Integer idOwner, Group group, CreatePostDTO postDTO, Post post){
 
         User owner=new User();
         owner.setId(idOwner);
@@ -18,21 +17,18 @@ public class PostMapper {
         post.setGroup(group);
         post.setPublic(group.isPublic());
         post.setText(postDTO.text());
-//        post.setImgUrl(postDTO.imgUrl());
         post.setOwner(owner);
 
         return post;
     }
 
     public Post createPostDTOtoPostOnTimeline(Integer idOwner, CreatePostDTO postDTO, Post post){
-//        Post post=new Post();
 
         User owner=new User();
         owner.setId(idOwner);
 
         post.setPublic(postDTO.isPublic());
         post.setText(postDTO.text());
-//        post.setImgUrl(postDTO.imgUrl());
         post.setOwner(owner);
 
         return post;
