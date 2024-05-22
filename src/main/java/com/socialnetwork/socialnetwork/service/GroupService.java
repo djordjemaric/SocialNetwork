@@ -1,7 +1,7 @@
 package com.socialnetwork.socialnetwork.service;
 
-import com.socialnetwork.socialnetwork.dto.group.CreateGroupDto;
-import com.socialnetwork.socialnetwork.dto.group.GroupDto;
+import com.socialnetwork.socialnetwork.dto.group.CreateGroupDTO;
+import com.socialnetwork.socialnetwork.dto.group.GroupDTO;
 import com.socialnetwork.socialnetwork.entity.Group;
 import com.socialnetwork.socialnetwork.entity.GroupMember;
 import com.socialnetwork.socialnetwork.entity.User;
@@ -29,7 +29,7 @@ public class GroupService {
         this.jwtService = jwtService;
     }
 
-    public GroupDto createGroup(CreateGroupDto group) {
+    public GroupDTO createGroup(CreateGroupDTO group) {
         User currentUser = jwtService.getUser();
 
         //provera da li postoji grupa sa tim imenom
