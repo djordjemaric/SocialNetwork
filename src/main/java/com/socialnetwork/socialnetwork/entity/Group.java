@@ -31,15 +31,7 @@ public class Group {
     @JoinColumn(name = "id_admin")
     private User admin;
 
-
     private boolean isPublic;
-
-    @OneToMany(mappedBy = "group")
-    private List<GroupMember> members;
-
-    @OneToMany(mappedBy = "group")
-    private List<GroupRequest> requests;
-
 
     @OneToMany(mappedBy = "group")
     private List<Post> posts;
