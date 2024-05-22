@@ -69,6 +69,11 @@ public class GroupService {
             throw new FunctionArgumentException("User is already in that group");
         }
 
+        //provera da li je user vec u toj grupi
+        if (groupRequestRepository.existsByUserIdAndGroupId(currentUser.getId(), idGroup)) {
+            throw new FunctionArgumentException("Request already exist");
+        }
+
         GroupRequest groupRequest = groupRequestRepository.save(new GroupRequest(null, currentUser, group));
 
 
