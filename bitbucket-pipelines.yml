@@ -12,22 +12,21 @@ definitions:
           - mvn -B clean package -DskipTests --file pom.xml
         artifacts:
           - target/*.jar
-
-
-
-pipelines:
-  default:
-    - step:
+    - step: &OIDCtest
+        image: amazon/aws-cli
         name: Testing aws openID connect
         oidc: true
         script:
-          - apt-get update
-          - apt-get install awscli -y
           - export AWS_REGION=eu-central-1
           - export AWS_ROLE_ARN=arn:aws:iam::211125711045:role/bitbucket_oidc_role
           - export AWS_WEB_IDENTITY_TOKEN_FILE=$(pwd)/web-identity-token
           - echo $BITBUCKET_STEP_OIDC_TOKEN > $(pwd)/web-identity-token
           - aws s3 ls
+
+
+pipelines:
+  default:
+    - step: *OIDCtest
   branches:
     master:
       - step: *build
