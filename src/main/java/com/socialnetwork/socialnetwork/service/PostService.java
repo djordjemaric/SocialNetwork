@@ -1,6 +1,7 @@
 package com.socialnetwork.socialnetwork.service;
 
 import com.socialnetwork.socialnetwork.dto.post.CreatePostDTO;
+import com.socialnetwork.socialnetwork.dto.post.PostDTO;
 import com.socialnetwork.socialnetwork.dto.post.UpdatePostDTO;
 import com.socialnetwork.socialnetwork.entity.Group;
 import com.socialnetwork.socialnetwork.entity.Post;
@@ -28,19 +29,21 @@ public class PostService {
         this.jwtService = jwtService;
     }
 
-    public void createPostInGroup(CreatePostDTO postDTO) {
+    public PostDTO createPostInGroup(CreatePostDTO postDTO) {
         User user = jwtService.getUser();
         Group group = groupRepository.findById(postDTO.idGroup()).orElseThrow(
                 () -> new NoSuchElementException("There is no group with the id of " + postDTO.idGroup()));
-        postRepository.save(postMapper.createPostDTOtoPostInGroup(user.getId(), group, postDTO));
+        Post post=postRepository.save(postMapper.createPostDTOtoPostInGroup(user.getId(), group, postDTO));
+        return postMapper.postToPostDTO(post);
     }
 
-    public void createPostOnTimeline(CreatePostDTO postDTO) {
+    public PostDTO createPostOnTimeline(CreatePostDTO postDTO) {
         User user = jwtService.getUser();
-        postRepository.save(postMapper.createPostDTOtoPostOnTimeline(user.getId(), postDTO));
+        Post post=postRepository.save(postMapper.createPostDTOtoPostOnTimeline(user.getId(), postDTO));
+        return postMapper.postToPostDTO(post);
     }
 
-    public void updatePost(Integer idPost, UpdatePostDTO updatePostDTO) {
+    public PostDTO updatePost(Integer idPost, UpdatePostDTO updatePostDTO) {
         User user = jwtService.getUser();
         Post post = postRepository.findById(idPost).orElseThrow(() ->
                 new NoSuchElementException("There is no post with the id of " + idPost));
@@ -51,6 +54,7 @@ public class PostService {
         post.setImgUrl(updatePostDTO.imgUrl());
         post.setPublic(updatePostDTO.isPublic());
         postRepository.save(post);
+        return postMapper.postToPostDTO(post);
     }
 
 }

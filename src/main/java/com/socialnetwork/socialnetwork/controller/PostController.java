@@ -1,6 +1,7 @@
 package com.socialnetwork.socialnetwork.controller;
 
 import com.socialnetwork.socialnetwork.dto.post.CreatePostDTO;
+import com.socialnetwork.socialnetwork.dto.post.PostDTO;
 import com.socialnetwork.socialnetwork.dto.post.UpdatePostDTO;
 import com.socialnetwork.socialnetwork.service.PostService;
 import org.springframework.web.bind.annotation.*;
@@ -17,17 +18,16 @@ public class PostController {
 
 
     @PostMapping
-    public void save(@RequestBody CreatePostDTO postDTO) {
+    public PostDTO save(@RequestBody CreatePostDTO postDTO) {
         if (postDTO.idGroup() == null) {
-            postService.createPostOnTimeline(postDTO);
-        } else {
-            postService.createPostInGroup(postDTO);
+            return postService.createPostOnTimeline(postDTO);
         }
+        return postService.createPostInGroup(postDTO);
     }
 
     @PutMapping("/{id}")
-    public void update(@PathVariable Integer id, @RequestBody UpdatePostDTO postDTO) {
-        postService.updatePost(id, postDTO);
+    public PostDTO update(@PathVariable Integer id, @RequestBody UpdatePostDTO postDTO) {
+        return postService.updatePost(id, postDTO);
     }
 
 }

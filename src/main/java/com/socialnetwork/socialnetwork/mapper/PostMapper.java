@@ -1,6 +1,7 @@
 package com.socialnetwork.socialnetwork.mapper;
 
 import com.socialnetwork.socialnetwork.dto.post.CreatePostDTO;
+import com.socialnetwork.socialnetwork.dto.post.PostDTO;
 import com.socialnetwork.socialnetwork.entity.Group;
 import com.socialnetwork.socialnetwork.entity.Post;
 import com.socialnetwork.socialnetwork.entity.User;
@@ -36,6 +37,11 @@ public class PostMapper {
         post.setOwner(owner);
 
         return post;
+    }
+
+    public PostDTO postToPostDTO(Post post) {
+        return new PostDTO(
+                post.getId(), post.getText(), post.getImgUrl(), post.getOwner().getEmail(), post.getGroup().getName(), post.getComments());
     }
 
 }
