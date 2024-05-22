@@ -1,23 +1,19 @@
 package com.socialnetwork.socialnetwork.service;
 
 import io.awspring.cloud.s3.S3Template;
-import jakarta.annotation.Nullable;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 
-import java.io.*;
-import java.net.URL;
-import java.net.http.HttpClient;
-import java.net.http.HttpRequest;
-import java.net.http.HttpResponse;
-import java.nio.file.Path;
+import java.io.IOException;
 import java.time.Duration;
 
 @Service
 public class S3Service {
     private final S3Template s3Template;
 
-    private String bucketName = "social-network-storage";
+    @Value("${aws.s3.bucket-name}")
+    private String bucketName;
 
     public S3Service(S3Template s3Template) {
         this.s3Template = s3Template;
@@ -34,10 +30,8 @@ public class S3Service {
         }
         try {
             s3Template.upload(bucketName, key, file.getInputStream());
-        } catch (FileNotFoundException e) {
+        } catch (IOException e) {
             throw new RuntimeException(e);
-        } catch (IOException ex) {
-            throw new RuntimeException(ex);
         }
         return key;
     }
