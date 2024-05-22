@@ -7,31 +7,24 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 
-import java.util.List;
-
-
 @Entity
 @Getter
 @Setter
 @NoArgsConstructor
 @AllArgsConstructor
-@Table(name = "\"group\"")
-public class Group {
+public class Reply {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Integer id;
 
-    @Column(nullable = false, unique = true)
-    private String name;
+    @NotNull
+    private String text;
 
     @NotNull
     @ManyToOne
-    @JoinColumn(name = "id_admin")
-    private User admin;
+    @JoinColumn(name = "id_reply_owner")
+    private User replyOwner;
 
-    private boolean isPublic;
 
-    @OneToMany(mappedBy = "group")
-    private List<Post> posts;
 }

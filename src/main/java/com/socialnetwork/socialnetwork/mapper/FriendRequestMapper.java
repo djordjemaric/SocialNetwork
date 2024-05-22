@@ -1,5 +1,6 @@
 package com.socialnetwork.socialnetwork.mapper;
 
+import com.socialnetwork.socialnetwork.dto.friendRequest.FriendRequestDTO;
 import com.socialnetwork.socialnetwork.dto.friendRequest.PreviewFriendRequestDTO;
 import com.socialnetwork.socialnetwork.entity.FriendRequest;
 import com.socialnetwork.socialnetwork.entity.User;
@@ -21,4 +22,7 @@ public class FriendRequestMapper {
         return new PreviewFriendRequestDTO(friendRequest.getFrom().getEmail(), friendRequest.getTo().getEmail());
     }
 
+    public FriendRequestDTO entityToDTO(FriendRequest friendRequest){
+        return new FriendRequestDTO(friendRequest.getId(), friendRequest.getFrom().getEmail());
+    }
 }

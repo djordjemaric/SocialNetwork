@@ -4,9 +4,9 @@ import com.socialnetwork.socialnetwork.dto.group.CreateGroupDto;
 import com.socialnetwork.socialnetwork.dto.group.GroupDto;
 import com.socialnetwork.socialnetwork.dto.group.GroupMemberDto;
 import com.socialnetwork.socialnetwork.dto.group.GroupRequestDto;
+import com.socialnetwork.socialnetwork.service.GroupService;
 import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.*;
-import com.socialnetwork.socialnetwork.service.GroupService;
 
 import java.util.List;
 
@@ -43,6 +43,18 @@ public class GroupController {
     @PostMapping("/reject/{idUser}/{idGroup}")
     public void rejectRequest(@PathVariable Integer idUser,@PathVariable Integer idGroup) {
         groupService.rejectRequest(idUser,idGroup);
+    }
+    @DeleteMapping("/{idGroup}/leave")
+    @ResponseStatus(HttpStatus.OK)
+    public void leaveGroup(@PathVariable Integer idGroup) {
+        groupService.leaveGroup(idGroup);
+    }
+
+    @ResponseStatus(HttpStatus.OK)
+    @DeleteMapping( "/{idGroup}/members/{idUser}") // idGroup and idUser that we want to remove
+    public void removeMember (@PathVariable Integer idGroup, @PathVariable Integer idUser)
+    {
+        groupService.removeMember(idGroup, idUser);
     }
 
 }

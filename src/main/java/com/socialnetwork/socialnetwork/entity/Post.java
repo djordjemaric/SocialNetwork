@@ -9,29 +9,34 @@ import lombok.Setter;
 
 import java.util.List;
 
-
 @Entity
 @Getter
 @Setter
 @NoArgsConstructor
 @AllArgsConstructor
-@Table(name = "\"group\"")
-public class Group {
+public class Post {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Integer id;
 
-    @Column(nullable = false, unique = true)
-    private String name;
+    private boolean isPublic;
+
+    private String text;
+
+    private String imgUrl;
 
     @NotNull
     @ManyToOne
-    @JoinColumn(name = "id_admin")
-    private User admin;
+    @JoinColumn(name = "id_owner")
+    private User owner;
 
-    private boolean isPublic;
+    @ManyToOne
+    @JoinColumn(name = "id_group")
+    private Group group;
 
-    @OneToMany(mappedBy = "group")
-    private List<Post> posts;
+    @OneToMany
+    @JoinColumn(name = "id_post")
+    private List<Comment> comments;
+
 }
