@@ -56,19 +56,21 @@ public class PostService {
         return postMapper.postToPostDTO(post);
     }
 
-    public void createPostInGroup(CreatePostDTO postDTO) {
+    public PostDTO createPostInGroup(CreatePostDTO postDTO) {
         User user = jwtService.getUser();
         Group group = groupRepository.findById(postDTO.idGroup()).orElseThrow(
                 () -> new NoSuchElementException("There is no group with the id of " + postDTO.idGroup()));
-        postRepository.save(postMapper.createPostDTOtoPostInGroup(user.getId(), group, postDTO));
+        Post post = postRepository.save(postMapper.createPostDTOtoPostInGroup(user.getId(), group, postDTO));
+        return postMapper.postToPostDTO(post);
     }
 
-    public void createPostOnTimeline(CreatePostDTO postDTO) {
+    public PostDTO createPostOnTimeline(CreatePostDTO postDTO) {
         User user = jwtService.getUser();
-        postRepository.save(postMapper.createPostDTOtoPostOnTimeline(user.getId(), postDTO));
+        Post post = postRepository.save(postMapper.createPostDTOtoPostOnTimeline(user.getId(), postDTO));
+        return postMapper.postToPostDTO(post);
     }
 
-    public void updatePost(Integer idPost, UpdatePostDTO updatePostDTO) {
+    public PostDTO updatePost(Integer idPost, UpdatePostDTO updatePostDTO) {
         User user = jwtService.getUser();
         Post post = postRepository.findById(idPost).orElseThrow(() ->
                 new NoSuchElementException("There is no post with the id of " + idPost));
@@ -78,24 +80,7 @@ public class PostService {
         post.setText(updatePostDTO.text());
         post.setImgUrl(updatePostDTO.imgUrl());
         post.setPublic(updatePostDTO.isPublic());
-        postRepository.save(post);
-    }
-
-
-    public void deletePost(Integer idPost) {
-        Post post = postRepository.findById(idPost).orElseThrow(() ->
-                new NoSuchElementException("There is no post with the id of " + idPost));
-        User user = jwtService.getUser();
-        if (post.getGroup() != null) {
-            if (Objects.equals(post.getGroup().getAdmin().getId(), user.getId())) {
-                postRepository.deleteById(idPost);
-                return;
-            }
-        }
-        if (Objects.equals(user.getId(), post.getOwner().getId())) {
-            postRepository.deleteById(idPost);
-            return;
-        }
-        throw new RuntimeException("You don't have the permission to delete the post.");
+        post = postRepository.save(post);
+        return postMapper.postToPostDTO(post);
     }
 }
