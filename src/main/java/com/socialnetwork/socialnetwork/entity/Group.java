@@ -7,7 +7,6 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 
-import java.util.Set;
 
 import java.util.List;
 
@@ -36,10 +35,10 @@ public class Group {
     private boolean isPublic;
 
     @OneToMany(mappedBy = "group")
-    private Set<GroupMember> members;
+    private List<GroupMember> members;
 
     @OneToMany(mappedBy = "group")
-    private Set<GroupRequest> requests;
+    private List<GroupRequest> requests;
 
 
     @OneToMany(mappedBy = "group")
