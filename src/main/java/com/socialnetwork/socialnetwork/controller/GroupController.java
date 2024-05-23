@@ -10,7 +10,7 @@ import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
 
-@CrossOrigin
+
 @RestController
 @RequestMapping("/api/groups")
 public class GroupController {
@@ -25,6 +25,17 @@ public class GroupController {
     @PostMapping
     public GroupDTO createGroup(@RequestBody CreateGroupDTO createGroupDto) {
         return groupService.createGroup(createGroupDto);
+    }
+
+    @ResponseStatus(HttpStatus.OK)
+    @DeleteMapping("/{id}")
+    public void deleteGroup(@PathVariable Integer id) {
+        groupService.deleteGroup(id);
+    }
+    @ResponseStatus(HttpStatus.OK)
+    @GetMapping
+    public List<GroupDTO> getGroupsByName(@RequestParam String name) {
+        return groupService.findByName(name);
     }
 
     @ResponseStatus(HttpStatus.OK)
