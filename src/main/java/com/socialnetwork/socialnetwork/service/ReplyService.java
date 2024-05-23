@@ -41,19 +41,19 @@ public class ReplyService {
 
     public ReplyDTO createReply(Integer postId,Integer commentId, CreateReplyDTO replyDTO) {
         User currentUser = jwtService.getUser();
-        Comment comment = commentRepository.findById(commentId)
-                .orElseThrow(() -> new NoSuchElementException("The comment with the id of " + commentId + " is not present in the database."));
+
+
+        Comment comment=commentRepository.findByIdAndPost_Id(commentId, postId)
+                .orElseThrow(() -> new RuntimeException("This comment is not associated with this post."));
 
         Post post = comment.getPost();
-
-        commentRepository.findByIdAndPost_Id(commentId, postId)
-                .orElseThrow(() -> new RuntimeException("This comment is not associated with this post."));
 
         if (!post.isPublic() && post.getGroup() == null) {
             if (friendsRepository.areTwoUsersFriends(post.getOwner().getId(), currentUser.getId()).isEmpty()) {
                 throw new RuntimeException("You cannot see the post because you are not friends with the post owner.");
             }
         }
+
         if (post.getGroup() != null && !(post.getGroup().isPublic())) {
             if (!(groupMemberRepository.existsByUserIdAndGroupId(currentUser.getId(), post.getGroup().getId()))) {
                 throw new RuntimeException("You cannot see the post because you are not a member of the "
@@ -62,8 +62,7 @@ public class ReplyService {
         }
         Reply reply = replyMapper.createReplyDTOtoReply(currentUser, comment, replyDTO);
         Reply savedReply = replyRepository.save(reply);
-        CommentDTO commentDTO=commentMapper.createCommentToCommentDTO(savedReply.getComment());
-        return new ReplyDTO(savedReply.getId(), savedReply.getText(), commentDTO, savedReply.getReplyOwner().getId());
+        return replyMapper.replytoReplyDTO(savedReply);
 
     }
 }

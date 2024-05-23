@@ -46,7 +46,7 @@ public class CommentService {
                         + post.getGroup().getName() + " group.");
             }
         }
-        Comment comment = commentMapper.createCommentDTOtoComment(currentUser, post, commentDTO);
+        Comment comment = commentMapper.commentDTOtoComment(currentUser, post, commentDTO);
         Comment savedComment = commentRepository.save(comment);
         return new CommentDTO(savedComment.getId(), savedComment.getText(), savedComment.getPost().getId(), savedComment.getCommOwner().getId());
 

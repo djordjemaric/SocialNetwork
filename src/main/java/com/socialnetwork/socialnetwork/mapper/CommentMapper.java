@@ -9,7 +9,9 @@ import org.springframework.stereotype.Component;
 
 @Component
 public class CommentMapper {
-    public Comment createCommentDTOtoComment(User owner, Post post, CreateCommentDTO commentDTO){
+
+
+    public Comment commentDTOtoComment(User owner, Post post, CreateCommentDTO commentDTO){
         Comment comment = new Comment();
         comment.setCommOwner(owner);
         comment.setPost(post);
@@ -17,7 +19,7 @@ public class CommentMapper {
         return comment;
     }
 
-    public CommentDTO createCommentToCommentDTO(Comment comment){
-        return new CommentDTO(comment.getId(),comment.getText(),comment.getPost().getId(),comment.getCommOwner().getId());
+    public CommentDTO commentToCommentDTO(Comment comment){
+        return new CommentDTO(comment.getId(), comment.getText(), comment.getPost().getId(), comment.getCommOwner().getId());
     }
 }
