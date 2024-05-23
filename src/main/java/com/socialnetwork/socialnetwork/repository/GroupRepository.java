@@ -13,7 +13,6 @@ import static com.socialnetwork.socialnetwork.repository.QueryConstants.ADMIN_AN
 
 @Repository
 public interface GroupRepository extends JpaRepository<Group, Integer> {
-
     boolean existsByAdmin(User user);
     boolean existsByIdAndAdminId(Integer idGroup, Integer idAdmin);
 

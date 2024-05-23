@@ -19,7 +19,6 @@ public class GroupRequestMapper {
     }
 
     public GroupRequestDTO requestToGroupRequestDTO(GroupRequest request) {
-
         PreviewUserDTO userDTO = userMapper.requestToPreviewUserDTO(request);
         GroupDTO groupDTO = groupMapper.requestToGroupDTO(request);
 

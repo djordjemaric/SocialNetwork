@@ -55,7 +55,6 @@ public class GroupService {
     }
 
     public void deleteGroup(Integer idGroup) {
-
         User currentUser = jwtService.getUser();
 
         if (!groupRepository.existsByIdAndAdminId(idGroup, currentUser.getId())) {
@@ -68,7 +67,6 @@ public class GroupService {
 
 
     public List<GroupDTO> findByName(String name) {
-
         List<Group> groups = groupRepository.findAllByNameStartingWith(name);
 
         return groups.stream()
@@ -89,11 +87,9 @@ public class GroupService {
         return groupRequests.stream()
                 .map(groupRequestMapper::requestToGroupRequestDTO)
                 .toList();
-
     }
 
     public RequestDTO checkRequest(Integer idGroup, Integer idRequest) {
-
         User currentUser = jwtService.getUser();
 
         Group group = groupRepository.findById(idGroup).orElseThrow(() -> new FunctionArgumentException("Group does not exist!"));
@@ -120,7 +116,6 @@ public class GroupService {
     }
 
     public void acceptRequest(Integer idGroup, Integer idRequest) {
-
         RequestDTO requestDTO = checkRequest(idGroup, idRequest);
 
         groupMemberRepository.save(new GroupMember(null, requestDTO.user(), requestDTO.group()));

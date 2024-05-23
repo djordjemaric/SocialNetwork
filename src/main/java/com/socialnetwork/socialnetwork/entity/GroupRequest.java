@@ -19,7 +19,6 @@ public class GroupRequest {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Integer id;
 
-
     @NotNull
     @ManyToOne
     @JoinColumn(name = "id_user")
