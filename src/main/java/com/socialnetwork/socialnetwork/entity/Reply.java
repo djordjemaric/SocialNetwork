@@ -24,7 +24,7 @@ public class Reply {
     @NotNull
     @ManyToOne
     @JoinColumn(name = "id_reply_owner")
-    private User replyOwner;
+    private User owner;
 
 
 }

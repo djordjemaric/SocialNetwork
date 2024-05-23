@@ -9,7 +9,6 @@ import com.socialnetwork.socialnetwork.entity.User;
 import com.socialnetwork.socialnetwork.mapper.PostMapper;
 import com.socialnetwork.socialnetwork.repository.GroupRepository;
 import com.socialnetwork.socialnetwork.repository.PostRepository;
-import com.socialnetwork.socialnetwork.repository.UserRepository;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 
@@ -90,5 +89,21 @@ public class PostService {
         post = postMapper.updatePostDTOtoPost(updatePostDTO, imgS3Key, post);
         post = postRepository.save(post);
         return postMapper.postToPostDTO(post);
+    }
+    public void deletePost(Integer idPost) {
+        Post post = postRepository.findById(idPost).orElseThrow(() ->
+                new NoSuchElementException("There is no post with the id of " + idPost));
+        User user = jwtService.getUser();
+        if (post.getGroup() != null) {
+            if (Objects.equals(post.getGroup().getAdmin().getId(), user.getId())) {
+                postRepository.deleteById(idPost);
+                return;
+            }
+        }
+        if (Objects.equals(user.getId(), post.getOwner().getId())) {
+            postRepository.deleteById(idPost);
+            return;
+        }
+        throw new RuntimeException("You don't have the permission to delete the post.");
     }
 }
