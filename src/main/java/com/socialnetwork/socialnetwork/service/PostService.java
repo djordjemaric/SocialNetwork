@@ -81,6 +81,7 @@ public class PostService {
     }
 
     public PostDTO createPostOnTimeline(CreatePostDTO postDTO) {
+        System.out.println(postDTO.isPublic());
         User user = jwtService.getUser();
         Post post = new Post();
         if (postDTO.img() != null) {
