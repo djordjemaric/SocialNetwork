@@ -21,5 +21,4 @@ public class QueryConstants {
             "ELSE FALSE END " +
             "FROM Group g WHERE (g.admin.id = :idAdmin AND g.id = :idGroup)";
 
-
 }
