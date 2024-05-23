@@ -57,7 +57,6 @@ public class GroupService {
         }
 
         groupRepository.deleteById(idGroup);
-
     }
 
 
@@ -92,14 +91,12 @@ public class GroupService {
         GroupRequest groupRequest = groupRequestRepository.save(new GroupRequest(null, user, group));
 
         return new ResolvedGroupRequestDTO(groupRequest.getId(), new PreviewUserDTO(user.getId(), user.getEmail()), new GroupDTO(group.getName(), group.getAdmin().getEmail(), group.isPublic(), group.getId()), ResolvedGroupRequestStatus.REQUEST_TO_JOIN_GROUP_CREATED);
-
     }
 
     public ResolvedGroupRequestDTO addUserAsAMemberToPublicGroup(User user, Group group) {
         GroupMember groupMember = groupMemberRepository.save(new GroupMember(null, user, group));
 
         return new ResolvedGroupRequestDTO(groupMember.getId(), new PreviewUserDTO(user.getId(), user.getEmail()), new GroupDTO(group.getName(), group.getAdmin().getEmail(), group.isPublic(), group.getId()), ResolvedGroupRequestStatus.REQUEST_TO_JOIN_GROUP_ACCEPTED);
-
     }
 
     public void leaveGroup(Integer idGroup) {
