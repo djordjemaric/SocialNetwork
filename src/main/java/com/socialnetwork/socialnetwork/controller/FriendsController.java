@@ -21,9 +21,6 @@ public class FriendsController {
         this.friendsService = friendsService;
     }
 
-//    Logger logger = LoggerFactory.getLogger(FriendsController.class);
-
-//    for now we will get id of the user that sent the request from path, but later will change it to it from JWT
     @ResponseStatus(HttpStatus.OK)
     @GetMapping("/requests")
     public List<FriendRequestDTO> getFriendRequests(){
@@ -36,7 +33,6 @@ public class FriendsController {
         return friendsService.searchFriends(searchTerm);
     }
 
-//    for now we will get id of the user that sent the request from path, but later will change it to it from JWT
     @ResponseStatus(HttpStatus.CREATED)
     @PostMapping("/requests")
     public PreviewFriendRequestDTO sendFriendRequest(@RequestBody SentFriendRequestDTO friendRequestDTO){
