@@ -8,7 +8,6 @@ import lombok.NoArgsConstructor;
 import lombok.Setter;
 
 import java.util.List;
-import java.util.UUID;
 
 @Entity
 @Getter
@@ -26,7 +25,7 @@ public class Post {
     private String text;
 
     @Column(name = "img_s3_key")
-    private String imgS3Url;
+    private String imgS3Key;
 
     @NotNull
     @ManyToOne
