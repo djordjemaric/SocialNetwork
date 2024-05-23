@@ -13,6 +13,8 @@ import com.socialnetwork.socialnetwork.repository.UserRepository;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 
+import java.io.IOException;
+import java.io.InputStream;
 import java.util.NoSuchElementException;
 import java.util.Objects;
 
@@ -34,7 +36,19 @@ public class PostService {
     }
     private String uploadImageAndGetKey(MultipartFile image) {
         if (image != null) {
-            return s3Service.uploadToBucket(image);
+            String filename = image.getOriginalFilename();
+            if (filename == null) {
+                throw new IllegalArgumentException("Filename cannot be null");
+            }
+
+            String extension = filename
+                    .substring(filename.lastIndexOf("."));
+
+            try (InputStream inputStream = image.getInputStream()) {
+                return s3Service.uploadToBucket(extension, inputStream);
+            } catch (IOException e) {
+                throw new RuntimeException(e);
+            }
         }
         return null;
     }

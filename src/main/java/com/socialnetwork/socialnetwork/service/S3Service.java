@@ -3,9 +3,8 @@ package com.socialnetwork.socialnetwork.service;
 import io.awspring.cloud.s3.S3Template;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
-import org.springframework.web.multipart.MultipartFile;
 
-import java.io.IOException;
+import java.io.InputStream;
 import java.time.Duration;
 import java.util.UUID;
 
@@ -24,19 +23,10 @@ public class S3Service {
         return s3Template.createSignedGetURL(bucketName, key, Duration.ofMinutes(10)).toExternalForm();
     }
 
-    public String uploadToBucket(MultipartFile file) {
-        try {
-            String filename = file.getOriginalFilename();
-            String extension = filename
-                    .substring(filename.lastIndexOf("."));
-            String key = UUID.randomUUID() + extension;
-            s3Template.upload(bucketName, key, file.getInputStream());
-            return key;
-        } catch (IOException e) {
-            throw new RuntimeException(e);
-        } catch (NullPointerException e) {
-            throw new RuntimeException(e);
-        }
+    public String uploadToBucket(String fileExtension, InputStream stream) {
+        String fileKey = UUID.randomUUID() + fileExtension;
+        s3Template.upload(bucketName, fileKey, stream);
+        return fileKey;
     }
 
     public void deleteFromBucket(String key) {
