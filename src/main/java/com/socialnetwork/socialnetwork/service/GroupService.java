@@ -23,13 +23,11 @@ public class GroupService {
     private final GroupRepository groupRepository;
     private final GroupMemberRepository groupMemberRepository;
     private final GroupMapper groupMapper;
-    private final UserRepository userRepository;
     private final JwtService jwtService;
 
-    public GroupService(GroupRepository groupRepository, GroupMapper groupMapper, GroupMemberRepository groupMemberRepository, UserRepository userRepository, JwtService jwtService) {
+    public GroupService(GroupRepository groupRepository, JwtService jwtService, GroupMemberRepository groupMemberRepository, GroupMapper groupMapper) {
         this.groupRepository = groupRepository;
         this.groupMemberRepository = groupMemberRepository;
-        this.userRepository = userRepository;
         this.groupMapper = groupMapper;
         this.jwtService = jwtService;
     }
@@ -49,6 +47,20 @@ public class GroupService {
 
         return groupMapper.entityToGroupDto(createdGroup);
     }
+
+    public void deleteGroup(Integer idGroup) {
+
+        User currentUser = jwtService.getUser();
+
+        //provera da li postoji grupa sa prosledjenim id-jem i id-jem admina
+        if (!groupRepository.existsByIdAndAdminId(idGroup, currentUser.getId())) {
+            throw new FunctionArgumentException("There is no group with given id or id of admin");
+        }
+
+        groupRepository.deleteById(idGroup);
+
+    }
+
 
     public List<GroupDTO> findByName(String name) {
 
