@@ -38,6 +38,12 @@ public class PostController {
         return postService.createPostInGroup(postDTO);
     }
 
+    @ResponseStatus(HttpStatus.OK)
+    @PutMapping("/{id}")
+    public PostDTO update(@PathVariable Integer id, @RequestBody UpdatePostDTO postDTO) {
+        return postService.updatePost(id, postDTO);
+    }
+
     @ResponseStatus(HttpStatus.CREATED)
     @PostMapping("/{postId}/comments")
     public CommentDTO saveComment(@PathVariable Integer idPost, @RequestBody CreateCommentDTO commentDTO) {
@@ -46,8 +52,9 @@ public class PostController {
     }
 
     @ResponseStatus(HttpStatus.OK)
-    @PutMapping("/{id}")
-    public PostDTO update(@PathVariable Integer id, @RequestBody UpdatePostDTO postDTO) {
-        return postService.updatePost(id, postDTO);
+    @DeleteMapping("/{id}")
+    public void delete(@PathVariable Integer id) {
+        postService.deletePost(id);
     }
+
 }
