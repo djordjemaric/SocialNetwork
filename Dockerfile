@@ -1,7 +1,7 @@
 FROM amazoncorretto:22
 LABEL authors="levi-interns"
 
-ARG JAR_FILE=target/*.jar
+ARG JAR_FILE
 
 COPY ${JAR_FILE} social-network.jar
 
