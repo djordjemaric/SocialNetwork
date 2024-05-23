@@ -1,6 +1,7 @@
 package com.socialnetwork.socialnetwork.service;
 
 import com.socialnetwork.socialnetwork.dto.post.CreatePostDTO;
+import com.socialnetwork.socialnetwork.dto.post.OpenAIPostDTO;
 import com.socialnetwork.socialnetwork.dto.post.PostDTO;
 import com.socialnetwork.socialnetwork.dto.post.UpdatePostDTO;
 import com.socialnetwork.socialnetwork.entity.Group;
@@ -9,7 +10,8 @@ import com.socialnetwork.socialnetwork.entity.User;
 import com.socialnetwork.socialnetwork.mapper.PostMapper;
 import com.socialnetwork.socialnetwork.repository.GroupRepository;
 import com.socialnetwork.socialnetwork.repository.PostRepository;
-import com.socialnetwork.socialnetwork.repository.UserRepository;
+import org.springframework.ai.chat.ChatClient;
+import org.springframework.ai.chat.prompt.Prompt;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 
@@ -26,13 +28,15 @@ public class PostService {
     private final GroupRepository groupRepository;
     private final JwtService jwtService;
     private final S3Service s3Service;
+    private final ChatClient chatClient;
 
-    public PostService(PostRepository postRepository, PostMapper postMapper, GroupRepository groupRepository, JwtService jwtService, S3Service s3Service) {
+    public PostService(PostRepository postRepository, PostMapper postMapper, GroupRepository groupRepository, JwtService jwtService, S3Service s3Service, ChatClient chatClient) {
         this.postRepository = postRepository;
         this.postMapper = postMapper;
         this.groupRepository = groupRepository;
         this.jwtService = jwtService;
         this.s3Service = s3Service;
+        this.chatClient = chatClient;
     }
     private String uploadImageAndGetKey(MultipartFile image) {
         if(image==null){
@@ -90,5 +94,19 @@ public class PostService {
         post = postMapper.updatePostDTOtoPost(updatePostDTO, imgS3Key, post);
         post = postRepository.save(post);
         return postMapper.postToPostDTO(post);
+    }
+
+    public PostDTO createAIPostOnTimeline(OpenAIPostDTO postDTO) {
+        String generatedText= chatClient.call(new Prompt(postDTO.txtPrompt())).getResult().getOutput().getContent();
+        return null;
+    }
+
+    public PostDTO createAIPostInGroup(OpenAIPostDTO postDTO) {
+        User user = jwtService.getUser();
+
+        Group group = groupRepository.findById(postDTO.idGroup()).orElseThrow(
+                () -> new NoSuchElementException("There is no group with the id of " + postDTO.idGroup()));
+        String generatedText= chatClient.call(new Prompt(postDTO.txtPrompt())).getResult().getOutput().getContent();
+        return null;
     }
 }
