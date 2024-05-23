@@ -3,6 +3,7 @@ package com.socialnetwork.socialnetwork.controller;
 import com.socialnetwork.socialnetwork.dto.group.CreateGroupDTO;
 import com.socialnetwork.socialnetwork.dto.group.GroupDTO;
 import com.socialnetwork.socialnetwork.dto.group.GroupRequestDTO;
+import com.socialnetwork.socialnetwork.dto.group.ResolvedGroupRequestDTO;
 import com.socialnetwork.socialnetwork.service.GroupService;
 import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.*;
@@ -66,6 +67,12 @@ public class GroupController {
     @DeleteMapping("/{idGroup}/members/{idUser}")
     public void removeMember(@PathVariable Integer idGroup, @PathVariable Integer idUser) {
         groupService.removeMember(idGroup, idUser);
+    }
+
+    @ResponseStatus(HttpStatus.CREATED)
+    @PostMapping("/{id}/join")
+    public ResolvedGroupRequestDTO createRequestToJoinGroup(@PathVariable Integer id) {
+        return groupService.createRequestToJoinGroup(id);
     }
 
 }

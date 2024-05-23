@@ -7,7 +7,11 @@ import org.springframework.data.jpa.repository.JpaRepository;
 
 import java.util.List;
 
+
 public interface GroupRequestRepository extends JpaRepository<GroupRequest, Integer> {
+
+    boolean existsByUserIdAndGroupId(Integer idUser,Integer idGroup);
+
     List<GroupRequest> findAllByGroup(Group group);
 
     boolean existsByUserAndGroup(User user, Group group);
