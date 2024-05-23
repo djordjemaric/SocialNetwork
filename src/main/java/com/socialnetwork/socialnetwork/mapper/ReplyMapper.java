@@ -19,7 +19,7 @@ public class ReplyMapper {
 
     public Reply createReplyDTOtoReply(User owner, Comment comment, CreateReplyDTO replyDTO){
         Reply reply=new Reply();
-        reply.setReplyOwner(owner);
+        reply.setOwner(owner);
         reply.setComment(comment);
         reply.setText(replyDTO.text());
         return reply;
@@ -27,7 +27,7 @@ public class ReplyMapper {
 
     public ReplyDTO replytoReplyDTO(Reply reply){
         CommentDTO commentDTO=commentMapper.commentToCommentDTO(reply.getComment());
-        return new ReplyDTO(reply.getId(), reply.getText(), commentDTO, reply.getReplyOwner().getId());
+        return new ReplyDTO(reply.getId(), reply.getText(), commentDTO, reply.getOwner().getId());
     }
 
 }

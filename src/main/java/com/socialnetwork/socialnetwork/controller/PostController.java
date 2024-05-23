@@ -1,13 +1,14 @@
 package com.socialnetwork.socialnetwork.controller;
 
 import com.socialnetwork.socialnetwork.dto.post.*;
-import com.socialnetwork.socialnetwork.entity.Comment;
-import com.socialnetwork.socialnetwork.entity.Post;
-import com.socialnetwork.socialnetwork.entity.User;
+import com.socialnetwork.socialnetwork.dto.post.CommentDTO;
+import com.socialnetwork.socialnetwork.dto.post.CreateCommentDTO;
+import com.socialnetwork.socialnetwork.dto.post.CreatePostDTO;
+import com.socialnetwork.socialnetwork.dto.post.PostDTO;
+import com.socialnetwork.socialnetwork.dto.post.UpdatePostDTO;
 import com.socialnetwork.socialnetwork.service.CommentService;
 import com.socialnetwork.socialnetwork.service.PostService;
 import com.socialnetwork.socialnetwork.service.ReplyService;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.*;
 
@@ -26,31 +27,38 @@ public class PostController {
         this.replyService = replyService;
     }
 
+
+    @ResponseStatus(HttpStatus.CREATED)
     @PostMapping
-    public void save(@RequestBody CreatePostDTO postDTO) {
-        if(postDTO.idGroup()==null){
-            postService.createPostOnTimeline(postDTO);
-        }else{
-            postService.createPostInGroup(postDTO);
+    public PostDTO save(@ModelAttribute CreatePostDTO postDTO) {
+        if (postDTO.idGroup() == null) {
+            return postService.createPostOnTimeline(postDTO);
         }
+        return postService.createPostInGroup(postDTO);
     }
 
-    @PutMapping("post/{idPost}")
-    public void update(@PathVariable Integer idPost, @RequestBody UpdatePostDTO postDTO){
-        postService.updatePost(idPost, postDTO);
+    @ResponseStatus(HttpStatus.OK)
+    @PutMapping("/{id}")
+    public PostDTO update(@PathVariable Integer id, @RequestBody UpdatePostDTO postDTO) {
+        return postService.updatePost(id, postDTO);
     }
 
     @ResponseStatus(HttpStatus.CREATED)
-    @PostMapping("/{postId}/comments")
+    @PostMapping("/{idPost}/comments")
     public CommentDTO saveComment(@PathVariable Integer idPost, @RequestBody CreateCommentDTO commentDTO) {
         return commentService.createComment(idPost,commentDTO);
 
     }
 
     @ResponseStatus(HttpStatus.CREATED)
-    @PostMapping("/{postId}/comments/{commentId}/replies")
-    public ReplyDTO saveReply(@PathVariable Integer postId,@PathVariable Integer commentId, @RequestBody CreateReplyDTO replyDTO) {
-        return replyService.createReply(postId,commentId, replyDTO);
+    @PostMapping("/{idPost}/comments/{commentId}/replies")
+    public ReplyDTO saveReply(@PathVariable Integer idPost,@PathVariable Integer commentId, @RequestBody CreateReplyDTO replyDTO) {
+        return replyService.createReply(idPost,commentId, replyDTO);
+    }
+    @ResponseStatus(HttpStatus.OK)
+    @DeleteMapping("/{id}")
+    public void delete(@PathVariable Integer id) {
+        postService.deletePost(id);
     }
 
     }
