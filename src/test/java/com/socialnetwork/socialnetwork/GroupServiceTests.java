@@ -15,6 +15,7 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.ArgumentCaptor;
+import org.mockito.Captor;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
@@ -51,8 +52,12 @@ class GroupServiceTests {
     private GroupMember groupMember;
     private CreateGroupDTO createGroupDTO;
     private GroupDTO expectedGroupDTO;
+
+    @Captor
     private ArgumentCaptor<Group> groupCaptor;
+    @Captor
     private ArgumentCaptor<GroupMember> groupMemberCaptor;
+    @Captor
     private ArgumentCaptor<Integer> idCaptor;
 
     @BeforeEach
@@ -63,11 +68,6 @@ class GroupServiceTests {
         groupMember = new GroupMember(1, user, group);
         createGroupDTO = new CreateGroupDTO("Group1", true);
         expectedGroupDTO = new GroupDTO("Group1", "admin@admin.com", true, 1);
-
-        groupCaptor = ArgumentCaptor.forClass(Group.class);
-        groupMemberCaptor = ArgumentCaptor.forClass(GroupMember.class);
-        idCaptor = ArgumentCaptor.forClass(Integer.class);
-
     }
 
     @Test
