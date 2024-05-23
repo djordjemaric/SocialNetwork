@@ -2,15 +2,16 @@ package com.socialnetwork.socialnetwork.service;
 
 import com.socialnetwork.socialnetwork.dto.group.CreateGroupDTO;
 import com.socialnetwork.socialnetwork.dto.group.GroupDTO;
+import com.socialnetwork.socialnetwork.dto.group.ResolvedGroupRequestDTO;
+import com.socialnetwork.socialnetwork.dto.group.ResolvedGroupRequestStatus;
 import com.socialnetwork.socialnetwork.dto.post.PostDTO;
-import com.socialnetwork.socialnetwork.entity.Group;
-import com.socialnetwork.socialnetwork.entity.GroupMember;
-import com.socialnetwork.socialnetwork.entity.Post;
-import com.socialnetwork.socialnetwork.entity.User;
+import com.socialnetwork.socialnetwork.dto.user.PreviewUserDTO;
+import com.socialnetwork.socialnetwork.entity.*;
 import com.socialnetwork.socialnetwork.mapper.GroupMapper;
 import com.socialnetwork.socialnetwork.mapper.PostMapper;
 import com.socialnetwork.socialnetwork.repository.GroupMemberRepository;
 import com.socialnetwork.socialnetwork.repository.GroupRepository;
+import com.socialnetwork.socialnetwork.repository.GroupRequestRepository;
 import com.socialnetwork.socialnetwork.repository.PostRepository;
 import org.hibernate.query.sqm.produce.function.FunctionArgumentException;
 import org.springframework.stereotype.Service;
@@ -23,14 +24,16 @@ import java.util.NoSuchElementException;
 @Service
 public class GroupService {
     private final GroupRepository groupRepository;
+    private final GroupRequestRepository groupRequestRepository;
     private final GroupMemberRepository groupMemberRepository;
     private final GroupMapper groupMapper;
     private final PostMapper postMapper;
     private final PostRepository postRepository;
     private final JwtService jwtService;
 
-    public GroupService(GroupRepository groupRepository, JwtService jwtService, GroupMemberRepository groupMemberRepository, GroupMapper groupMapper, PostMapper postMapper, PostRepository postRepository) {
+    public GroupService(GroupRepository groupRepository, JwtService jwtService, GroupRequestRepository groupRequestRepository, GroupMemberRepository groupMemberRepository, GroupMapper groupMapper, PostMapper postMapper, PostRepository postRepository) {
         this.groupRepository = groupRepository;
+        this.groupRequestRepository = groupRequestRepository;
         this.groupMemberRepository = groupMemberRepository;
         this.groupMapper = groupMapper;
         this.jwtService = jwtService;
@@ -44,7 +47,6 @@ public class GroupService {
         if (groupRepository.existsByName(group.name())) {
             throw new FunctionArgumentException("Group with that name already exists");
         }
-
         Group createdGroup = groupRepository.save(groupMapper.dtoToEntity(currentUser, group));
 
         groupMemberRepository.save(new GroupMember(null, currentUser, createdGroup));
@@ -81,15 +83,43 @@ public class GroupService {
         groupRepository.deleteById(idGroup);
     }
 
-
     public List<GroupDTO> findByName(String name) {
         List<Group> groups = groupRepository.findAllByNameStartingWith(name);
 
-        return groups.stream()
-                .map(group -> new GroupDTO(group.getName(), group.getAdmin().getEmail(), group.isPublic(), group.getId()))
-                .toList();
+        return groups.stream().map(group -> new GroupDTO(group.getName(), group.getAdmin().getEmail(), group.isPublic(), group.getId())).toList();
     }
 
+    public ResolvedGroupRequestDTO createRequestToJoinGroup(Integer idGroup) {
+        User currentUser = jwtService.getUser();
+
+        Group group = groupRepository.findById(idGroup).orElseThrow(() -> new FunctionArgumentException("Group does not exist!"));
+
+        if (groupRequestRepository.existsByUserIdAndGroupId(currentUser.getId(), idGroup)) {
+            throw new FunctionArgumentException("Request already exist");
+        }
+
+        if (groupMemberRepository.existsByUserIdAndGroupId(currentUser.getId(), idGroup)) {
+            throw new FunctionArgumentException("User is already in that group");
+        }
+
+        if (group.isPublic()) {
+            return addUserAsAMemberToPublicGroup(currentUser, group);
+        }
+
+        return addUserAsAMemberToPrivateGroup(currentUser, group);
+    }
+
+    public ResolvedGroupRequestDTO addUserAsAMemberToPrivateGroup(User user, Group group) {
+        GroupRequest groupRequest = groupRequestRepository.save(new GroupRequest(null, user, group));
+
+        return new ResolvedGroupRequestDTO(groupRequest.getId(), new PreviewUserDTO(user.getId(), user.getEmail()), new GroupDTO(group.getName(), group.getAdmin().getEmail(), group.isPublic(), group.getId()), ResolvedGroupRequestStatus.REQUEST_TO_JOIN_GROUP_CREATED);
+    }
+
+    public ResolvedGroupRequestDTO addUserAsAMemberToPublicGroup(User user, Group group) {
+        GroupMember groupMember = groupMemberRepository.save(new GroupMember(null, user, group));
+
+        return new ResolvedGroupRequestDTO(groupMember.getId(), new PreviewUserDTO(user.getId(), user.getEmail()), new GroupDTO(group.getName(), group.getAdmin().getEmail(), group.isPublic(), group.getId()), ResolvedGroupRequestStatus.REQUEST_TO_JOIN_GROUP_ACCEPTED);
+    }
 
     public void leaveGroup(Integer idGroup) {
         Group group = groupRepository.findById(idGroup).orElseThrow(() -> new FunctionArgumentException("Group does not exist"));
@@ -103,18 +133,15 @@ public class GroupService {
 
     @Transactional
     public void removeMember(Integer idGroup, Integer idUser) {
-
         User admin = jwtService.getUser();
         if (!groupRepository.existsByAdminIdAndGroupId(admin.getId(), idGroup)) {
-            throw new NoSuchElementException("There are no groups with that id: "
-                    + idGroup + " and that admin: " + admin.getEmail());
+            throw new NoSuchElementException("There are no groups with that id: " + idGroup + " and that admin: " + admin.getEmail());
         }
         if (admin.getId().equals(idUser)) {
             throw new RuntimeException("Can't remove an admin from the group!");
         }
         if (!groupMemberRepository.existsByUserIdAndGroupId(idUser, idGroup)) {
-            throw new NoSuchElementException("User with that id: " + idUser
-                    + " is not in this group: " + idGroup);
+            throw new NoSuchElementException("User with that id: " + idUser + " is not in this group: " + idGroup);
         }
         groupMemberRepository.deleteGroupMemberByGroupIdAndMemberId(idGroup, idUser);
     }

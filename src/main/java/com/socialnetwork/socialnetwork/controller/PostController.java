@@ -5,11 +5,8 @@ import com.socialnetwork.socialnetwork.dto.post.CreateCommentDTO;
 import com.socialnetwork.socialnetwork.dto.post.CreatePostDTO;
 import com.socialnetwork.socialnetwork.dto.post.PostDTO;
 import com.socialnetwork.socialnetwork.dto.post.UpdatePostDTO;
-import com.socialnetwork.socialnetwork.entity.Comment;
-import com.socialnetwork.socialnetwork.entity.Post;
 import com.socialnetwork.socialnetwork.service.CommentService;
 import com.socialnetwork.socialnetwork.service.PostService;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.*;
 
@@ -26,6 +23,8 @@ public class PostController {
         this.commentService = commentService;
     }
 
+
+    @ResponseStatus(HttpStatus.CREATED)
     @PostMapping
     public PostDTO save(@ModelAttribute CreatePostDTO postDTO) {
         if (postDTO.idGroup() == null) {
@@ -34,9 +33,10 @@ public class PostController {
         return postService.createPostInGroup(postDTO);
     }
 
-    @PutMapping("{idPost}")
-    public PostDTO update(@PathVariable Integer idPost, @ModelAttribute UpdatePostDTO postDTO) {
-        return postService.updatePost(idPost, postDTO);
+    @ResponseStatus(HttpStatus.OK)
+    @PutMapping("/{id}")
+    public PostDTO update(@PathVariable Integer id, @RequestBody UpdatePostDTO postDTO) {
+        return postService.updatePost(id, postDTO);
     }
 
     @ResponseStatus(HttpStatus.CREATED)
@@ -45,5 +45,13 @@ public class PostController {
         return commentService.createComment(idPost,commentDTO);
 
     }
-    
+
+    @ResponseStatus(HttpStatus.OK)
+    @DeleteMapping("/{id}")
+    public void delete(@PathVariable Integer id) {
+        postService.deletePost(id);
+    }
+
 }
+
+
