@@ -40,14 +40,11 @@ public class GroupService {
     public GroupDTO createGroup(CreateGroupDTO group) {
         User currentUser = jwtService.getUser();
 
-        //provera da li postoji grupa sa tim imenom
         if (groupRepository.existsByName(group.name())) {
             throw new FunctionArgumentException("Group with that name already exists");
         }
-        //kreiranje grupe
         Group createdGroup = groupRepository.save(groupMapper.dtoToEntity(currentUser, group));
 
-        //dodavanje admina kao membera u tu grupu
         groupMemberRepository.save(new GroupMember(null, currentUser, createdGroup));
 
         return groupMapper.entityToGroupDto(createdGroup);
@@ -57,7 +54,6 @@ public class GroupService {
 
         User currentUser = jwtService.getUser();
 
-        //provera da li postoji grupa sa prosledjenim id-jem i id-jem admina
         if (!groupRepository.existsByIdAndAdminId(idGroup, currentUser.getId())) {
             throw new FunctionArgumentException("There is no group with given id or id of admin");
         }
@@ -81,7 +77,6 @@ public class GroupService {
         User currentUser = jwtService.getUser();
         Group group = groupRepository.findByIdAndAdminId(idGroup, currentUser.getId());
 
-        //provera da li postoji grupa sa prosledjenim id-jem i admin id-jem
         if (group == null) {
             throw new FunctionArgumentException("There is no group with given id and given admin id!");
         }
@@ -103,17 +98,14 @@ public class GroupService {
         Group group = groupRepository.findById(idGroup).orElseThrow(() -> new FunctionArgumentException("Group does not exist!"));
         User newMember = userRepository.findById(idUser).orElseThrow(() -> new FunctionArgumentException("User with that id does not exist!"));
 
-        //provera da li je prosledjeni user admin ustvari admin te grupe
         if (!group.getAdmin().equals(currentUser)) {
             throw new FunctionArgumentException("That user is not an admin for that group!");
         }
 
-        //provera da li postoji request sa prosledjenim novim memberom i grupom u koju zeli da udje
         if (!groupRequestRepository.existsByUserAndGroup(newMember, group)) {
             throw new FunctionArgumentException("That request does not exist");
         }
 
-        //provera da li je grupa public
         if (group.isPublic()) {
             throw new FunctionArgumentException("Given group is public");
         }
@@ -150,9 +142,6 @@ public class GroupService {
     @Transactional
     public void removeMember(Integer idGroup, Integer idUser) {
 
-        // need to check if the group with that admin and group id exists
-        // need to check if the user is in the group and if he is the admin
-        // need to remove user from GroupMember table
         User admin = jwtService.getUser();
         if (!groupRepository.existsByAdminIdAndGroupId(admin.getId(), idGroup)) {
             throw new NoSuchElementException("There are no groups with that id: "
