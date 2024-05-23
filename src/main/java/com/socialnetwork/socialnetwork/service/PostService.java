@@ -35,6 +35,31 @@ public class PostService {
         this.groupMemberRepository = groupMemberRepository;
     }
 
+    public PostDTO getById(Integer idPost) {
+        User user = jwtService.getUser();
+        Post post = postRepository.findById(idPost)
+                .orElseThrow(() -> new NoSuchElementException("The post with the id of " +
+                        idPost + " is not present in the database."));
+
+        if (!post.isPublic() && post.getGroup() == null) {
+            if (friendsRepository.areTwoUsersFriends(post.getOwner().getId(), user.getId()).isEmpty()) {
+                throw new RuntimeException("You cannot see the post because you are not friends with the post owner.");
+            }
+        }
+
+        if (post.getGroup() != null && !(post.getGroup().isPublic())) {
+            if (!(groupMemberRepository.existsByUserIdAndGroupId(user.getId(), post.getGroup().getId()))) {
+                throw new RuntimeException("You cannot see the post because you are not a member of the "
+                        + post.getGroup().getName() + " group.");
+            }
+        }
+        String imageUrl = "";
+        if (post.getImgS3Url() != null) {
+            imageUrl = s3Service.createPresignedDownloadUrl(post.getImgS3Url());
+        }
+        return postMapper.postToPostDTO(post, imageUrl);
+    }
+
     public PostDTO createPostInGroup(CreatePostDTO postDTO) {
         User user = jwtService.getUser();
         Group group = groupRepository.findById(postDTO.idGroup()).orElseThrow(
@@ -91,28 +116,5 @@ public class PostService {
         return postMapper.postToPostDTO(post, imgURL);
     }
 
-    public PostDTO getById(Integer idPost) {
-        User user = jwtService.getUser();
-        Post post = postRepository.findById(idPost)
-                .orElseThrow(() -> new NoSuchElementException("The post with the id of " +
-                        idPost + " is not present in the database."));
 
-        if (!post.isPublic() && post.getGroup() == null) {
-            if (friendsRepository.areTwoUsersFriends(post.getOwner().getId(), user.getId()).isEmpty()) {
-                throw new RuntimeException("You cannot see the post because you are not friends with the post owner.");
-            }
-        }
-
-        if (post.getGroup() != null && !(post.getGroup().isPublic())) {
-            if (!(groupMemberRepository.existsByUserIdAndGroupId(user.getId(), post.getGroup().getId()))) {
-                throw new RuntimeException("You cannot see the post because you are not a member of the "
-                        + post.getGroup().getName() + " group.");
-            }
-        }
-        String imageUrl = "";
-        if (post.getImgS3Url() != null) {
-            imageUrl = s3Service.createPresignedDownloadUrl(post.getImgS3Url());
-        }
-        return postMapper.postToPostDTO(post, imageUrl);
-    }
 }
