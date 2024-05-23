@@ -1,5 +1,5 @@
 package com.socialnetwork.socialnetwork.dto.post;
 
-public record CreateReplyDTO(String text,
-                               Integer idComm,
-                               Integer idCommOwner) {}
+import jakarta.validation.constraints.NotBlank;
+
+public record CreateReplyDTO(@NotBlank String text) {}

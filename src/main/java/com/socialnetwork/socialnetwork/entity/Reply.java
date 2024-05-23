@@ -6,6 +6,9 @@ import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
+import org.hibernate.annotations.CreationTimestamp;
+
+import java.time.LocalDateTime;
 
 @Entity
 @Getter
@@ -20,6 +23,10 @@ public class Reply {
 
     @NotNull
     private String text;
+
+    @CreationTimestamp
+    @Column(name= "datetime")
+    private LocalDateTime creationDateTime;
 
     @NotNull
     @ManyToOne
