@@ -41,15 +41,12 @@ public class GroupService {
     public GroupDTO createGroup(CreateGroupDTO group) {
         User currentUser = jwtService.getUser();
 
-        //provera da li postoji grupa sa tim imenom
         if (groupRepository.existsByName(group.name())) {
             throw new FunctionArgumentException("Group with that name already exists");
         }
 
-        //kreiranje grupe
         Group createdGroup = groupRepository.save(groupMapper.dtoToEntity(currentUser, group));
 
-        //dodavanje admina kao membera u tu grupu
         groupMemberRepository.save(new GroupMember(null, currentUser, createdGroup));
 
         return groupMapper.entityToGroupDto(createdGroup);
@@ -59,12 +56,10 @@ public class GroupService {
     public List<PostDTO> getAllPostsByGroupId(Integer idGroup) {
         User currentUser = jwtService.getUser();
 
-        //provera da li postoji grupa sa tim id-jem
         if (!groupRepository.existsById(idGroup)) {
             throw new FunctionArgumentException("Group with that id does not exists");
         }
 
-        //provera da li je user member te grupe
         if (!groupMemberRepository.existsByUserIdAndGroupId(currentUser.getId(), idGroup)) {
             throw new FunctionArgumentException("User is not member of give group!");
         }
@@ -74,25 +69,20 @@ public class GroupService {
         return posts.stream()
                 .map(postMapper::postToPostDTO)
                 .toList();
-
     }
 
     public void deleteGroup(Integer idGroup) {
-
         User currentUser = jwtService.getUser();
 
-        //provera da li postoji grupa sa prosledjenim id-jem i id-jem admina
         if (!groupRepository.existsByIdAndAdminId(idGroup, currentUser.getId())) {
             throw new FunctionArgumentException("There is no group with given id or id of admin");
         }
 
         groupRepository.deleteById(idGroup);
-
     }
 
 
     public List<GroupDTO> findByName(String name) {
-
         List<Group> groups = groupRepository.findAllByNameStartingWith(name);
 
         return groups.stream()
@@ -114,9 +104,6 @@ public class GroupService {
     @Transactional
     public void removeMember(Integer idGroup, Integer idUser) {
 
-        // need to check if the group with that admin and group id exists
-        // need to check if the user is in the group and if he is the admin
-        // need to remove user from GroupMember table
         User admin = jwtService.getUser();
         if (!groupRepository.existsByAdminIdAndGroupId(admin.getId(), idGroup)) {
             throw new NoSuchElementException("There are no groups with that id: "

@@ -10,7 +10,6 @@ import java.util.Optional;
 
 @Repository
 public interface GroupMemberRepository extends JpaRepository<GroupMember, Integer> {
-
     public static final String queryText = "SELECT CASE " +
             "WHEN count(*) > 0 THEN TRUE ELSE FALSE END " +
             "FROM GroupMember gm WHERE (gm.member.id = :idUser AND gm.group.id = :idGroup)";

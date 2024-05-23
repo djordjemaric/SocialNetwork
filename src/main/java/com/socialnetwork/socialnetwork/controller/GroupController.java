@@ -45,7 +45,7 @@ public class GroupController {
     }
 
     @ResponseStatus(HttpStatus.OK)
-    @DeleteMapping("/{idGroup}/members/{idUser}") // idGroup and idUser that we want to remove
+    @DeleteMapping("/{idGroup}/members/{idUser}")
     public void removeMember(@PathVariable Integer idGroup, @PathVariable Integer idUser) {
         groupService.removeMember(idGroup, idUser);
     }
