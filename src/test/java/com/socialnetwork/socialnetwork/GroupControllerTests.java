@@ -75,7 +75,7 @@ class GroupControllerTests {
 
         Integer idGroup = 1;
 
-        doNothing().when(groupService).leaveGroup(1);
+        doNothing().when(groupService).leaveGroup(idGroup);
 
         mockMvc.perform(MockMvcRequestBuilders.delete("/api/groups/{idGroup}/leave", idGroup)
                 .contentType(MediaType.APPLICATION_JSON))
@@ -91,7 +91,7 @@ class GroupControllerTests {
         Integer idGroup = 1;
         Integer idUser = 3;
 
-        doNothing().when(groupService).removeMember(1, 3);
+        doNothing().when(groupService).removeMember(idGroup, idUser);
 
         mockMvc.perform(MockMvcRequestBuilders.delete("/api/groups/{idGroup}/members/{idUser}",
                                 idGroup, idUser).contentType(MediaType.APPLICATION_JSON))
