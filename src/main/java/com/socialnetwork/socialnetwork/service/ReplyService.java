@@ -8,10 +8,12 @@ import com.socialnetwork.socialnetwork.entity.Post;
 import com.socialnetwork.socialnetwork.entity.Reply;
 import com.socialnetwork.socialnetwork.entity.User;
 
+import com.socialnetwork.socialnetwork.mapper.CommentMapper;
 import com.socialnetwork.socialnetwork.mapper.ReplyMapper;
 import com.socialnetwork.socialnetwork.repository.*;
 import org.springframework.stereotype.Service;
 
+import javax.management.RuntimeErrorException;
 import java.util.NoSuchElementException;
 
 
@@ -24,8 +26,9 @@ public class ReplyService {
     private final PostRepository postRepository;
     private final GroupMemberRepository groupMemberRepository;
     private final FriendsRepository friendsRepository;
+    private final CommentMapper commentMapper;
 
-    public ReplyService(CommentRepository commentRepository, ReplyRepository replyRepository, ReplyMapper replyMapper, JwtService jwtService, PostRepository postRepository, GroupMemberRepository groupMemberRepository, FriendsRepository friendsRepository) {
+    public ReplyService(CommentRepository commentRepository, ReplyRepository replyRepository, ReplyMapper replyMapper, JwtService jwtService, PostRepository postRepository, GroupMemberRepository groupMemberRepository, FriendsRepository friendsRepository, CommentMapper commentMapper) {
         this.commentRepository = commentRepository;
         this.replyRepository = replyRepository;
         this.replyMapper = replyMapper;
@@ -33,17 +36,18 @@ public class ReplyService {
         this.postRepository = postRepository;
         this.groupMemberRepository = groupMemberRepository;
         this.friendsRepository = friendsRepository;
+        this.commentMapper = commentMapper;
     }
 
-    public ReplyDTO createReply(Integer commentId, CreateReplyDTO replyDTO) {
+    public ReplyDTO createReply(Integer postId,Integer commentId, CreateReplyDTO replyDTO) {
         User currentUser = jwtService.getUser();
         Comment comment = commentRepository.findById(commentId)
                 .orElseThrow(() -> new NoSuchElementException("The comment with the id of " + commentId + " is not present in the database."));
 
         Post post = comment.getPost();
-        if (post == null) {
-            throw new NoSuchElementException("The post associated with the comment is not present in the database.");
-        }
+
+        commentRepository.findByIdAndPost_Id(commentId, postId)
+                .orElseThrow(() -> new RuntimeException("This comment is not associated with this post."));
 
         if (!post.isPublic() && post.getGroup() == null) {
             if (friendsRepository.areTwoUsersFriends(post.getOwner().getId(), currentUser.getId()).isEmpty()) {
@@ -58,7 +62,8 @@ public class ReplyService {
         }
         Reply reply = replyMapper.createReplyDTOtoReply(currentUser, comment, replyDTO);
         Reply savedReply = replyRepository.save(reply);
-        return new ReplyDTO(savedReply.getId(), savedReply.getText(), savedReply.getComment().getId(), savedReply.getReplyOwner().getId());
+        CommentDTO commentDTO=commentMapper.createCommentToCommentDTO(savedReply.getComment());
+        return new ReplyDTO(savedReply.getId(), savedReply.getText(), commentDTO, savedReply.getReplyOwner().getId());
 
     }
 }

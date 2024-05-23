@@ -1,5 +1,6 @@
 package com.socialnetwork.socialnetwork.mapper;
 
+import com.socialnetwork.socialnetwork.dto.post.CommentDTO;
 import com.socialnetwork.socialnetwork.dto.post.CreateCommentDTO;
 import com.socialnetwork.socialnetwork.entity.Comment;
 import com.socialnetwork.socialnetwork.entity.Post;
@@ -16,4 +17,7 @@ public class CommentMapper {
         return comment;
     }
 
+    public CommentDTO createCommentToCommentDTO(Comment comment){
+        return new CommentDTO(comment.getId(),comment.getText(),comment.getPost().getId(),comment.getCommOwner().getId());
+    }
 }

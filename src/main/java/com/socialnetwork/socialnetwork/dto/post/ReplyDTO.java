@@ -1,6 +1,6 @@
 package com.socialnetwork.socialnetwork.dto.post;
 
-public record ReplyDTO(Integer id,
+public record ReplyDTO(Integer ownerId,
                        String text,
-                       Integer idComment,
+                       CommentDTO comment,
                        Integer userId) {}
