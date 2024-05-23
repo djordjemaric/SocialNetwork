@@ -23,4 +23,5 @@ public class GroupMapper {
                 group.isPublic(),
                 group.getId());
     }
+
 }

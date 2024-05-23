@@ -24,7 +24,8 @@ public class Post {
 
     private String text;
 
-    private String imgUrl;
+    @Column(name = "img_s3_key")
+    private String imgS3Key;
 
     @NotNull
     @ManyToOne
