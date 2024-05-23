@@ -35,8 +35,6 @@ public class ReplyService {
         this.friendsRepository = friendsRepository;
     }
 
-//check if there’s comment with the given combination postId and commentId (from endpoint path)
-// to be sure that the reply will be saved on the right comment
     public ReplyDTO createReply(Integer commentId, CreateReplyDTO replyDTO) {
         User currentUser = jwtService.getUser();
         Comment comment = commentRepository.findById(commentId)
