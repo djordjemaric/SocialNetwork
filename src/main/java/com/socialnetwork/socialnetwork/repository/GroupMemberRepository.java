@@ -15,7 +15,7 @@ public interface GroupMemberRepository extends JpaRepository<GroupMember, Intege
             "FROM GroupMember gm WHERE (gm.member.id = :idUser AND gm.group.id = :idGroup)";
 
     @Query(value = queryText)
-    boolean existsByUserIdAndGroupId(Integer idUser,Integer idGroup);
+    boolean existsByUserIdAndGroupId(Integer idUser, Integer idGroup);
 
     Optional<GroupMember> findByMember(User member);
 

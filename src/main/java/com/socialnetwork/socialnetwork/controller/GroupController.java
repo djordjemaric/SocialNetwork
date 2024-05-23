@@ -4,6 +4,7 @@ import com.socialnetwork.socialnetwork.dto.group.CreateGroupDTO;
 import com.socialnetwork.socialnetwork.dto.group.GroupDTO;
 import com.socialnetwork.socialnetwork.dto.group.GroupRequestDTO;
 import com.socialnetwork.socialnetwork.dto.group.ResolvedGroupRequestDTO;
+import com.socialnetwork.socialnetwork.dto.post.PostDTO;
 import com.socialnetwork.socialnetwork.service.GroupService;
 import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.*;
@@ -73,6 +74,12 @@ public class GroupController {
     @PostMapping("/{id}/join")
     public ResolvedGroupRequestDTO createRequestToJoinGroup(@PathVariable Integer id) {
         return groupService.createRequestToJoinGroup(id);
+    }
+
+    @ResponseStatus(HttpStatus.OK)
+    @GetMapping("/{id}/posts")
+    public List<PostDTO> getAllPostsByGroupId(@PathVariable Integer id) {
+        return groupService.getAllPostsByGroupId(id);
     }
 
 }

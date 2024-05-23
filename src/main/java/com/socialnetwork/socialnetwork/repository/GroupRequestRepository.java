@@ -9,7 +9,6 @@ import java.util.List;
 
 
 public interface GroupRequestRepository extends JpaRepository<GroupRequest, Integer> {
-
     boolean existsByUserIdAndGroupId(Integer idUser,Integer idGroup);
 
     List<GroupRequest> findAllByGroup(Group group);
