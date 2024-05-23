@@ -3,10 +3,10 @@ package com.socialnetwork.socialnetwork.service;
 import io.awspring.cloud.s3.S3Template;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
-import org.springframework.web.multipart.MultipartFile;
 
-import java.io.IOException;
+import java.io.InputStream;
 import java.time.Duration;
+import java.util.UUID;
 
 @Service
 public class S3Service {
@@ -23,18 +23,17 @@ public class S3Service {
         return s3Template.createSignedGetURL(bucketName, key, Duration.ofMinutes(10)).toExternalForm();
     }
 
-    public String uploadToBucket(MultipartFile file) {
-        String key = file.getOriginalFilename();
-        if (key == null || key.isEmpty()) {
-            throw new IllegalArgumentException("File name cannot be null or empty");
-        }
-        try {
-            s3Template.upload(bucketName, key, file.getInputStream());
-        } catch (IOException e) {
-            throw new RuntimeException(e);
-        }
-        return key;
+    public String uploadToBucket(String fileExtension, InputStream stream) {
+        String fileKey = UUID.randomUUID() + fileExtension;
+        s3Template.upload(bucketName, fileKey, stream);
+        return fileKey;
     }
+
+    public void deleteFromBucket(String key) {
+        s3Template.deleteObject(bucketName, key);
+    }
+
+
 
 
 }
