@@ -1,7 +1,7 @@
 package com.socialnetwork.socialnetwork.service;
 
-import com.socialnetwork.socialnetwork.dto.GroupDto;
-import com.socialnetwork.socialnetwork.dto.group.CreateGroupDto;
+import com.socialnetwork.socialnetwork.dto.group.CreateGroupDTO;
+import com.socialnetwork.socialnetwork.dto.group.GroupDTO;
 import com.socialnetwork.socialnetwork.entity.Group;
 import com.socialnetwork.socialnetwork.entity.GroupMember;
 import com.socialnetwork.socialnetwork.entity.User;
@@ -16,32 +16,29 @@ import org.springframework.transaction.annotation.Transactional;
 import java.util.NoSuchElementException;
 
 
+import java.util.List;
+
 @Service
 public class GroupService {
     private final GroupRepository groupRepository;
     private final GroupMemberRepository groupMemberRepository;
     private final GroupMapper groupMapper;
-
-    private final UserRepository userRepository;
-
     private final JwtService jwtService;
 
-    public GroupService(GroupRepository groupRepository, GroupMapper groupMapper, GroupMemberRepository groupMemberRepository, UserRepository userRepository, JwtService jwtService) {
+    public GroupService(GroupRepository groupRepository, JwtService jwtService, GroupMemberRepository groupMemberRepository, GroupMapper groupMapper) {
         this.groupRepository = groupRepository;
-        this.groupMapper = groupMapper;
         this.groupMemberRepository = groupMemberRepository;
-        this.userRepository = userRepository;
+        this.groupMapper = groupMapper;
         this.jwtService = jwtService;
     }
 
-    public GroupDto createGroup(CreateGroupDto group) {
+    public GroupDTO createGroup(CreateGroupDTO group) {
         User currentUser = jwtService.getUser();
 
         //provera da li postoji grupa sa tim imenom
         if (groupRepository.existsByName(group.name())) {
             throw new FunctionArgumentException("Group with that name already exists");
         }
-
         //kreiranje grupe
         Group createdGroup = groupRepository.save(groupMapper.dtoToEntity(currentUser, group));
 
@@ -50,6 +47,30 @@ public class GroupService {
 
         return groupMapper.entityToGroupDto(createdGroup);
     }
+
+    public void deleteGroup(Integer idGroup) {
+
+        User currentUser = jwtService.getUser();
+
+        //provera da li postoji grupa sa prosledjenim id-jem i id-jem admina
+        if (!groupRepository.existsByIdAndAdminId(idGroup, currentUser.getId())) {
+            throw new FunctionArgumentException("There is no group with given id or id of admin");
+        }
+
+        groupRepository.deleteById(idGroup);
+
+    }
+
+
+    public List<GroupDTO> findByName(String name) {
+
+        List<Group> groups = groupRepository.findAllByNameStartingWith(name);
+
+        return groups.stream()
+                .map(group -> new GroupDTO(group.getName(),group.getAdmin().getEmail(),group.isPublic(),group.getId()))
+                .toList();
+    }
+
 
     public void leaveGroup(Integer idGroup) {
         Group group = groupRepository.findById(idGroup).orElseThrow(() -> new FunctionArgumentException("Group does not exist"));
