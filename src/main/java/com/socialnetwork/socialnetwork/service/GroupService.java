@@ -4,15 +4,15 @@ import com.socialnetwork.socialnetwork.dto.group.CreateGroupDTO;
 import com.socialnetwork.socialnetwork.dto.group.GroupDTO;
 import com.socialnetwork.socialnetwork.dto.group.ResolvedGroupRequestDTO;
 import com.socialnetwork.socialnetwork.dto.group.ResolvedGroupRequestStatus;
+import com.socialnetwork.socialnetwork.dto.post.PostDTO;
 import com.socialnetwork.socialnetwork.dto.user.PreviewUserDTO;
-import com.socialnetwork.socialnetwork.entity.Group;
-import com.socialnetwork.socialnetwork.entity.GroupMember;
-import com.socialnetwork.socialnetwork.entity.GroupRequest;
-import com.socialnetwork.socialnetwork.entity.User;
+import com.socialnetwork.socialnetwork.entity.*;
 import com.socialnetwork.socialnetwork.mapper.GroupMapper;
+import com.socialnetwork.socialnetwork.mapper.PostMapper;
 import com.socialnetwork.socialnetwork.repository.GroupMemberRepository;
 import com.socialnetwork.socialnetwork.repository.GroupRepository;
 import com.socialnetwork.socialnetwork.repository.GroupRequestRepository;
+import com.socialnetwork.socialnetwork.repository.PostRepository;
 import org.hibernate.query.sqm.produce.function.FunctionArgumentException;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -20,20 +20,25 @@ import org.springframework.transaction.annotation.Transactional;
 import java.util.List;
 import java.util.NoSuchElementException;
 
+
 @Service
 public class GroupService {
     private final GroupRepository groupRepository;
     private final GroupRequestRepository groupRequestRepository;
     private final GroupMemberRepository groupMemberRepository;
     private final GroupMapper groupMapper;
+    private final PostMapper postMapper;
+    private final PostRepository postRepository;
     private final JwtService jwtService;
 
-    public GroupService(GroupRepository groupRepository, GroupRequestRepository groupRequestRepository, GroupMapper groupMapper, GroupMemberRepository groupMemberRepository, JwtService jwtService) {
+    public GroupService(GroupRepository groupRepository, JwtService jwtService, GroupRequestRepository groupRequestRepository, GroupMemberRepository groupMemberRepository, GroupMapper groupMapper, PostMapper postMapper, PostRepository postRepository) {
         this.groupRepository = groupRepository;
         this.groupRequestRepository = groupRequestRepository;
-        this.groupMapper = groupMapper;
         this.groupMemberRepository = groupMemberRepository;
+        this.groupMapper = groupMapper;
         this.jwtService = jwtService;
+        this.postMapper = postMapper;
+        this.postRepository = postRepository;
     }
 
     public GroupDTO createGroup(CreateGroupDTO group) {
@@ -49,6 +54,25 @@ public class GroupService {
         return groupMapper.entityToGroupDto(createdGroup);
     }
 
+
+    public List<PostDTO> getAllPostsByGroupId(Integer idGroup) {
+        User currentUser = jwtService.getUser();
+
+        if (!groupRepository.existsById(idGroup)) {
+            throw new FunctionArgumentException("Group with that id does not exists");
+        }
+
+        if (!groupMemberRepository.existsByUserIdAndGroupId(currentUser.getId(), idGroup)) {
+            throw new FunctionArgumentException("User is not member of give group!");
+        }
+
+        List<Post> posts = postRepository.findAllByGroup_Id(idGroup);
+
+        return posts.stream()
+                .map(postMapper::postToPostDTO)
+                .toList();
+    }
+
     public void deleteGroup(Integer idGroup) {
         User currentUser = jwtService.getUser();
 
@@ -59,13 +83,11 @@ public class GroupService {
         groupRepository.deleteById(idGroup);
     }
 
-
     public List<GroupDTO> findByName(String name) {
         List<Group> groups = groupRepository.findAllByNameStartingWith(name);
 
         return groups.stream().map(group -> new GroupDTO(group.getName(), group.getAdmin().getEmail(), group.isPublic(), group.getId())).toList();
     }
-
 
     public ResolvedGroupRequestDTO createRequestToJoinGroup(Integer idGroup) {
         User currentUser = jwtService.getUser();
@@ -111,8 +133,6 @@ public class GroupService {
 
     @Transactional
     public void removeMember(Integer idGroup, Integer idUser) {
-
-
         User admin = jwtService.getUser();
         if (!groupRepository.existsByAdminIdAndGroupId(admin.getId(), idGroup)) {
             throw new NoSuchElementException("There are no groups with that id: " + idGroup + " and that admin: " + admin.getEmail());
