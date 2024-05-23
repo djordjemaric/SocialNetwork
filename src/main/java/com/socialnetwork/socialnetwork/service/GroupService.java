@@ -1,11 +1,13 @@
 package com.socialnetwork.socialnetwork.service;
 
 import com.socialnetwork.socialnetwork.dto.group.*;
+import com.socialnetwork.socialnetwork.dto.user.PreviewUserDTO;
 import com.socialnetwork.socialnetwork.entity.Group;
 import com.socialnetwork.socialnetwork.entity.GroupMember;
 import com.socialnetwork.socialnetwork.entity.GroupRequest;
 import com.socialnetwork.socialnetwork.entity.User;
 import com.socialnetwork.socialnetwork.mapper.GroupMapper;
+import com.socialnetwork.socialnetwork.mapper.GroupRequestMapper;
 import com.socialnetwork.socialnetwork.repository.GroupMemberRepository;
 import com.socialnetwork.socialnetwork.repository.GroupRequestRepository;
 import com.socialnetwork.socialnetwork.repository.GroupRepository;
@@ -25,15 +27,17 @@ public class GroupService {
     private final GroupRequestRepository groupRequestRepository;
     private final GroupMemberRepository groupMemberRepository;
     private final GroupMapper groupMapper;
+    private final GroupRequestMapper groupRequestMapper;
     private final UserRepository userRepository;
     private final JwtService jwtService;
 
-    public GroupService(GroupRepository groupRepository, GroupRequestRepository groupRequestRepository, JwtService jwtService, GroupMemberRepository groupMemberRepository, GroupMapper groupMapper, UserRepository userRepository) {
+    public GroupService(GroupRepository groupRepository, GroupRequestRepository groupRequestRepository, JwtService jwtService, GroupMemberRepository groupMemberRepository, GroupMapper groupMapper, GroupRequestMapper groupRequestMapper, UserRepository userRepository) {
         this.groupRepository = groupRepository;
         this.groupRequestRepository = groupRequestRepository;
         this.groupMemberRepository = groupMemberRepository;
         this.groupMapper = groupMapper;
         this.jwtService = jwtService;
+        this.groupRequestMapper = groupRequestMapper;
         this.userRepository = userRepository;
     }
 
@@ -75,31 +79,33 @@ public class GroupService {
 
     public List<GroupRequestDTO> getAllRequestsForGroup(Integer idGroup) {
         User currentUser = jwtService.getUser();
-        Group group = groupRepository.findByIdAndAdminId(idGroup, currentUser.getId());
+        Group group = groupRepository.findById(idGroup).orElseThrow(() -> new FunctionArgumentException("Group does not exist!"));
 
-        if (group == null) {
-            throw new FunctionArgumentException("There is no group with given id and given admin id!");
+        if (!groupRepository.existsByAdmin(currentUser)) {
+            throw new FunctionArgumentException("There is no group with given admin id!");
         }
         List<GroupRequest> groupRequests = groupRequestRepository.findAllByGroup(group);
 
         return groupRequests.stream()
-                .map(request -> new GroupRequestDTO(request.getUser().getEmail(),
-                        request.getGroup().getName(),
-                        request.getUser().getId(),
-                        request.getGroup().getId()))
+                .map(groupRequestMapper::requestToGroupRequestDTO)
                 .toList();
 
     }
 
-    public RequestDTO checkRequest(Integer idUser, Integer idGroup) {
+    public RequestDTO checkRequest(Integer idGroup, Integer idRequest) {
 
         User currentUser = jwtService.getUser();
 
         Group group = groupRepository.findById(idGroup).orElseThrow(() -> new FunctionArgumentException("Group does not exist!"));
-        User newMember = userRepository.findById(idUser).orElseThrow(() -> new FunctionArgumentException("User with that id does not exist!"));
+        GroupRequest request = groupRequestRepository.findById(idRequest).orElseThrow(() -> new FunctionArgumentException("Request does not exist!"));
+        User newMember = userRepository.findById(request.getUser().getId()).orElseThrow(() -> new FunctionArgumentException("User with that id does not exist!"));
 
         if (!group.getAdmin().equals(currentUser)) {
             throw new FunctionArgumentException("That user is not an admin for that group!");
+        }
+
+        if (!groupRequestRepository.existsByGroupId(idGroup)) {
+            throw new FunctionArgumentException("That request does not exist");
         }
 
         if (!groupRequestRepository.existsByUserAndGroup(newMember, group)) {
@@ -110,23 +116,21 @@ public class GroupService {
             throw new FunctionArgumentException("Given group is public");
         }
 
-        return new RequestDTO(newMember, group);
+        return new RequestDTO(newMember, group, request);
     }
 
-    public GroupMemberDTO acceptRequest(Integer idUser, Integer idGroup) {
+    public void acceptRequest(Integer idGroup, Integer idRequest) {
 
-        RequestDTO requestDTO = checkRequest(idUser, idGroup);
+        RequestDTO requestDTO = checkRequest(idGroup, idRequest);
 
-        GroupMember groupMember = groupMemberRepository.save(new GroupMember(null, requestDTO.user(), requestDTO.group()));
-        groupRequestRepository.delete(groupRequestRepository.findByUserAndGroup(requestDTO.user(), requestDTO.group()));
-
-        return groupMapper.groupMemberToGroupMemberDto(groupMember);
+        groupMemberRepository.save(new GroupMember(null, requestDTO.user(), requestDTO.group()));
+        groupRequestRepository.deleteById(idRequest);
     }
 
-    public void rejectRequest(Integer idUser, Integer idGroup) {
-        RequestDTO requestDTO = checkRequest(idUser, idGroup);
+    public void rejectRequest(Integer idGroup, Integer idRequest) {
+        RequestDTO requestDTO = checkRequest(idGroup, idRequest);
 
-        groupRequestRepository.delete(groupRequestRepository.findByUserAndGroup(requestDTO.user(), requestDTO.group()));
+        groupRequestRepository.deleteById(requestDTO.groupRequest().getId());
     }
 
     public void leaveGroup(Integer idGroup) {

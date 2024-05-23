@@ -13,7 +13,7 @@ public interface GroupRequestRepository extends JpaRepository<GroupRequest, Inte
 
     boolean existsByUserAndGroup(User user, Group group);
 
-    GroupRequest findByUserAndGroup(User user, Group group);
+    boolean existsByGroupId(Integer idGroup);
 
 
 }

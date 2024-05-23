@@ -1,9 +1,6 @@
 package com.socialnetwork.socialnetwork.dto.group;
 
-public record GroupRequestDTO(String userEmail,
-                              String groupName,
-                              Integer idUser,
-                              Integer idGroup
+import com.socialnetwork.socialnetwork.dto.user.PreviewUserDTO;
 
-){
+public record GroupRequestDTO(PreviewUserDTO userDTO, GroupDTO groupDTO, Integer idRequest) {
 }
