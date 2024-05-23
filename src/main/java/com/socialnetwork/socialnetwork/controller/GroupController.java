@@ -1,7 +1,7 @@
 package com.socialnetwork.socialnetwork.controller;
 
-import com.socialnetwork.socialnetwork.dto.group.GroupDTO;
 import com.socialnetwork.socialnetwork.dto.group.CreateGroupDTO;
+import com.socialnetwork.socialnetwork.dto.group.GroupDTO;
 import com.socialnetwork.socialnetwork.dto.post.PostDTO;
 import com.socialnetwork.socialnetwork.service.GroupService;
 import org.springframework.http.HttpStatus;
@@ -20,11 +20,22 @@ public class GroupController {
         this.groupService = groupService;
     }
 
-
     @ResponseStatus(HttpStatus.CREATED)
     @PostMapping
     public GroupDTO createGroup(@RequestBody CreateGroupDTO createGroupDto) {
         return groupService.createGroup(createGroupDto);
+    }
+
+    @ResponseStatus(HttpStatus.OK)
+    @DeleteMapping("/{id}")
+    public void deleteGroup(@PathVariable Integer id) {
+        groupService.deleteGroup(id);
+    }
+
+    @ResponseStatus(HttpStatus.OK)
+    @GetMapping
+    public List<GroupDTO> getGroupsByName(@RequestParam String name) {
+        return groupService.findByName(name);
     }
 
     @DeleteMapping("/{idGroup}/leave")

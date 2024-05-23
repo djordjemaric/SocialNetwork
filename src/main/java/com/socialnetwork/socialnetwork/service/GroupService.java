@@ -8,7 +8,6 @@ import com.socialnetwork.socialnetwork.entity.GroupMember;
 import com.socialnetwork.socialnetwork.entity.Post;
 import com.socialnetwork.socialnetwork.entity.User;
 import com.socialnetwork.socialnetwork.mapper.GroupMapper;
-import com.socialnetwork.socialnetwork.mapper.PostMapper;
 import com.socialnetwork.socialnetwork.repository.GroupMemberRepository;
 import com.socialnetwork.socialnetwork.repository.GroupRepository;
 import com.socialnetwork.socialnetwork.repository.PostRepository;
@@ -19,24 +18,21 @@ import org.springframework.transaction.annotation.Transactional;
 import java.util.List;
 import java.util.NoSuchElementException;
 
+
 @Service
 public class GroupService {
     private final GroupRepository groupRepository;
     private final GroupMemberRepository groupMemberRepository;
     private final GroupMapper groupMapper;
-    private final PostMapper postMapper;
-
     private final PostRepository postRepository;
-
     private final JwtService jwtService;
 
-    public GroupService(GroupRepository groupRepository, GroupMapper groupMapper, GroupMemberRepository groupMemberRepository, JwtService jwtService, PostRepository postRepository, PostMapper postMapper) {
+    public GroupService(GroupRepository groupRepository, JwtService jwtService, GroupMemberRepository groupMemberRepository, GroupMapper groupMapper, PostRepository postRepository) {
         this.groupRepository = groupRepository;
-        this.groupMapper = groupMapper;
         this.groupMemberRepository = groupMemberRepository;
-        this.postRepository = postRepository;
-        this.postMapper = postMapper;
+        this.groupMapper = groupMapper;
         this.jwtService = jwtService;
+        this.postRepository = postRepository;
     }
 
     public GroupDTO createGroup(CreateGroupDTO group) {
@@ -77,6 +73,30 @@ public class GroupService {
                 .toList();
 
     }
+
+    public void deleteGroup(Integer idGroup) {
+
+        User currentUser = jwtService.getUser();
+
+        //provera da li postoji grupa sa prosledjenim id-jem i id-jem admina
+        if (!groupRepository.existsByIdAndAdminId(idGroup, currentUser.getId())) {
+            throw new FunctionArgumentException("There is no group with given id or id of admin");
+        }
+
+        groupRepository.deleteById(idGroup);
+
+    }
+
+
+    public List<GroupDTO> findByName(String name) {
+
+        List<Group> groups = groupRepository.findAllByNameStartingWith(name);
+
+        return groups.stream()
+                .map(group -> new GroupDTO(group.getName(), group.getAdmin().getEmail(), group.isPublic(), group.getId()))
+                .toList();
+    }
+
 
     public void leaveGroup(Integer idGroup) {
         Group group = groupRepository.findById(idGroup).orElseThrow(() -> new FunctionArgumentException("Group does not exist"));
