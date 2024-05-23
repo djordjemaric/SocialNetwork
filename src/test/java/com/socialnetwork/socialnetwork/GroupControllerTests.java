@@ -11,7 +11,6 @@ import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
-import org.mockito.Mockito;
 import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.http.MediaType;
 import org.springframework.test.web.servlet.MockMvc;
@@ -20,7 +19,9 @@ import org.springframework.test.web.servlet.request.MockMvcRequestBuilders;
 import org.springframework.test.web.servlet.setup.MockMvcBuilders;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.mockito.Mockito.*;
+import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.doNothing;
+import static org.mockito.Mockito.when;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
 @ExtendWith(MockitoExtension.class)
@@ -50,7 +51,7 @@ class GroupControllerTests {
     @Test
     void createGroup_success() throws Exception {
 
-        Mockito.when(groupService.createGroup(createGroupDTO)).thenReturn(expectedGroupDTO);
+        when(groupService.createGroup(createGroupDTO)).thenReturn(expectedGroupDTO);
 
         String content = objectWriter.writeValueAsString(createGroupDTO);
 
@@ -80,8 +81,7 @@ class GroupControllerTests {
                 .contentType(MediaType.APPLICATION_JSON))
                 .andExpect(status().isOk());
 
-        verify(groupService).leaveGroup(1);
-        verify(groupService, times(1)).leaveGroup(idGroup);
+        verify(groupService).leaveGroup(idGroup);
 
     }
 
@@ -97,8 +97,7 @@ class GroupControllerTests {
                                 idGroup, idUser).contentType(MediaType.APPLICATION_JSON))
                                 .andExpect(status().isOk());
 
-        verify(groupService).removeMember(1, 3);
-        verify(groupService, times(1)).removeMember(idGroup, idUser);
+        verify(groupService).removeMember(idGroup, idUser);
 
     }
 
