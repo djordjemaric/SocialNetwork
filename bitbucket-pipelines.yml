@@ -1,6 +1,12 @@
 image: maven:3.9.6-amazoncorretto-17
 
+
 definitions:
+  script: &createOIDC
+    export AWS_REGION=eu-central-1 
+            && export AWS_ROLE_ARN=arn:aws:iam::211125711045:role/bitbucket_oidc_role 
+            && export AWS_WEB_IDENTITY_TOKEN_FILE=$(pwd)/web-identity-token 
+            && echo $BITBUCKET_STEP_OIDC_TOKEN > $(pwd)/web-identity-token
   steps:
     - step: &build
         name: Build the application
@@ -10,8 +16,17 @@ definitions:
           - mvn -B clean package -DskipTests --file pom.xml
         artifacts:
           - target/*.jar
+    - step: &testOIDC
+        image: amazon/aws-cli
+        name: Creating aws openID connection
+        oidc: true
+        script:
+          - *createOIDC
+          - aws sts get-caller-identity
+
 
 pipelines:
   branches:
     master:
       - step: *build
+      - step: *testOIDC
