@@ -35,7 +35,9 @@ public class PostService {
         this.s3Service = s3Service;
     }
     private String uploadImageAndGetKey(MultipartFile image) {
-        if (image != null) {
+        if(image==null){
+            return null;
+        }
             String filename = image.getOriginalFilename();
             if (filename == null) {
                 throw new IllegalArgumentException("Filename cannot be null");
@@ -49,8 +51,6 @@ public class PostService {
             } catch (IOException e) {
                 throw new RuntimeException(e);
             }
-        }
-        return null;
     }
 
     public PostDTO createPostInGroup(CreatePostDTO postDTO) {
