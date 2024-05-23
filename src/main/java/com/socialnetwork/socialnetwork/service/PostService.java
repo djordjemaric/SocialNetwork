@@ -97,16 +97,20 @@ public class PostService {
     }
 
     public PostDTO createAIPostOnTimeline(OpenAIPostDTO postDTO) {
+        User user=jwtService.getUser();
         String generatedText= chatClient.call(new Prompt(postDTO.txtPrompt())).getResult().getOutput().getContent();
-        return null;
+        Post post=postMapper.OpenAIPostDTOtoPostOnTimeline(postDTO,user,generatedText);
+        post=postRepository.save(post);
+        return postMapper.postToPostDTO(post);
     }
 
     public PostDTO createAIPostInGroup(OpenAIPostDTO postDTO) {
         User user = jwtService.getUser();
-
         Group group = groupRepository.findById(postDTO.idGroup()).orElseThrow(
                 () -> new NoSuchElementException("There is no group with the id of " + postDTO.idGroup()));
         String generatedText= chatClient.call(new Prompt(postDTO.txtPrompt())).getResult().getOutput().getContent();
-        return null;
+        Post post=postMapper.OpenAIPostDTOtoPostInGroup(postDTO,user,group,generatedText);
+        post=postRepository.save(post);
+        return postMapper.postToPostDTO(post);
     }
 }

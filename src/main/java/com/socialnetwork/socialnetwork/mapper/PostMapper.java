@@ -1,6 +1,7 @@
 package com.socialnetwork.socialnetwork.mapper;
 
 import com.socialnetwork.socialnetwork.dto.post.CreatePostDTO;
+import com.socialnetwork.socialnetwork.dto.post.OpenAIPostDTO;
 import com.socialnetwork.socialnetwork.dto.post.PostDTO;
 import com.socialnetwork.socialnetwork.dto.post.UpdatePostDTO;
 import com.socialnetwork.socialnetwork.entity.Group;
@@ -68,4 +69,26 @@ public class PostMapper {
             groupName,
             post.getComments());
     }
+
+    public Post OpenAIPostDTOtoPostOnTimeline(OpenAIPostDTO postDTO, User user, String generatedText){
+        Post post=new Post();
+        post.setText(generatedText);
+        post.setPublic(postDTO.isPublic());
+        //imgPrompt handling
+        post.setOwner(user);
+        return post;
+    }
+
+    public Post OpenAIPostDTOtoPostInGroup(OpenAIPostDTO postDTO, User user, Group group, String generatedText){
+        Post post=new Post();
+        post.setText(generatedText);
+        post.setPublic(postDTO.isPublic());
+        post.setGroup(group);
+        //imgPrompt handling
+        post.setOwner(user);
+        return post;
+    }
+
+
+
 }
