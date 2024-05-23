@@ -49,8 +49,8 @@ public class PostController {
 
     @ResponseStatus(HttpStatus.CREATED)
     @PostMapping("/{postId}/comments/{commentId}/replies")
-    public ReplyDTO saveReply(@PathVariable Integer idComment, @RequestBody CreateReplyDTO replyDTO) {
-        return replyService.createReply(idComment, replyDTO);
+    public ReplyDTO saveReply(@PathVariable Integer commentId, @RequestBody CreateReplyDTO replyDTO) {
+        return replyService.createReply(commentId, replyDTO);
     }
 
     }
