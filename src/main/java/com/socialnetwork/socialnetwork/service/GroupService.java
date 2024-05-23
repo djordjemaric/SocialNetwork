@@ -8,6 +8,7 @@ import com.socialnetwork.socialnetwork.entity.GroupMember;
 import com.socialnetwork.socialnetwork.entity.Post;
 import com.socialnetwork.socialnetwork.entity.User;
 import com.socialnetwork.socialnetwork.mapper.GroupMapper;
+import com.socialnetwork.socialnetwork.mapper.PostMapper;
 import com.socialnetwork.socialnetwork.repository.GroupMemberRepository;
 import com.socialnetwork.socialnetwork.repository.GroupRepository;
 import com.socialnetwork.socialnetwork.repository.PostRepository;
@@ -24,14 +25,16 @@ public class GroupService {
     private final GroupRepository groupRepository;
     private final GroupMemberRepository groupMemberRepository;
     private final GroupMapper groupMapper;
+    private final PostMapper postMapper;
     private final PostRepository postRepository;
     private final JwtService jwtService;
 
-    public GroupService(GroupRepository groupRepository, JwtService jwtService, GroupMemberRepository groupMemberRepository, GroupMapper groupMapper, PostRepository postRepository) {
+    public GroupService(GroupRepository groupRepository, JwtService jwtService, GroupMemberRepository groupMemberRepository, GroupMapper groupMapper, PostMapper postMapper, PostRepository postRepository) {
         this.groupRepository = groupRepository;
         this.groupMemberRepository = groupMemberRepository;
         this.groupMapper = groupMapper;
         this.jwtService = jwtService;
+        this.postMapper = postMapper;
         this.postRepository = postRepository;
     }
 
@@ -69,7 +72,7 @@ public class GroupService {
         List<Post> posts = postRepository.findAllByGroup_Id(idGroup);
 
         return posts.stream()
-                .map(post -> new PostDTO(post.getId(), post.getText(), post.getImgUrl(), post.getOwner().getEmail(), post.getGroup().getName(), post.getComments()))
+                .map(postMapper::postToPostDTO)
                 .toList();
 
     }
