@@ -2,7 +2,6 @@ package com.socialnetwork.socialnetwork.service;
 
 import com.socialnetwork.socialnetwork.dto.group.CreateGroupDTO;
 import com.socialnetwork.socialnetwork.dto.group.GroupDTO;
-import com.socialnetwork.socialnetwork.dto.group.GroupRequest_MemberDTO;
 import com.socialnetwork.socialnetwork.entity.Group;
 import com.socialnetwork.socialnetwork.entity.GroupMember;
 import com.socialnetwork.socialnetwork.entity.GroupRequest;
@@ -19,23 +18,25 @@ import org.springframework.transaction.annotation.Transactional;
 import java.util.NoSuchElementException;
 
 
+import java.util.List;
+
 @Service
 public class GroupService {
     private final GroupRepository groupRepository;
     private final GroupRequestRepository groupRequestRepository;
     private final GroupMemberRepository groupMemberRepository;
-    private final UserRepository userRepository;
     private final GroupMapper groupMapper;
+
+    private final UserRepository userRepository;
+
     private final JwtService jwtService;
 
-    public GroupService(GroupRepository groupRepository, GroupMemberRepository groupMemberRepository, GroupMapper groupMapper, GroupRequestRepository groupRequestRepository, UserRepository userRepository, JwtService jwtService) {
+    public GroupService(GroupRepository groupRepository, GroupMapper groupMapper, GroupMemberRepository groupMemberRepository, UserRepository userRepository, JwtService jwtService) {
         this.groupRepository = groupRepository;
-        this.groupRequestRepository = groupRequestRepository;
+        this.groupMapper = groupMapper;
         this.groupMemberRepository = groupMemberRepository;
         this.userRepository = userRepository;
-        this.groupMapper = groupMapper;
         this.jwtService = jwtService;
-
     }
 
     public GroupDTO createGroup(CreateGroupDTO group) {
@@ -45,7 +46,6 @@ public class GroupService {
         if (groupRepository.existsByName(group.name())) {
             throw new FunctionArgumentException("Group with that name already exists");
         }
-
         //kreiranje grupe
         Group createdGroup = groupRepository.save(groupMapper.dtoToEntity(currentUser, group));
 
@@ -54,6 +54,30 @@ public class GroupService {
 
         return groupMapper.entityToGroupDto(createdGroup);
     }
+
+    public void deleteGroup(Integer idGroup) {
+
+        User currentUser = jwtService.getUser();
+
+        //provera da li postoji grupa sa prosledjenim id-jem i id-jem admina
+        if (!groupRepository.existsByIdAndAdminId(idGroup, currentUser.getId())) {
+            throw new FunctionArgumentException("There is no group with given id or id of admin");
+        }
+
+        groupRepository.deleteById(idGroup);
+
+    }
+
+
+    public List<GroupDTO> findByName(String name) {
+
+        List<Group> groups = groupRepository.findAllByNameStartingWith(name);
+
+        return groups.stream()
+                .map(group -> new GroupDTO(group.getName(),group.getAdmin().getEmail(),group.isPublic(),group.getId()))
+                .toList();
+    }
+
 
     public GroupRequest_MemberDTO createRequestToJoinGroup(Integer idGroup) {
         User currentUser = jwtService.getUser();
@@ -105,7 +129,7 @@ public class GroupService {
     }
 
     @Transactional
-    public void removeMember(Integer idGroup, Integer idUser) {
+     public void removeMember (Integer idGroup, Integer idUser){
 
         // need to check if the group with that admin and group id exists
         // need to check if the user is in the group and if he is the admin
@@ -113,15 +137,15 @@ public class GroupService {
         User admin = jwtService.getUser();
         if (!groupRepository.existsByAdminIdAndGroupId(admin.getId(), idGroup)) {
             throw new NoSuchElementException("There are no groups with that id: "
-                    + idGroup + " and that admin: " + admin.getEmail());
-        }
+                                            + idGroup + " and that admin: " + admin.getEmail());
+            }
         if (admin.getId().equals(idUser)) {
             throw new RuntimeException("Can't remove an admin from the group!");
-        }
+            }
         if (!groupMemberRepository.existsByUserIdAndGroupId(idUser, idGroup)) {
             throw new NoSuchElementException("User with that id: " + idUser
-                    + " is not in this group: " + idGroup);
-        }
+                                            + " is not in this group: " + idGroup);
+            }
         groupMemberRepository.deleteGroupMemberByGroupIdAndMemberId(idGroup, idUser);
     }
 

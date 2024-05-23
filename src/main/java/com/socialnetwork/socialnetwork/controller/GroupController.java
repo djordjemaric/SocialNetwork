@@ -7,6 +7,8 @@ import com.socialnetwork.socialnetwork.dto.group.GroupRequest_MemberDTO;
 import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.List;
+
 
 @RestController
 @RequestMapping("/api/groups")
@@ -19,11 +21,21 @@ public class GroupController {
         this.groupService = groupService;
     }
 
-
     @ResponseStatus(HttpStatus.CREATED)
     @PostMapping
     public GroupDTO createGroup(@RequestBody CreateGroupDTO createGroupDto) {
         return groupService.createGroup(createGroupDto);
+    }
+
+    @ResponseStatus(HttpStatus.OK)
+    @DeleteMapping("/{id}")
+    public void deleteGroup(@PathVariable Integer id) {
+        groupService.deleteGroup(id);
+    }
+    @ResponseStatus(HttpStatus.OK)
+    @GetMapping
+    public List<GroupDTO> getGroupsByName(@RequestParam String name) {
+        return groupService.findByName(name);
     }
 
     @DeleteMapping("/{idGroup}/leave")
