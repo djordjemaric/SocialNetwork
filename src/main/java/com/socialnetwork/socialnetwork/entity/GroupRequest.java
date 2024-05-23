@@ -23,13 +23,11 @@ public class GroupRequest {
     @NotNull
     @ManyToOne
     @JoinColumn(name = "id_user")
-    @JsonManagedReference
     private User user;
 
     @NotNull
     @ManyToOne
     @JoinColumn(name = "id_group")
-    @JsonManagedReference
     private Group group;
 
 }
