@@ -2,8 +2,8 @@ package com.socialnetwork.socialnetwork.controller;
 
 import com.socialnetwork.socialnetwork.dto.group.CreateGroupDTO;
 import com.socialnetwork.socialnetwork.dto.group.GroupDTO;
-import com.socialnetwork.socialnetwork.service.GroupService;
 import com.socialnetwork.socialnetwork.dto.group.ResolvedGroupRequestDTO;
+import com.socialnetwork.socialnetwork.service.GroupService;
 import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.*;
 
@@ -46,7 +46,7 @@ public class GroupController {
     }
 
     @ResponseStatus(HttpStatus.OK)
-    @DeleteMapping("/{idGroup}/members/{idUser}") // idGroup and idUser that we want to remove
+    @DeleteMapping("/{idGroup}/members/{idUser}")
     public void removeMember(@PathVariable Integer idGroup, @PathVariable Integer idUser) {
         groupService.removeMember(idGroup, idUser);
     }
