@@ -6,10 +6,7 @@ import com.socialnetwork.socialnetwork.entity.Comment;
 import com.socialnetwork.socialnetwork.entity.Post;
 import com.socialnetwork.socialnetwork.entity.User;
 import com.socialnetwork.socialnetwork.mapper.CommentMapper;
-import com.socialnetwork.socialnetwork.repository.CommentRepository;
-import com.socialnetwork.socialnetwork.repository.FriendsRepository;
-import com.socialnetwork.socialnetwork.repository.GroupRepository;
-import com.socialnetwork.socialnetwork.repository.PostRepository;
+import com.socialnetwork.socialnetwork.repository.*;
 import org.springframework.stereotype.Service;
 
 import java.util.NoSuchElementException;
@@ -20,17 +17,17 @@ public class CommentService {
     private final PostRepository postRepository;
     private final CommentMapper commentMapper;
     private final JwtService jwtService;
-    private final GroupRepository groupRepository;
-    private final FriendsRepository friendshipRepository;
+    private final GroupMemberRepository groupMemberRepository;
+    private final FriendsRepository friendsRepository;
 
 
-    public CommentService(CommentRepository commentRepository, PostRepository postRepository, CommentMapper commentMapper, JwtService jwtService, GroupRepository groupRepository, FriendsRepository friendshipRepository) {
+    public CommentService(CommentRepository commentRepository, PostRepository postRepository, CommentMapper commentMapper, JwtService jwtService, GroupMemberRepository groupMemberRepository, FriendsRepository friendshipRepository) {
         this.commentRepository = commentRepository;
         this.postRepository = postRepository;
         this.commentMapper = commentMapper;
         this.jwtService = jwtService;
-        this.groupRepository = groupRepository;
-        this.friendshipRepository = friendshipRepository;
+        this.groupMemberRepository = groupMemberRepository;
+        this.friendsRepository = friendshipRepository;
     }
 
     public CommentDTO createComment(Integer postId, CreateCommentDTO commentDTO) {
