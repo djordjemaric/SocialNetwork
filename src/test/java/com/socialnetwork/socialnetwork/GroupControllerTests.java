@@ -3,8 +3,8 @@ package com.socialnetwork.socialnetwork;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.ObjectWriter;
 import com.socialnetwork.socialnetwork.controller.GroupController;
-import com.socialnetwork.socialnetwork.dto.GroupDto;
-import com.socialnetwork.socialnetwork.dto.group.CreateGroupDto;
+import com.socialnetwork.socialnetwork.dto.group.GroupDTO;
+import com.socialnetwork.socialnetwork.dto.group.CreateGroupDTO;
 import com.socialnetwork.socialnetwork.service.GroupService;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -37,22 +37,22 @@ class GroupControllerTests {
     @InjectMocks
     private GroupController groupController;
 
-    private CreateGroupDto createGroupDto;
-    private GroupDto expectedGroupDto;
+    private CreateGroupDTO createGroupDTO;
+    private GroupDTO expectedGroupDTO;
 
     @BeforeEach
     public void setUp(){
         this.mockMvc = MockMvcBuilders.standaloneSetup(groupController).build();
-        createGroupDto = new CreateGroupDto("Group1", true);
-        expectedGroupDto = new GroupDto("Group1", "admin@admin.com", true, 1);
+        createGroupDTO = new CreateGroupDTO("Group1", true);
+        expectedGroupDTO = new GroupDTO("Group1", "admin@admin.com", true, 1);
     }
 
     @Test
     void createGroup_success() throws Exception {
 
-        Mockito.when(groupService.createGroup(createGroupDto)).thenReturn(expectedGroupDto);
+        Mockito.when(groupService.createGroup(createGroupDTO)).thenReturn(expectedGroupDTO);
 
-        String content = objectWriter.writeValueAsString(createGroupDto);
+        String content = objectWriter.writeValueAsString(createGroupDTO);
 
         MockHttpServletRequestBuilder mockRequest = MockMvcRequestBuilders.post("/api/groups")
                 .contentType(MediaType.APPLICATION_JSON)
@@ -63,8 +63,8 @@ class GroupControllerTests {
                 .andExpect(status().isCreated())
                 .andExpect(result -> {
                     String responseBody = result.getResponse().getContentAsString();
-                    GroupDto actualGroupDto = objectMapper.readValue(responseBody, GroupDto.class);
-                    assertEquals(expectedGroupDto, actualGroupDto);
+                    GroupDTO actualGroupDTO = objectMapper.readValue(responseBody, GroupDTO.class);
+                    assertEquals(expectedGroupDTO, actualGroupDTO);
                 });
 
     }

@@ -1,7 +1,7 @@
 package com.socialnetwork.socialnetwork;
 
-import com.socialnetwork.socialnetwork.dto.GroupDto;
-import com.socialnetwork.socialnetwork.dto.group.CreateGroupDto;
+import com.socialnetwork.socialnetwork.dto.group.GroupDTO;
+import com.socialnetwork.socialnetwork.dto.group.CreateGroupDTO;
 import com.socialnetwork.socialnetwork.entity.Group;
 import com.socialnetwork.socialnetwork.entity.GroupMember;
 import com.socialnetwork.socialnetwork.entity.User;
@@ -47,8 +47,8 @@ class GroupServiceTests {
     private User user;
     private Group group;
     private GroupMember groupMember;
-    private CreateGroupDto createGroupDto;
-    private GroupDto expectedGroupDto;
+    private CreateGroupDTO createGroupDTO;
+    private GroupDTO expectedGroupDTO;
 
     @BeforeEach
     void setUp() {
@@ -56,33 +56,33 @@ class GroupServiceTests {
         user = new User(2, "user@user.com", "");
         group = new Group(1, "Group1", admin, true, null);
         groupMember = new GroupMember(1, user, group);
-        createGroupDto = new CreateGroupDto("Group1", true);
-        expectedGroupDto = new GroupDto("Group1", "admin@admin.com", true, 1);
+        createGroupDTO = new CreateGroupDTO("Group1", true);
+        expectedGroupDTO = new GroupDTO("Group1", "admin@admin.com", true, 1);
     }
 
     @Test
     void createGroup_groupNameExists_throwsException() {
         Mockito.when(jwtService.getUser()).thenReturn(admin);
-        Mockito.when(groupRepository.existsByName(createGroupDto.name())).thenReturn(true);
+        Mockito.when(groupRepository.existsByName(createGroupDTO.name())).thenReturn(true);
 
-        assertThrows(FunctionArgumentException.class, () -> groupService.createGroup(createGroupDto),
+        assertThrows(FunctionArgumentException.class, () -> groupService.createGroup(createGroupDTO),
                 "Group with that name already exists");
     }
 
     @Test
     void createGroup_success() {
         Mockito.when(jwtService.getUser()).thenReturn(admin);
-        Mockito.when(groupRepository.existsByName(createGroupDto.name())).thenReturn(false);
-        Mockito.when(groupMapper.dtoToEntity(admin, createGroupDto)).thenReturn(group);
+        Mockito.when(groupRepository.existsByName(createGroupDTO.name())).thenReturn(false);
+        Mockito.when(groupMapper.dtoToEntity(admin, createGroupDTO)).thenReturn(group);
         Mockito.when(groupRepository.save(Mockito.any(Group.class)))
                 .thenAnswer(invocation -> invocation.getArgument(0));
         Mockito.when(groupMemberRepository.save(Mockito.any(GroupMember.class)))
                 .thenAnswer(invocation -> invocation.getArgument(0));
-        Mockito.when(groupMapper.entityToGroupDto(group)).thenReturn(expectedGroupDto);
+        Mockito.when(groupMapper.entityToGroupDto(group)).thenReturn(expectedGroupDTO);
 
-        GroupDto result = groupService.createGroup(createGroupDto);
+        GroupDTO result = groupService.createGroup(createGroupDTO);
 
-        assertEquals(expectedGroupDto, result);
+        assertEquals(expectedGroupDTO, result);
 
     }
 
@@ -100,7 +100,8 @@ class GroupServiceTests {
         Mockito.when(groupRepository.findById(group.getId())).thenReturn(Optional.of(group));
         Mockito.when(groupMemberRepository.findByMember(user)).thenReturn(Optional.empty());
 
-        assertThrows(FunctionArgumentException.class, () -> groupService.leaveGroup(group.getId()), "User is not member of group");
+        assertThrows(FunctionArgumentException.class, () -> groupService.leaveGroup(group.getId()),
+                "User is not member of group");
     }
 
     @Test
@@ -119,7 +120,8 @@ class GroupServiceTests {
         Mockito.when(jwtService.getUser()).thenReturn(admin);
         Mockito.when(groupRepository.existsByAdminIdAndGroupId(admin.getId(), group.getId())).thenReturn(false);
 
-        assertThrows(NoSuchElementException.class, () -> groupService.removeMember(group.getId(), user.getId()));
+        assertThrows(NoSuchElementException.class, () -> groupService.removeMember(group.getId(), user.getId()),
+                    "Group with that admin and group id does not exist.");
     }
 
     @Test
@@ -127,7 +129,8 @@ class GroupServiceTests {
         Mockito.when(jwtService.getUser()).thenReturn(admin);
         Mockito.when(groupRepository.existsByAdminIdAndGroupId(admin.getId(), group.getId())).thenReturn(true);
 
-        assertThrows(RuntimeException.class, () -> groupService.removeMember(group.getId(), admin.getId()));
+        assertThrows(RuntimeException.class, () -> groupService.removeMember(group.getId(), admin.getId()),
+                "Admin can not remove himself from the group!");
     }
 
     @Test
@@ -136,7 +139,8 @@ class GroupServiceTests {
         Mockito.when(groupRepository.existsByAdminIdAndGroupId(admin.getId(), group.getId())).thenReturn(true);
         Mockito.when(groupMemberRepository.existsByUserIdAndGroupId(user.getId(), group.getId())).thenReturn(false);
 
-        assertThrows(NoSuchElementException.class, () -> groupService.removeMember(group.getId(), user.getId()));
+        assertThrows(NoSuchElementException.class, () -> groupService.removeMember(group.getId(), user.getId()),
+                "User with that id is not in the group.");
     }
 
     @Test
