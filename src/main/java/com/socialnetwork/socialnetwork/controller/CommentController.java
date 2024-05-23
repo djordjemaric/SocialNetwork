@@ -16,10 +16,4 @@ public class CommentController {
     public CommentController(CommentService commentService) {
         this.commentService = commentService;
     }
-
-
-    @PostMapping("/")
-    public void save(@RequestBody User owner,@RequestBody CreateCommentDTO commentDTO) {
-        commentService.createComment(owner, commentDTO);
-    }
 }
