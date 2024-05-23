@@ -16,7 +16,7 @@ public class PromptController {
     }
     @GetMapping()
     public String generatePrompt(){
-        return chatClient.call(new Prompt("tell me a funny joke")).getResult().getOutput().getContent();
+        return chatClient.call(new Prompt("tell me a dad joke")).getResult().getOutput().getContent();
     }
 
 }
