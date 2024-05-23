@@ -1,6 +1,5 @@
 package com.socialnetwork.socialnetwork.dto.post;
 
-
 import com.socialnetwork.socialnetwork.entity.Comment;
 
 import java.util.List;
@@ -11,6 +10,6 @@ public record PostDTO(
         String imgUrl,
         String userEmail,
         String groupName,
-        List<Comment> comments
-){
+        List<Comment> comments) {
+
 }
