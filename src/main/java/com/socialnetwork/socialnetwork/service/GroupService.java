@@ -2,7 +2,6 @@ package com.socialnetwork.socialnetwork.service;
 
 import com.socialnetwork.socialnetwork.dto.group.*;
 import com.socialnetwork.socialnetwork.dto.post.PostDTO;
-import com.socialnetwork.socialnetwork.dto.user.PreviewUserDTO;
 import com.socialnetwork.socialnetwork.entity.*;
 import com.socialnetwork.socialnetwork.mapper.GroupMapper;
 import com.socialnetwork.socialnetwork.mapper.GroupRequestMapper;
@@ -86,7 +85,7 @@ public class GroupService {
     public List<GroupDTO> findByName(String name) {
         List<Group> groups = groupRepository.findAllByNameStartingWith(name);
 
-        return groups.stream().map(group -> new GroupDTO(group.getName(), group.getAdmin().getEmail(), group.isPublic(), group.getId())).toList();
+        return groups.stream().map(groupMapper::entityToGroupDto).toList();
     }
 
 
@@ -113,13 +112,7 @@ public class GroupService {
     public ResolvedGroupRequestDTO addUserAsAMemberToPrivateGroup(User user, Group group) {
         GroupRequest groupRequest = groupRequestRepository.save(new GroupRequest(null, user, group));
 
-        return new ResolvedGroupRequestDTO(groupRequest.getId(),
-                new PreviewUserDTO(user.getId(), user.getEmail()),
-                new GroupDTO(group.getName(),
-                        group.getAdmin().getEmail(),
-                        group.isPublic(),
-                        group.getId()),
-                ResolvedGroupRequestStatus.REQUEST_TO_JOIN_GROUP_CREATED);
+        return groupRequestMapper.requestToResolvedGroupRequestDTOStatusCreated(groupRequest);
     }
 
 
@@ -137,19 +130,15 @@ public class GroupService {
                 .toList();
     }
 
-    public RequestDTO checkRequest(Integer idGroup, Integer idRequest) {
+    public GroupRequest checkRequest(Integer idGroup, Integer idRequest) {
         User currentUser = jwtService.getUser();
 
         Group group = groupRepository.findById(idGroup).orElseThrow(() -> new FunctionArgumentException("Group does not exist!"));
         GroupRequest request = groupRequestRepository.findById(idRequest).orElseThrow(() -> new FunctionArgumentException("Request does not exist!"));
         User newMember = userRepository.findById(request.getUser().getId()).orElseThrow(() -> new FunctionArgumentException("User with that id does not exist!"));
 
-        if (!group.getAdmin().equals(currentUser)) {
+        if (!groupRepository.existsByAdmin(currentUser)) {
             throw new FunctionArgumentException("That user is not an admin for that group!");
-        }
-
-        if (!groupRequestRepository.existsByGroupId(idGroup)) {
-            throw new FunctionArgumentException("That request does not exist");
         }
 
         if (!groupRequestRepository.existsByUserAndGroup(newMember, group)) {
@@ -160,31 +149,26 @@ public class GroupService {
             throw new FunctionArgumentException("Given group is public");
         }
 
-        return new RequestDTO(newMember, group, request);
+        return request;
     }
 
     public void acceptRequest(Integer idGroup, Integer idRequest) {
-        RequestDTO requestDTO = checkRequest(idGroup, idRequest);
+         GroupRequest groupRequest = checkRequest(idGroup, idRequest);
 
-        groupMemberRepository.save(new GroupMember(null, requestDTO.user(), requestDTO.group()));
+        groupMemberRepository.save(new GroupMember(null, groupRequest.getUser(), groupRequest.getGroup()));
         groupRequestRepository.deleteById(idRequest);
     }
 
     public void rejectRequest(Integer idGroup, Integer idRequest) {
-        RequestDTO requestDTO = checkRequest(idGroup, idRequest);
+        GroupRequest groupRequest = checkRequest(idGroup, idRequest);
 
-        groupRequestRepository.deleteById(requestDTO.groupRequest().getId());
+        groupRequestRepository.deleteById(groupRequest.getId());
     }
 
     public ResolvedGroupRequestDTO addUserAsAMemberToPublicGroup(User user, Group group) {
         GroupMember groupMember = groupMemberRepository.save(new GroupMember(null, user, group));
 
-        return new ResolvedGroupRequestDTO(groupMember.getId(),
-                new PreviewUserDTO(user.getId(), user.getEmail()),
-                new GroupDTO(group.getName(),
-                        group.getAdmin().getEmail(),
-                        group.isPublic(), group.getId()),
-                ResolvedGroupRequestStatus.REQUEST_TO_JOIN_GROUP_ACCEPTED);
+        return groupRequestMapper.groupMemberToResolvedGroupRequestDTOStatusAccepted(groupMember);
     }
 
     public void leaveGroup(Integer idGroup) {

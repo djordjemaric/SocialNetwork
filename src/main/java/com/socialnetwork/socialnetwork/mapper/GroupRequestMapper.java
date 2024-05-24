@@ -2,7 +2,10 @@ package com.socialnetwork.socialnetwork.mapper;
 
 import com.socialnetwork.socialnetwork.dto.group.GroupDTO;
 import com.socialnetwork.socialnetwork.dto.group.GroupRequestDTO;
+import com.socialnetwork.socialnetwork.dto.group.ResolvedGroupRequestDTO;
+import com.socialnetwork.socialnetwork.dto.group.ResolvedGroupRequestStatus;
 import com.socialnetwork.socialnetwork.dto.user.PreviewUserDTO;
+import com.socialnetwork.socialnetwork.entity.GroupMember;
 import com.socialnetwork.socialnetwork.entity.GroupRequest;
 import org.springframework.stereotype.Component;
 
@@ -19,9 +22,25 @@ public class GroupRequestMapper {
     }
 
     public GroupRequestDTO requestToGroupRequestDTO(GroupRequest request) {
-        PreviewUserDTO userDTO = userMapper.requestToPreviewUserDTO(request);
-        GroupDTO groupDTO = groupMapper.requestToGroupDTO(request);
+        PreviewUserDTO userDTO = userMapper.requestToPreviewUserDTO(request.getUser());
+        GroupDTO groupDTO = groupMapper.requestToGroupDTO(request.getGroup());
 
         return new GroupRequestDTO(userDTO, groupDTO, request.getId());
+    }
+
+    public ResolvedGroupRequestDTO requestToResolvedGroupRequestDTOStatusCreated(GroupRequest request) {
+        PreviewUserDTO userDTO = userMapper.requestToPreviewUserDTO(request.getUser());
+        GroupDTO groupDTO = groupMapper.requestToGroupDTO(request.getGroup());
+
+        return new ResolvedGroupRequestDTO(request.getId(), userDTO, groupDTO,
+                ResolvedGroupRequestStatus.REQUEST_TO_JOIN_GROUP_CREATED);
+    }
+
+    public ResolvedGroupRequestDTO groupMemberToResolvedGroupRequestDTOStatusAccepted(GroupMember groupMember) {
+        PreviewUserDTO userDTO = userMapper.requestToPreviewUserDTO(groupMember.getMember());
+        GroupDTO groupDTO = groupMapper.requestToGroupDTO(groupMember.getGroup());
+
+        return new ResolvedGroupRequestDTO(groupMember.getId(), userDTO, groupDTO,
+                ResolvedGroupRequestStatus.REQUEST_TO_JOIN_GROUP_ACCEPTED);
     }
 }
