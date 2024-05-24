@@ -30,21 +30,21 @@ public class AIService {
         this.imageClient = imageClient;
     }
 
-    public String generateText(String prompt){
+    public String generateText(String prompt) {
         return chatClient.call(new Prompt(prompt)).getResult().getOutput().getContent();
     }
 
     public InputStream generateImg(String prompt) {
         try {
-            ImageResponse imageResponse=imageClient.call(
-                new ImagePrompt(prompt,
-                        OpenAiImageOptions.builder()
-                                .withQuality("hd")
-                                .withN(1)
-                                .withHeight(1024)
-                                .withWidth(1024)
-                                .build())
-        );
+            ImageResponse imageResponse = imageClient.call(
+                    new ImagePrompt(prompt,
+                            OpenAiImageOptions.builder()
+                                    .withQuality("hd")
+                                    .withN(1)
+                                    .withHeight(1024)
+                                    .withWidth(1024)
+                                    .build())
+            );
 
             return downloadImageFromUrl(imageResponse.getResult().getOutput().getUrl());
         } catch (IOException e) {
@@ -53,7 +53,7 @@ public class AIService {
     }
 
     public static MultipartFile convertToMultipartFile(InputStream inputStream, String fileName, String contentType) throws IOException {
-        BufferedImage bufferedImage=ImageIO.read(inputStream);
+        BufferedImage bufferedImage = ImageIO.read(inputStream);
 
         ByteArrayOutputStream baos = new ByteArrayOutputStream();
         ImageIO.write(bufferedImage, "image/jpg", baos);

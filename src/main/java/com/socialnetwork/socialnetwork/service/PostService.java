@@ -12,7 +12,6 @@ import com.socialnetwork.socialnetwork.repository.FriendsRepository;
 import com.socialnetwork.socialnetwork.repository.GroupMemberRepository;
 import com.socialnetwork.socialnetwork.repository.GroupRepository;
 import com.socialnetwork.socialnetwork.repository.PostRepository;
-import org.springframework.ai.chat.ChatClient;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 
@@ -117,22 +116,35 @@ public class PostService {
     }
 
     public PostDTO createAIPostOnTimeline(AIGeneratedPostDTO postDTO) {
+        User user = jwtService.getUser();
         String generatedText = aiService.generateText(postDTO.txtPrompt());
-        //null prosledjujemo umesto MultipartFile dok se ne napravi metoda u AIServisu
-        String imgS3Key;
+        String imgS3Key = null;
         if (postDTO.imgPrompt() != null) {
             InputStream stream = aiService.generateImg(postDTO.imgPrompt());
             imgS3Key = uploadImageAndGetKey(stream);
         }
-        CreatePostDTO createPostDTO = postMapper.openAIPostDTOtoCreatePostDTO(postDTO, generatedText, null);
-        return createPostOnTimeline(createPostDTO);
+        Post post = postMapper.AIGeneratedPostDTOtoPostOnTimeline(postDTO, user, generatedText, imgS3Key);
+        post = postRepository.save(post);
+        return postMapper.postToPostDTO(post);
     }
 
     public PostDTO createAIPostInGroup(AIGeneratedPostDTO postDTO) {
+        User user = jwtService.getUser();
+        Group group = groupRepository.findById(postDTO.idGroup()).orElseThrow(
+                () -> new NoSuchElementException("There is no group with the id of " + postDTO.idGroup()));
+
+        if (!groupMemberRepository.existsByUserIdAndGroupId(user.getId(), postDTO.idGroup())) {
+            throw new RuntimeException("You cannot create post because you are not a member of this group.");
+        }
         String generatedText = aiService.generateText(postDTO.txtPrompt());
-        //null prosledjujemo umesto MultipartFile dok se ne napravi metoda u AIServisu
-        CreatePostDTO createPostDTO = postMapper.openAIPostDTOtoCreatePostDTO(postDTO, generatedText, null);
-        return createPostInGroup(createPostDTO);
+        String imgS3Key = null;
+        if (postDTO.imgPrompt() != null) {
+            InputStream stream = aiService.generateImg(postDTO.imgPrompt());
+            imgS3Key = uploadImageAndGetKey(stream);
+        }
+        Post post = postMapper.AIGeneratedPostDTOtoPostInGroup(postDTO, user, group, generatedText, imgS3Key);
+        post = postRepository.save(post);
+        return postMapper.postToPostDTO(post);
     }
 
     public PostDTO updatePost(Integer idPost, UpdatePostDTO updatePostDTO) {
