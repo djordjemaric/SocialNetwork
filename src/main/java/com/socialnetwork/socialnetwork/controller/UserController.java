@@ -28,12 +28,21 @@ public class UserController {
 
     @PostMapping(path = "/signup")
     public User createUser(@RequestBody UserRequest userRequest) {
-        return userService.createUser(userRequest.email(), userRequest.password());
+        try {
+            return userService.createUser(userRequest.email(), userRequest.password());
+        } catch (Exception e) {
+            throw new RuntimeException(e);
+        }
     }
 
     @PostMapping(path = "/login")
     public LoginResponse loginUser(@RequestBody UserRequest userRequest) {
-        return userService.loginUser(userRequest.email(), userRequest.password());
+        try {
+            return userService.loginUser(userRequest.email(), userRequest.password());
+        } catch (Exception e) {
+            throw new RuntimeException(e);
+        }
+
     }
 }
 

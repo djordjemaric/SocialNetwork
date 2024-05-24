@@ -41,7 +41,7 @@ public class UserService {
     }
 
 
-    public User createUser(String email, String password) {
+    public User createUser(String email, String password) throws IAMProviderException {
 
         if (userRepository.existsByEmail(email)) {
             throw new FunctionArgumentException("User already exists");
@@ -55,7 +55,7 @@ public class UserService {
         return user;
     }
 
-    public LoginResponse loginUser(String email, String password) {
+    public LoginResponse loginUser(String email, String password) throws IAMProviderException {
         return cognitoService.loginUser(email, password);
     }
 

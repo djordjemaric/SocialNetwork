@@ -24,7 +24,7 @@ public class CognitoService {
         this.cognitoIdentityProvider = cognitoIdentityProvider;
     }
 
-    public String registerUser(String username, String email, String password) {
+    public String registerUser(String username, String email, String password) throws IAMProviderException {
         // Set up the AWS Cognito registration request
         SignUpRequest signUpRequest = SignUpRequest.builder().
                 clientId(clientId)
@@ -48,7 +48,7 @@ public class CognitoService {
         }
     }
 
-    public LoginResponse loginUser(String email, String password) {
+    public LoginResponse loginUser(String email, String password) throws IAMProviderException {
         // Set up the authentication request
         InitiateAuthRequest authRequest = InitiateAuthRequest.builder()
                 .authFlow(AuthFlowType.USER_PASSWORD_AUTH)
