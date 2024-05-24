@@ -27,6 +27,11 @@ public class PostController {
         this.replyService = replyService;
     }
 
+    @ResponseStatus(HttpStatus.OK)
+    @GetMapping("/{id}")
+    public PostDTO getById(@PathVariable Integer id) {
+        return postService.getById(id);
+    }
 
     @ResponseStatus(HttpStatus.CREATED)
     @PostMapping
