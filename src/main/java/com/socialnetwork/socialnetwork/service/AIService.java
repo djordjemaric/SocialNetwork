@@ -73,9 +73,8 @@ public class AIService {
         byte[] imageData = Base64.getDecoder().decode(b64Json);
 
         ByteArrayInputStream bais = new ByteArrayInputStream(imageData);
-        BufferedImage awtImage = ImageIO.read(bais);
 
-        return awtImage;
+        return ImageIO.read(bais);
     }
 
 }
