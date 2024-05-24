@@ -36,7 +36,8 @@ public class AIService {
     }
 
     public MultipartFile generateImg(String prompt) {
-        try { ImageResponse imageResponse=imageClient.call(
+        try {
+            ImageResponse imageResponse=imageClient.call(
                 new ImagePrompt(prompt,
                         OpenAiImageOptions.builder()
                                 .withQuality("hd")
@@ -66,6 +67,7 @@ public class AIService {
 
         return new MockMultipartFile(fileName, fileName, contentType, baos.toByteArray());
     }
+
     public static BufferedImage convertToAwtImage(org.springframework.ai.image.Image springImage) throws IOException {
         String b64Json= springImage.getB64Json();
         byte[] imageData = Base64.getDecoder().decode(b64Json);
