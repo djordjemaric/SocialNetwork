@@ -2,6 +2,7 @@ package com.socialnetwork.socialnetwork.controller;
 
 import com.socialnetwork.socialnetwork.dto.LoginResponse;
 import com.socialnetwork.socialnetwork.dto.UserRequest;
+import com.socialnetwork.socialnetwork.exceptions.IAMProviderException;
 import com.socialnetwork.socialnetwork.service.UserService;
 import com.socialnetwork.socialnetwork.entity.User;
 import org.springframework.web.bind.annotation.*;
@@ -27,22 +28,13 @@ public class UserController {
     }
 
     @PostMapping(path = "/signup")
-    public User createUser(@RequestBody UserRequest userRequest) {
-        try {
-            return userService.createUser(userRequest.email(), userRequest.password());
-        } catch (Exception e) {
-            throw new RuntimeException(e);
-        }
+    public User createUser(@RequestBody UserRequest userRequest) throws IAMProviderException {
+        return userService.createUser(userRequest.email(), userRequest.password());
     }
 
     @PostMapping(path = "/login")
-    public LoginResponse loginUser(@RequestBody UserRequest userRequest) {
-        try {
-            return userService.loginUser(userRequest.email(), userRequest.password());
-        } catch (Exception e) {
-            throw new RuntimeException(e);
-        }
-
+    public LoginResponse loginUser(@RequestBody UserRequest userRequest) throws IAMProviderException {
+        return userService.loginUser(userRequest.email(), userRequest.password());
     }
 }
 
