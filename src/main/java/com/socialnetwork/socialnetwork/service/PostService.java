@@ -13,7 +13,6 @@ import com.socialnetwork.socialnetwork.repository.GroupMemberRepository;
 import com.socialnetwork.socialnetwork.repository.GroupRepository;
 import com.socialnetwork.socialnetwork.repository.PostRepository;
 import org.springframework.ai.chat.ChatClient;
-import org.springframework.ai.chat.prompt.Prompt;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 
@@ -32,10 +31,9 @@ public class PostService {
     private final S3Service s3Service;
     private final FriendsRepository friendsRepository;
     private final GroupMemberRepository groupMemberRepository;
-    private final ChatClient chatClient;
     private final AIService aiService;
 
-    public PostService(PostRepository postRepository, PostMapper postMapper, GroupRepository groupRepository, JwtService jwtService, S3Service s3Service, FriendsRepository friendsRepository, GroupMemberRepository groupMemberRepository, ChatClient chatClient, AIService aiService) {
+    public PostService(PostRepository postRepository, PostMapper postMapper, GroupRepository groupRepository, JwtService jwtService, S3Service s3Service, FriendsRepository friendsRepository, GroupMemberRepository groupMemberRepository, AIService aiService) {
         this.postRepository = postRepository;
         this.postMapper = postMapper;
         this.groupRepository = groupRepository;
@@ -43,7 +41,6 @@ public class PostService {
         this.friendsRepository = friendsRepository;
         this.groupMemberRepository = groupMemberRepository;
         this.s3Service = s3Service;
-        this.chatClient = chatClient;
         this.aiService = aiService;
     }
 
@@ -56,11 +53,11 @@ public class PostService {
             throw new IllegalArgumentException("Filename cannot be null");
         }
 
-        String extension = filename
-                .substring(filename.lastIndexOf("."));
+//        String extension = filename
+//                .substring(filename.lastIndexOf("."));
 
         try (InputStream inputStream = image.getInputStream()) {
-            return s3Service.uploadToBucket(extension, inputStream);
+            return s3Service.uploadToBucket("jpg", inputStream);
         } catch (IOException e) {
             throw new RuntimeException(e);
         }

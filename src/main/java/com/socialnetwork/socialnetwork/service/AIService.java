@@ -11,14 +11,13 @@ import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 
 import javax.imageio.ImageIO;
-import org.springframework.ai.image.Image;
 
-import java.awt.*;
 import java.awt.image.BufferedImage;
-import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
-import java.util.Base64;
+import java.io.InputStream;
+import java.net.HttpURLConnection;
+import java.net.URL;
 
 @Service
 public class AIService {
@@ -41,40 +40,32 @@ public class AIService {
                 new ImagePrompt(prompt,
                         OpenAiImageOptions.builder()
                                 .withQuality("hd")
-                                .withN(4)
+                                .withN(1)
                                 .withHeight(1024)
                                 .withWidth(1024)
                                 .build())
         );
 
-            return convertToMultipartFile(convertToAwtImage(imageResponse.getResult().getOutput()),prompt,"image/jpeg");
+            return convertToMultipartFile(downloadImageFromUrl(imageResponse.getResult().getOutput().getUrl()),prompt,"image/jpeg");
         } catch (IOException e) {
             throw new RuntimeException(e);
         }
     }
 
-    public static MultipartFile convertToMultipartFile(java.awt.Image image, String fileName, String contentType) throws IOException {
-        BufferedImage bufferedImage;
-        if (image instanceof BufferedImage) {
-            bufferedImage = (BufferedImage) image;
-        } else {
-            bufferedImage = new BufferedImage(image.getWidth(null), image.getHeight(null), BufferedImage.TYPE_INT_RGB);
-            bufferedImage.getGraphics().drawImage(image, 0, 0, null);
-        }
+    public static MultipartFile convertToMultipartFile(InputStream inputStream, String fileName, String contentType) throws IOException {
+        BufferedImage bufferedImage=ImageIO.read(inputStream);
 
         ByteArrayOutputStream baos = new ByteArrayOutputStream();
-        ImageIO.write(bufferedImage, "jpg", baos);
+        ImageIO.write(bufferedImage, "image/jpeg", baos);
 
         return new MockMultipartFile(fileName, fileName, contentType, baos.toByteArray());
     }
 
-    public static BufferedImage convertToAwtImage(org.springframework.ai.image.Image springImage) throws IOException {
-        String b64Json= springImage.getB64Json();
-        byte[] imageData = Base64.getDecoder().decode(b64Json);
+    public static InputStream downloadImageFromUrl(String imageUrl) throws IOException {
+        URL url = new URL(imageUrl);
+        HttpURLConnection connection = (HttpURLConnection) url.openConnection();
+        connection.setRequestMethod("GET");
 
-        ByteArrayInputStream bais = new ByteArrayInputStream(imageData);
-
-        return ImageIO.read(bais);
+        return connection.getInputStream();
     }
-
 }
