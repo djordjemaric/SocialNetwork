@@ -1,4 +1,11 @@
 package com.socialnetwork.socialnetwork.exceptions;
 
 public enum ErrorCode {
+    ERROR_EXISTS_GROUP,
+    ERROR_NOT_EXISTS_GROUP,
+    ERROR_NOT_MEMBER_GROUP,
+    ERROR_ACCESS_DENIED_GROUP,
+    ERROR_REQUEST_ALREADY_SENT_GROUP,
+    ERROR_ALREADY_MEMBER_GROUP,
+    ERROR_ADMIN_LEAVING_GROUP,
 }
