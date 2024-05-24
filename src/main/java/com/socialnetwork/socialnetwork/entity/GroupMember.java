@@ -22,12 +22,10 @@ public class GroupMember {
     @NotNull
     @ManyToOne
     @JoinColumn(name = "id_member")
-    @JsonManagedReference
     private User member;
 
     @NotNull
     @ManyToOne
     @JoinColumn(name = "id_group")
-    @JsonManagedReference
     private Group group;
 }

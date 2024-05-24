@@ -8,6 +8,8 @@ import com.socialnetwork.socialnetwork.entity.Group;
 import com.socialnetwork.socialnetwork.entity.Post;
 import com.socialnetwork.socialnetwork.entity.User;
 import com.socialnetwork.socialnetwork.mapper.PostMapper;
+import com.socialnetwork.socialnetwork.repository.FriendsRepository;
+import com.socialnetwork.socialnetwork.repository.GroupMemberRepository;
 import com.socialnetwork.socialnetwork.repository.GroupRepository;
 import com.socialnetwork.socialnetwork.repository.PostRepository;
 import org.springframework.ai.chat.ChatClient;
@@ -28,13 +30,17 @@ public class PostService {
     private final GroupRepository groupRepository;
     private final JwtService jwtService;
     private final S3Service s3Service;
+    private final FriendsRepository friendsRepository;
+    private final GroupMemberRepository groupMemberRepository;
     private final ChatClient chatClient;
 
-    public PostService(PostRepository postRepository, PostMapper postMapper, GroupRepository groupRepository, JwtService jwtService, S3Service s3Service, ChatClient chatClient) {
+    public PostService(PostRepository postRepository, PostMapper postMapper, GroupRepository groupRepository, JwtService jwtService, S3Service s3Service, FriendsRepository friendsRepository, GroupMemberRepository groupMemberRepository, ChatClient chatClient) {
         this.postRepository = postRepository;
         this.postMapper = postMapper;
         this.groupRepository = groupRepository;
         this.jwtService = jwtService;
+        this.friendsRepository = friendsRepository;
+        this.groupMemberRepository = groupMemberRepository;
         this.s3Service = s3Service;
         this.chatClient = chatClient;
     }
@@ -58,12 +64,36 @@ public class PostService {
         }
     }
 
+    public PostDTO getById(Integer idPost) {
+        User user = jwtService.getUser();
+        Post post = postRepository.findById(idPost)
+                .orElseThrow(() -> new NoSuchElementException("The post with the id of " +
+                        idPost + " is not present in the database."));
+
+        if (!post.isPublic() && post.getGroup() == null) {
+            if (friendsRepository.areTwoUsersFriends(post.getOwner().getId(), user.getId()).isEmpty()) {
+                throw new RuntimeException("You cannot see the post because you are not friends with the post owner.");
+            }
+        }
+
+        if (post.getGroup() != null && !(post.getGroup().isPublic())) {
+            if (!(groupMemberRepository.existsByUserIdAndGroupId(user.getId(), post.getGroup().getId()))) {
+                throw new RuntimeException("You cannot see the post because you are not a member of the "
+                        + post.getGroup().getName() + " group.");
+            }
+        }
+        return postMapper.postToPostDTO(post);
+    }
+
     public PostDTO createPostInGroup(CreatePostDTO postDTO) {
         User user = jwtService.getUser();
 
         Group group = groupRepository.findById(postDTO.idGroup()).orElseThrow(
                 () -> new NoSuchElementException("There is no group with the id of " + postDTO.idGroup()));
 
+        if (!groupMemberRepository.existsByUserIdAndGroupId(user.getId(), postDTO.idGroup())) {
+            throw new RuntimeException("You cannot create post because you are not a member of this group.");
+        }
         String imgS3Key = uploadImageAndGetKey(postDTO.img());
         Post post = postMapper.createPostDTOtoPostInGroup(user, group, imgS3Key, postDTO);
         post = postRepository.save(post);
@@ -74,6 +104,24 @@ public class PostService {
         User user = jwtService.getUser();
         String imgS3Key = uploadImageAndGetKey(postDTO.img());
         Post post = postMapper.createPostDTOtoPostOnTimeline(user, imgS3Key, postDTO);
+        post = postRepository.save(post);
+        return postMapper.postToPostDTO(post);
+    }
+
+    public PostDTO createAIPostOnTimeline(OpenAIPostDTO postDTO) {
+        User user = jwtService.getUser();
+        String generatedText = chatClient.call(new Prompt(postDTO.txtPrompt())).getResult().getOutput().getContent();
+        Post post = postMapper.OpenAIPostDTOtoPostOnTimeline(postDTO, user, generatedText);
+        post = postRepository.save(post);
+        return postMapper.postToPostDTO(post);
+    }
+
+    public PostDTO createAIPostInGroup(OpenAIPostDTO postDTO) {
+        User user = jwtService.getUser();
+        Group group = groupRepository.findById(postDTO.idGroup()).orElseThrow(
+                () -> new NoSuchElementException("There is no group with the id of " + postDTO.idGroup()));
+        String generatedText = chatClient.call(new Prompt(postDTO.txtPrompt())).getResult().getOutput().getContent();
+        Post post = postMapper.OpenAIPostDTOtoPostInGroup(postDTO, user, group, generatedText);
         post = postRepository.save(post);
         return postMapper.postToPostDTO(post);
     }
@@ -97,21 +145,23 @@ public class PostService {
         return postMapper.postToPostDTO(post);
     }
 
-    public PostDTO createAIPostOnTimeline(OpenAIPostDTO postDTO) {
+
+    public void deletePost(Integer idPost) {
+        Post post = postRepository.findById(idPost).orElseThrow(() ->
+                new NoSuchElementException("There is no post with the id of " + idPost));
         User user = jwtService.getUser();
-        String generatedText = chatClient.call(new Prompt(postDTO.txtPrompt())).getResult().getOutput().getContent();
-        Post post = postMapper.OpenAIPostDTOtoPostOnTimeline(postDTO, user, generatedText);
-        post = postRepository.save(post);
-        return postMapper.postToPostDTO(post);
+        if (post.getGroup() != null) {
+            if (Objects.equals(post.getGroup().getAdmin().getId(), user.getId())) {
+                postRepository.deleteById(idPost);
+                return;
+            }
+        }
+        if (Objects.equals(user.getId(), post.getOwner().getId())) {
+            postRepository.deleteById(idPost);
+            return;
+        }
+        throw new RuntimeException("You don't have the permission to delete the post.");
     }
 
-    public PostDTO createAIPostInGroup(OpenAIPostDTO postDTO) {
-        User user = jwtService.getUser();
-        Group group = groupRepository.findById(postDTO.idGroup()).orElseThrow(
-                () -> new NoSuchElementException("There is no group with the id of " + postDTO.idGroup()));
-        String generatedText = chatClient.call(new Prompt(postDTO.txtPrompt())).getResult().getOutput().getContent();
-        Post post = postMapper.OpenAIPostDTOtoPostInGroup(postDTO, user, group, generatedText);
-        post = postRepository.save(post);
-        return postMapper.postToPostDTO(post);
-    }
+
 }

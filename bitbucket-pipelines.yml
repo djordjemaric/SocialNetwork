@@ -1,6 +1,5 @@
 image: maven:3.9.6-amazoncorretto-17
 
-
 definitions:
   script: &createOIDC
     export AWS_REGION=eu-central-1 
@@ -25,8 +24,18 @@ definitions:
           - aws sts get-caller-identity
 
 
+    - step: &test
+        name: Run Tests and Generate Coverage Report
+        caches:
+          - maven
+        script:
+          - mvn -B clean verify --file pom.xml
+        artifacts:
+          - target/site/jacoco/*
+
 pipelines:
   branches:
     master:
       - step: *build
+      - step: *test
       - step: *testOIDC

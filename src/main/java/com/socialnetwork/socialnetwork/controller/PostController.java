@@ -1,5 +1,10 @@
 package com.socialnetwork.socialnetwork.controller;
 
+import com.socialnetwork.socialnetwork.dto.post.CommentDTO;
+import com.socialnetwork.socialnetwork.dto.post.CreateCommentDTO;
+import com.socialnetwork.socialnetwork.dto.post.CreatePostDTO;
+import com.socialnetwork.socialnetwork.dto.post.PostDTO;
+import com.socialnetwork.socialnetwork.dto.post.UpdatePostDTO;
 import com.socialnetwork.socialnetwork.dto.post.*;
 import com.socialnetwork.socialnetwork.service.CommentService;
 import com.socialnetwork.socialnetwork.service.PostService;
@@ -19,6 +24,13 @@ public class PostController {
         this.commentService = commentService;
     }
 
+    @ResponseStatus(HttpStatus.OK)
+    @GetMapping("/{id}")
+    public PostDTO getById(@PathVariable Integer id) {
+        return postService.getById(id);
+    }
+
+    @ResponseStatus(HttpStatus.CREATED)
     @PostMapping
     public PostDTO save(@ModelAttribute CreatePostDTO postDTO) {
         if (postDTO.idGroup() == null) {
@@ -35,9 +47,16 @@ public class PostController {
         return postService.createAIPostInGroup(postDTO);
     }
 
-    @PutMapping("{idPost}")
-    public PostDTO update(@PathVariable Integer idPost, @ModelAttribute UpdatePostDTO postDTO) {
-        return postService.updatePost(idPost, postDTO);
+    @ResponseStatus(HttpStatus.OK)
+    @PutMapping("/{id}")
+    public PostDTO update(@PathVariable Integer id, @RequestBody UpdatePostDTO postDTO) {
+        return postService.updatePost(id, postDTO);
+    }
+
+    @ResponseStatus(HttpStatus.OK)
+    @DeleteMapping("/{id}")
+    public void delete(@PathVariable Integer id) {
+        postService.deletePost(id);
     }
 
     @ResponseStatus(HttpStatus.CREATED)
@@ -46,5 +65,6 @@ public class PostController {
         return commentService.createComment(idPost, commentDTO);
 
     }
+
 
 }
