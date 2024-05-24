@@ -23,4 +23,5 @@ public interface GroupRepository extends JpaRepository<Group, Integer> {
     boolean existsByAdminIdAndGroupId(Integer idAdmin,Integer idGroup);
 
 
+
 }
