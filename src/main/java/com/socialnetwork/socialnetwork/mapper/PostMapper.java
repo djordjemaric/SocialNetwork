@@ -9,6 +9,7 @@ import com.socialnetwork.socialnetwork.entity.Post;
 import com.socialnetwork.socialnetwork.entity.User;
 import com.socialnetwork.socialnetwork.service.S3Service;
 import org.springframework.stereotype.Component;
+import org.springframework.web.multipart.MultipartFile;
 
 @Component
 public class PostMapper {
@@ -70,7 +71,16 @@ public class PostMapper {
             post.getComments());
     }
 
-    public Post OpenAIPostDTOtoPostOnTimeline(AIGeneratedPostDTO postDTO, User user, String generatedText){
+    public CreatePostDTO openAIPostDTOtoCreatePostDTO(AIGeneratedPostDTO postDTO, String generatedText, MultipartFile img){
+        return new CreatePostDTO(
+                postDTO.isPublic(),
+                generatedText,
+                img,
+                postDTO.idGroup()
+        );
+    }
+
+    public Post AIGeneratedPostDTOtoPostOnTimeline(AIGeneratedPostDTO postDTO, User user, String generatedText){
         Post post=new Post();
         post.setText(generatedText);
         post.setPublic(postDTO.isPublic());
@@ -79,7 +89,7 @@ public class PostMapper {
         return post;
     }
 
-    public Post OpenAIPostDTOtoPostInGroup(AIGeneratedPostDTO postDTO, User user, Group group, String generatedText){
+    public Post AIGeneratedPostDTOtoPostInGroup(AIGeneratedPostDTO postDTO, User user, Group group, String generatedText){
         Post post=new Post();
         post.setText(generatedText);
         post.setPublic(postDTO.isPublic());

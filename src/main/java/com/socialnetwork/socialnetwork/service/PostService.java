@@ -111,28 +111,22 @@ public class PostService {
     }
 
     public PostDTO createAIPostOnTimeline(AIGeneratedPostDTO postDTO) {
-        User user = jwtService.getUser();
         String generatedText = aiService.generateText(postDTO.txtPrompt());
+        //null prosledjujemo umesto MultipartFile dok se ne napravi metoda u AIServisu
         String imgS3Key;
         if(postDTO.imgPrompt()!=null){
             MultipartFile multipartFile=aiService.generateImg(postDTO.imgPrompt());
             imgS3Key=uploadImageAndGetKey(multipartFile);
         }
-
-        Post post = postMapper.OpenAIPostDTOtoPostOnTimeline(postDTO, user, generatedText);
-        post = postRepository.save(post);
-        return postMapper.postToPostDTO(post);
+        CreatePostDTO createPostDTO = postMapper.openAIPostDTOtoCreatePostDTO(postDTO,generatedText,null);
+        return createPostOnTimeline(createPostDTO);
     }
 
     public PostDTO createAIPostInGroup(AIGeneratedPostDTO postDTO) {
-        User user = jwtService.getUser();
-        Group group = groupRepository.findById(postDTO.idGroup()).orElseThrow(
-                () -> new NoSuchElementException("There is no group with the id of " + postDTO.idGroup()));
         String generatedText = aiService.generateText(postDTO.txtPrompt());
-
-        Post post = postMapper.OpenAIPostDTOtoPostInGroup(postDTO, user, group, generatedText);
-        post = postRepository.save(post);
-        return postMapper.postToPostDTO(post);
+        //null prosledjujemo umesto MultipartFile dok se ne napravi metoda u AIServisu
+        CreatePostDTO createPostDTO = postMapper.openAIPostDTOtoCreatePostDTO(postDTO,generatedText,null);
+        return createPostInGroup(createPostDTO);
     }
 
     public PostDTO updatePost(Integer idPost, UpdatePostDTO updatePostDTO) {

@@ -131,7 +131,6 @@
 			<artifactId>spring-test</artifactId>
 		</dependency>
 	</dependencies>
-
 	<build>
 		<plugins>
 			<plugin>
