@@ -1,0 +1,1 @@
+ALTER TABLE "reply" ADD COLUMN "datetime" timestamp ;
