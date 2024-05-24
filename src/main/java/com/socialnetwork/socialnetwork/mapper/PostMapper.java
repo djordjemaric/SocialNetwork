@@ -1,7 +1,7 @@
 package com.socialnetwork.socialnetwork.mapper;
 
 import com.socialnetwork.socialnetwork.dto.post.CreatePostDTO;
-import com.socialnetwork.socialnetwork.dto.post.OpenAIPostDTO;
+import com.socialnetwork.socialnetwork.dto.post.AIGeneratedPostDTO;
 import com.socialnetwork.socialnetwork.dto.post.PostDTO;
 import com.socialnetwork.socialnetwork.dto.post.UpdatePostDTO;
 import com.socialnetwork.socialnetwork.entity.Group;
@@ -70,7 +70,7 @@ public class PostMapper {
             post.getComments());
     }
 
-    public Post OpenAIPostDTOtoPostOnTimeline(OpenAIPostDTO postDTO, User user, String generatedText){
+    public Post OpenAIPostDTOtoPostOnTimeline(AIGeneratedPostDTO postDTO, User user, String generatedText){
         Post post=new Post();
         post.setText(generatedText);
         post.setPublic(postDTO.isPublic());
@@ -79,7 +79,7 @@ public class PostMapper {
         return post;
     }
 
-    public Post OpenAIPostDTOtoPostInGroup(OpenAIPostDTO postDTO, User user, Group group, String generatedText){
+    public Post OpenAIPostDTOtoPostInGroup(AIGeneratedPostDTO postDTO, User user, Group group, String generatedText){
         Post post=new Post();
         post.setText(generatedText);
         post.setPublic(postDTO.isPublic());

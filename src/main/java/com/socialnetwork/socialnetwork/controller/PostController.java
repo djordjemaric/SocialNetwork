@@ -39,8 +39,8 @@ public class PostController {
         return postService.createPostInGroup(postDTO);
     }
 
-    @PostMapping("/openAI")
-    public PostDTO save(@RequestBody OpenAIPostDTO postDTO) {
+    @PostMapping("/aiGenerated")
+    public PostDTO save(@RequestBody AIGeneratedPostDTO postDTO) {
         if (postDTO.idGroup() == null) {
             return postService.createAIPostOnTimeline(postDTO);
         }

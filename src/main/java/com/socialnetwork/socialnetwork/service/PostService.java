@@ -1,7 +1,7 @@
 package com.socialnetwork.socialnetwork.service;
 
 import com.socialnetwork.socialnetwork.dto.post.CreatePostDTO;
-import com.socialnetwork.socialnetwork.dto.post.OpenAIPostDTO;
+import com.socialnetwork.socialnetwork.dto.post.AIGeneratedPostDTO;
 import com.socialnetwork.socialnetwork.dto.post.PostDTO;
 import com.socialnetwork.socialnetwork.dto.post.UpdatePostDTO;
 import com.socialnetwork.socialnetwork.entity.Group;
@@ -33,8 +33,9 @@ public class PostService {
     private final FriendsRepository friendsRepository;
     private final GroupMemberRepository groupMemberRepository;
     private final ChatClient chatClient;
+    private final AIService aiService;
 
-    public PostService(PostRepository postRepository, PostMapper postMapper, GroupRepository groupRepository, JwtService jwtService, S3Service s3Service, FriendsRepository friendsRepository, GroupMemberRepository groupMemberRepository, ChatClient chatClient) {
+    public PostService(PostRepository postRepository, PostMapper postMapper, GroupRepository groupRepository, JwtService jwtService, S3Service s3Service, FriendsRepository friendsRepository, GroupMemberRepository groupMemberRepository, ChatClient chatClient, AIService aiService) {
         this.postRepository = postRepository;
         this.postMapper = postMapper;
         this.groupRepository = groupRepository;
@@ -43,6 +44,7 @@ public class PostService {
         this.groupMemberRepository = groupMemberRepository;
         this.s3Service = s3Service;
         this.chatClient = chatClient;
+        this.aiService = aiService;
     }
 
     private String uploadImageAndGetKey(MultipartFile image) {
@@ -63,6 +65,8 @@ public class PostService {
             throw new RuntimeException(e);
         }
     }
+
+//    public static  MultipartFile convertToMultipartFile(Image)
 
     public PostDTO getById(Integer idPost) {
         User user = jwtService.getUser();
@@ -108,7 +112,7 @@ public class PostService {
         return postMapper.postToPostDTO(post);
     }
 
-    public PostDTO createAIPostOnTimeline(OpenAIPostDTO postDTO) {
+    public PostDTO createAIPostOnTimeline(AIGeneratedPostDTO postDTO) {
         User user = jwtService.getUser();
         String generatedText = chatClient.call(new Prompt(postDTO.txtPrompt())).getResult().getOutput().getContent();
         Post post = postMapper.OpenAIPostDTOtoPostOnTimeline(postDTO, user, generatedText);
@@ -116,11 +120,11 @@ public class PostService {
         return postMapper.postToPostDTO(post);
     }
 
-    public PostDTO createAIPostInGroup(OpenAIPostDTO postDTO) {
+    public PostDTO createAIPostInGroup(AIGeneratedPostDTO postDTO) {
         User user = jwtService.getUser();
         Group group = groupRepository.findById(postDTO.idGroup()).orElseThrow(
                 () -> new NoSuchElementException("There is no group with the id of " + postDTO.idGroup()));
-        String generatedText = chatClient.call(new Prompt(postDTO.txtPrompt())).getResult().getOutput().getContent();
+        String generatedText = aiService.generateText(postDTO.txtPrompt());
         Post post = postMapper.OpenAIPostDTOtoPostInGroup(postDTO, user, group, generatedText);
         post = postRepository.save(post);
         return postMapper.postToPostDTO(post);
