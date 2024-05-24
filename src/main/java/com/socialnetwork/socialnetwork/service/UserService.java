@@ -32,14 +32,14 @@ public class UserService {
 
     public User getUserById(int id) throws ResourceNotFoundException {
         return userRepository.findById(id)
-                .orElseThrow(() -> new ResourceNotFoundException(ErrorCode.USER_NOT_FOUND, "No user found with id: " + id));
+                .orElseThrow(() -> new ResourceNotFoundException(ErrorCode.ERROR_FINDING_USER, "No user found with id: " + id));
     }
 
 
     public User createUser(String email, String password) throws BusinessLogicException {
 
         if (userRepository.existsByEmail(email)) {
-            throw new BusinessLogicException(ErrorCode.USER_ALREADY_EXISTS, "User already exists in db with email: " + email);
+            throw new BusinessLogicException(ErrorCode.ERROR_REGISTERING_USER, "User already exists in database with email: " + email);
         }
 
         String userSub = cognitoService.registerUser(email, email, password);
