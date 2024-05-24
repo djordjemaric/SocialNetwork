@@ -7,8 +7,8 @@ import com.socialnetwork.socialnetwork.entity.User;
 import com.socialnetwork.socialnetwork.exceptions.BusinessLogicException;
 import com.socialnetwork.socialnetwork.exceptions.ErrorCode;
 import com.socialnetwork.socialnetwork.exceptions.ResourceNotFoundException;
+import com.socialnetwork.socialnetwork.exceptions.IAMProviderException;
 import com.socialnetwork.socialnetwork.repository.UserRepository;
-import org.hibernate.query.sqm.produce.function.FunctionArgumentException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -36,12 +36,11 @@ public class UserService {
     }
 
 
-    public User createUser(String email, String password) throws BusinessLogicException {
+    public User createUser(String email, String password) throws IAMProviderException, BusinessLogicException {
 
         if (userRepository.existsByEmail(email)) {
             throw new BusinessLogicException(ErrorCode.ERROR_REGISTERING_USER, "User already exists in database with email: " + email);
         }
-
         String userSub = cognitoService.registerUser(email, email, password);
 
         User user = new User();
@@ -51,7 +50,7 @@ public class UserService {
         return user;
     }
 
-    public LoginResponse loginUser(String email, String password) {
+    public LoginResponse loginUser(String email, String password) throws IAMProviderException {
         return cognitoService.loginUser(email, password);
     }
 

@@ -2,6 +2,8 @@ package com.socialnetwork.socialnetwork.service;
 
 
 import com.socialnetwork.socialnetwork.dto.LoginResponse;
+import com.socialnetwork.socialnetwork.exceptions.ErrorCode;
+import com.socialnetwork.socialnetwork.exceptions.IAMProviderException;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 import software.amazon.awssdk.services.cognitoidentityprovider.CognitoIdentityProviderClient;
@@ -22,7 +24,7 @@ public class CognitoService {
         this.cognitoIdentityProvider = cognitoIdentityProvider;
     }
 
-    public String registerUser(String username, String email, String password) {
+    public String registerUser(String username, String email, String password) throws IAMProviderException {
         // Set up the AWS Cognito registration request
         SignUpRequest signUpRequest = SignUpRequest.builder().
                 clientId(clientId)
@@ -36,12 +38,17 @@ public class CognitoService {
         try {
             SignUpResponse signUpResponse = cognitoIdentityProvider.signUp(signUpRequest);
             return signUpResponse.userSub();
-        } catch (Exception e) {
-            throw new RuntimeException("User registration failed: " + e.getMessage(), e);
+        } catch (InvalidPasswordException e1) {
+            throw new IAMProviderException(ErrorCode.ERROR_REGISTERING_USER,
+                    "Password does not meet requirements. " +
+                    "Required: uppercase letter, lowercase letter, digit, special character");
+        } catch (UsernameExistsException e2) {
+            throw new IAMProviderException(ErrorCode.ERROR_REGISTERING_USER,
+                    "Email address already in use");
         }
     }
 
-    public LoginResponse loginUser(String email, String password) {
+    public LoginResponse loginUser(String email, String password) throws IAMProviderException {
         // Set up the authentication request
         InitiateAuthRequest authRequest = InitiateAuthRequest.builder()
                 .authFlow(AuthFlowType.USER_PASSWORD_AUTH)
@@ -64,8 +71,11 @@ public class CognitoService {
 
             return new LoginResponse(accessToken, refreshToken, expiresIn);
 
-        } catch (Exception e) {
-            throw new RuntimeException("User login failed: " + e.getMessage(), e);
+        } catch (NotAuthorizedException e) {
+            throw new IAMProviderException(ErrorCode.ERROR_LOGGING_IN, "Incorrect email or password.");
+        } catch (UserNotConfirmedException e) {
+            throw new IAMProviderException(ErrorCode.ERROR_LOGGING_IN,
+                    "Email not verified. Please check your email for a confirmation link.");
         }
     }
 
