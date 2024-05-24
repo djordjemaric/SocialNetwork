@@ -20,13 +20,10 @@ import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 
-import java.util.NoSuchElementException;
-import java.util.Optional;
+import java.util.*;
 
-import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertThrows;
-import static org.mockito.Mockito.verify;
-import static org.mockito.Mockito.when;
+import static org.junit.jupiter.api.Assertions.*;
+import static org.mockito.Mockito.*;
 
 @ExtendWith(MockitoExtension.class)
 class GroupServiceTests {
@@ -49,9 +46,11 @@ class GroupServiceTests {
     private User admin;
     private User user;
     private Group group;
+    private Group group2;
     private GroupMember groupMember;
     private CreateGroupDTO createGroupDTO;
     private GroupDTO expectedGroupDTO;
+    private GroupDTO expectedGroupDTO2;
 
     @Captor
     private ArgumentCaptor<Group> groupCaptor;
@@ -65,9 +64,11 @@ class GroupServiceTests {
         admin = new User(1, "admin@admin.com", "");
         user = new User(2, "user@user.com", "");
         group = new Group(1, "Group1", admin, true, null);
+        group2 = new Group(2, "Group2", admin, false, null);
         groupMember = new GroupMember(1, user, group);
         createGroupDTO = new CreateGroupDTO("Group1", true);
         expectedGroupDTO = new GroupDTO("Group1", "admin@admin.com", true, 1);
+        expectedGroupDTO2 = new GroupDTO("Group2", "admin@admin.com", false, 2);
     }
 
     @Test
@@ -80,6 +81,80 @@ class GroupServiceTests {
 
         verify(jwtService).getUser();
         verify(groupRepository).existsByName(createGroupDTO.name());
+    }
+
+    @Test
+    void findGroupByName_success() {
+        String name = "Group";
+
+        List<Group> groups = Arrays.asList(group, group2);
+
+        when(groupRepository.findAllByNameStartingWith(name)).thenReturn(groups);
+
+        List<GroupDTO> result = groupService.findByName(name);
+
+        verify(groupRepository).findAllByNameStartingWith(name);
+
+        assertNotNull(result);
+        assertEquals(2, result.size());
+        assertEquals(expectedGroupDTO, result.get(0));
+        assertEquals(expectedGroupDTO2, result.get(1));
+    }
+
+    @Test
+    void deleteGroup_success() {
+        when(jwtService.getUser()).thenReturn(admin);
+
+        doNothing().when(groupRepository).deleteById(group.getId());
+        when(groupRepository.existsByIdAndAdminId(group.getId(),admin.getId())).thenReturn(true);
+
+        // Verify that no exceptions are thrown
+        assertDoesNotThrow(() -> groupService.deleteGroup(group.getId()));
+
+        // Verify that deleteById method is called
+        verify(groupRepository).deleteById(group.getId());
+
+        // Verify that existsByIdAndAdminId method is called with the correct arguments
+        verify(groupRepository).existsByIdAndAdminId(group.getId(), admin.getId());
+
+        // Verify that getUser method is called
+        verify(jwtService).getUser();
+    }
+    @Test
+    void deleteGroup_throwsException() {
+        when(jwtService.getUser()).thenReturn(admin);
+
+        when(groupRepository.existsByIdAndAdminId(group.getId(),admin.getId())).thenReturn(false);
+
+        assertThrows(FunctionArgumentException.class, () -> groupService.deleteGroup(group.getId()),
+                "There is no group with given id or id of admin");
+
+
+        // Verify that existsByIdAndAdminId method is called with the correct arguments
+        verify(groupRepository).existsByIdAndAdminId(group.getId(), admin.getId());
+
+        // Verify that getUser method is called
+        verify(jwtService).getUser();
+    }
+
+    @Test
+    void createRequestToJoinGroup_success() {
+        when(jwtService.getUser()).thenReturn(admin);
+
+        doNothing().when(groupRepository).deleteById(group.getId());
+        when(groupRepository.existsByIdAndAdminId(group.getId(),admin.getId())).thenReturn(true);
+
+        // Verify that no exceptions are thrown
+        assertDoesNotThrow(() -> groupService.deleteGroup(group.getId()));
+
+        // Verify that deleteById method is called
+        verify(groupRepository).deleteById(group.getId());
+
+        // Verify that existsByIdAndAdminId method is called with the correct arguments
+        verify(groupRepository).existsByIdAndAdminId(group.getId(), admin.getId());
+
+        // Verify that getUser method is called
+        verify(jwtService).getUser();
     }
 
     @Test
