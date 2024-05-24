@@ -34,7 +34,7 @@ public class AIService {
         return chatClient.call(new Prompt(prompt)).getResult().getOutput().getContent();
     }
 
-    public MultipartFile generateImg(String prompt) {
+    public InputStream generateImg(String prompt) {
         try {
             ImageResponse imageResponse=imageClient.call(
                 new ImagePrompt(prompt,
@@ -46,7 +46,7 @@ public class AIService {
                                 .build())
         );
 
-            return convertToMultipartFile(downloadImageFromUrl(imageResponse.getResult().getOutput().getUrl()),prompt,"image/jpeg");
+            return downloadImageFromUrl(imageResponse.getResult().getOutput().getUrl());
         } catch (IOException e) {
             throw new RuntimeException(e);
         }
@@ -56,7 +56,7 @@ public class AIService {
         BufferedImage bufferedImage=ImageIO.read(inputStream);
 
         ByteArrayOutputStream baos = new ByteArrayOutputStream();
-        ImageIO.write(bufferedImage, "image/jpeg", baos);
+        ImageIO.write(bufferedImage, "image/jpg", baos);
 
         return new MockMultipartFile(fileName, fileName, contentType, baos.toByteArray());
     }

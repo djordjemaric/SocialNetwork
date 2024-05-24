@@ -53,15 +53,24 @@ public class PostService {
             throw new IllegalArgumentException("Filename cannot be null");
         }
 
-//        String extension = filename
-//                .substring(filename.lastIndexOf("."));
+        String extension = filename
+                .substring(filename.lastIndexOf("."));
 
         try (InputStream inputStream = image.getInputStream()) {
-            return s3Service.uploadToBucket("jpg", inputStream);
+            return s3Service.uploadToBucket(extension, inputStream);
         } catch (IOException e) {
             throw new RuntimeException(e);
         }
     }
+
+    private String uploadImageAndGetKey(InputStream image) {
+        if (image == null) {
+            return null;
+        }
+        String extension = ".jpg";
+        return s3Service.uploadToBucket(extension, image);
+    }
+
 
     public PostDTO getById(Integer idPost) {
         User user = jwtService.getUser();
@@ -111,18 +120,18 @@ public class PostService {
         String generatedText = aiService.generateText(postDTO.txtPrompt());
         //null prosledjujemo umesto MultipartFile dok se ne napravi metoda u AIServisu
         String imgS3Key;
-        if(postDTO.imgPrompt()!=null){
-            MultipartFile multipartFile=aiService.generateImg(postDTO.imgPrompt());
-            imgS3Key=uploadImageAndGetKey(multipartFile);
+        if (postDTO.imgPrompt() != null) {
+            InputStream stream = aiService.generateImg(postDTO.imgPrompt());
+            imgS3Key = uploadImageAndGetKey(stream);
         }
-        CreatePostDTO createPostDTO = postMapper.openAIPostDTOtoCreatePostDTO(postDTO,generatedText,null);
+        CreatePostDTO createPostDTO = postMapper.openAIPostDTOtoCreatePostDTO(postDTO, generatedText, null);
         return createPostOnTimeline(createPostDTO);
     }
 
     public PostDTO createAIPostInGroup(AIGeneratedPostDTO postDTO) {
         String generatedText = aiService.generateText(postDTO.txtPrompt());
         //null prosledjujemo umesto MultipartFile dok se ne napravi metoda u AIServisu
-        CreatePostDTO createPostDTO = postMapper.openAIPostDTOtoCreatePostDTO(postDTO,generatedText,null);
+        CreatePostDTO createPostDTO = postMapper.openAIPostDTOtoCreatePostDTO(postDTO, generatedText, null);
         return createPostInGroup(createPostDTO);
     }
 
