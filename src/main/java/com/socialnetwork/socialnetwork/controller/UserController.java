@@ -5,6 +5,8 @@ import com.socialnetwork.socialnetwork.dto.UserRequest;
 import com.socialnetwork.socialnetwork.exceptions.IAMProviderException;
 import com.socialnetwork.socialnetwork.service.UserService;
 import com.socialnetwork.socialnetwork.entity.User;
+import com.socialnetwork.socialnetwork.exceptions.BusinessLogicException;
+import com.socialnetwork.socialnetwork.exceptions.ResourceNotFoundException;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
@@ -23,12 +25,12 @@ public class UserController {
     }
 
     @GetMapping(path = "{userId}")
-    public User getUser(@PathVariable Integer userId) {
+    public User getUser(@PathVariable Integer userId) throws ResourceNotFoundException {
         return userService.getUserById(userId);
     }
 
     @PostMapping(path = "/signup")
-    public User createUser(@RequestBody UserRequest userRequest) throws IAMProviderException {
+    public User createUser(@RequestBody UserRequest userRequest) throws IAMProviderException, BusinessLogicException {
         return userService.createUser(userRequest.email(), userRequest.password());
     }
 
