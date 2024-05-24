@@ -4,6 +4,7 @@ package com.socialnetwork.socialnetwork.service;
 
 import com.socialnetwork.socialnetwork.dto.LoginResponse;
 import com.socialnetwork.socialnetwork.entity.User;
+import com.socialnetwork.socialnetwork.exceptions.IAMProviderException;
 import com.socialnetwork.socialnetwork.repository.UserRepository;
 import org.hibernate.query.sqm.produce.function.FunctionArgumentException;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -45,7 +46,6 @@ public class UserService {
         if (userRepository.existsByEmail(email)) {
             throw new FunctionArgumentException("User already exists");
         }
-
         String userSub = cognitoService.registerUser(email, email, password);
 
         User user = new User();
