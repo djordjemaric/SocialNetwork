@@ -66,8 +66,6 @@ public class PostService {
         }
     }
 
-//    public static  MultipartFile convertToMultipartFile(Image)
-
     public PostDTO getById(Integer idPost) {
         User user = jwtService.getUser();
         Post post = postRepository.findById(idPost)
@@ -114,7 +112,13 @@ public class PostService {
 
     public PostDTO createAIPostOnTimeline(AIGeneratedPostDTO postDTO) {
         User user = jwtService.getUser();
-        String generatedText = chatClient.call(new Prompt(postDTO.txtPrompt())).getResult().getOutput().getContent();
+        String generatedText = aiService.generateText(postDTO.txtPrompt());
+        String imgS3Key;
+        if(postDTO.imgPrompt()!=null){
+            MultipartFile multipartFile=aiService.generateImg(postDTO.imgPrompt());
+            imgS3Key=uploadImageAndGetKey(multipartFile);
+        }
+
         Post post = postMapper.OpenAIPostDTOtoPostOnTimeline(postDTO, user, generatedText);
         post = postRepository.save(post);
         return postMapper.postToPostDTO(post);
@@ -125,6 +129,7 @@ public class PostService {
         Group group = groupRepository.findById(postDTO.idGroup()).orElseThrow(
                 () -> new NoSuchElementException("There is no group with the id of " + postDTO.idGroup()));
         String generatedText = aiService.generateText(postDTO.txtPrompt());
+
         Post post = postMapper.OpenAIPostDTOtoPostInGroup(postDTO, user, group, generatedText);
         post = postRepository.save(post);
         return postMapper.postToPostDTO(post);
