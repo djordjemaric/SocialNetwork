@@ -39,11 +39,11 @@ public class CognitoService {
             SignUpResponse signUpResponse = cognitoIdentityProvider.signUp(signUpRequest);
             return signUpResponse.userSub();
         } catch (InvalidPasswordException e1) {
-            throw new IAMProviderException(ErrorCode.USER_PASSWORD_REQUIREMENTS,
+            throw new IAMProviderException(ErrorCode.USER_AUTH_PASSWORD_REQUIREMENTS,
                     "Password does not meet requirements. " +
                     "Required: uppercase letter, lowercase letter, digit, special character");
         } catch (UsernameExistsException e2) {
-            throw new IAMProviderException(ErrorCode.USER_EMAIL_TAKEN,
+            throw new IAMProviderException(ErrorCode.USER_AUTH_EMAIL_TAKEN,
                     "Email address already in use");
         }
     }
@@ -72,9 +72,9 @@ public class CognitoService {
             return new LoginResponse(accessToken, refreshToken, expiresIn);
 
         } catch (NotAuthorizedException e) {
-            throw new IAMProviderException(ErrorCode.USER_BAD_CREDENTIALS, "Incorrect email or password.");
+            throw new IAMProviderException(ErrorCode.USER_AUTH_BAD_CREDENTIALS, "Incorrect email or password.");
         } catch (UserNotConfirmedException e) {
-            throw new IAMProviderException(ErrorCode.USER_NOT_VERIFIED,
+            throw new IAMProviderException(ErrorCode.USER_AUTH_NOT_VERIFIED,
                     "Email not verified. Please check your email for a confirmation link.");
         }
     }
