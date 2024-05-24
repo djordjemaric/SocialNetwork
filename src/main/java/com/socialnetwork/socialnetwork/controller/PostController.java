@@ -28,7 +28,7 @@ public class PostController {
     }
 
     @PostMapping("/openAI")
-    public PostDTO save(@RequestBody OpenAIPostDTO postDTO){
+    public PostDTO save(@RequestBody OpenAIPostDTO postDTO) {
         if (postDTO.idGroup() == null) {
             return postService.createAIPostOnTimeline(postDTO);
         }
@@ -43,8 +43,8 @@ public class PostController {
     @ResponseStatus(HttpStatus.CREATED)
     @PostMapping("/{postId}/comments")
     public CommentDTO saveComment(@PathVariable Integer idPost, @RequestBody CreateCommentDTO commentDTO) {
-        return commentService.createComment(idPost,commentDTO);
+        return commentService.createComment(idPost, commentDTO);
 
     }
-    
+
 }
