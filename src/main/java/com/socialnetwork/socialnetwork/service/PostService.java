@@ -38,23 +38,24 @@ public class PostService {
         this.s3Service = s3Service;
         this.chatClient = chatClient;
     }
+
     private String uploadImageAndGetKey(MultipartFile image) {
-        if(image==null){
+        if (image == null) {
             return null;
         }
-            String filename = image.getOriginalFilename();
-            if (filename == null) {
-                throw new IllegalArgumentException("Filename cannot be null");
-            }
+        String filename = image.getOriginalFilename();
+        if (filename == null) {
+            throw new IllegalArgumentException("Filename cannot be null");
+        }
 
-            String extension = filename
-                    .substring(filename.lastIndexOf("."));
+        String extension = filename
+                .substring(filename.lastIndexOf("."));
 
-            try (InputStream inputStream = image.getInputStream()) {
-                return s3Service.uploadToBucket(extension, inputStream);
-            } catch (IOException e) {
-                throw new RuntimeException(e);
-            }
+        try (InputStream inputStream = image.getInputStream()) {
+            return s3Service.uploadToBucket(extension, inputStream);
+        } catch (IOException e) {
+            throw new RuntimeException(e);
+        }
     }
 
     public PostDTO createPostInGroup(CreatePostDTO postDTO) {
@@ -87,7 +88,7 @@ public class PostService {
         }
 
         if (updatePostDTO.img() != null && post.getImgS3Key() != null) {
-           s3Service.deleteFromBucket(post.getImgS3Key());
+            s3Service.deleteFromBucket(post.getImgS3Key());
         }
 
         String imgS3Key = uploadImageAndGetKey(updatePostDTO.img());
@@ -97,10 +98,10 @@ public class PostService {
     }
 
     public PostDTO createAIPostOnTimeline(OpenAIPostDTO postDTO) {
-        User user=jwtService.getUser();
-        String generatedText= chatClient.call(new Prompt(postDTO.txtPrompt())).getResult().getOutput().getContent();
-        Post post=postMapper.OpenAIPostDTOtoPostOnTimeline(postDTO,user,generatedText);
-        post=postRepository.save(post);
+        User user = jwtService.getUser();
+        String generatedText = chatClient.call(new Prompt(postDTO.txtPrompt())).getResult().getOutput().getContent();
+        Post post = postMapper.OpenAIPostDTOtoPostOnTimeline(postDTO, user, generatedText);
+        post = postRepository.save(post);
         return postMapper.postToPostDTO(post);
     }
 
@@ -108,9 +109,9 @@ public class PostService {
         User user = jwtService.getUser();
         Group group = groupRepository.findById(postDTO.idGroup()).orElseThrow(
                 () -> new NoSuchElementException("There is no group with the id of " + postDTO.idGroup()));
-        String generatedText= chatClient.call(new Prompt(postDTO.txtPrompt())).getResult().getOutput().getContent();
-        Post post=postMapper.OpenAIPostDTOtoPostInGroup(postDTO,user,group,generatedText);
-        post=postRepository.save(post);
+        String generatedText = chatClient.call(new Prompt(postDTO.txtPrompt())).getResult().getOutput().getContent();
+        Post post = postMapper.OpenAIPostDTOtoPostInGroup(postDTO, user, group, generatedText);
+        post = postRepository.save(post);
         return postMapper.postToPostDTO(post);
     }
 }
