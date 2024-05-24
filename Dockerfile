@@ -1,4 +1,4 @@
-FROM amazoncorretto:22
+FROM amazoncorretto:17
 LABEL authors="levi-interns"
 
 ARG JAR_FILE
