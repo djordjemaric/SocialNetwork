@@ -5,6 +5,7 @@ import com.socialnetwork.socialnetwork.dto.post.CreateCommentDTO;
 import com.socialnetwork.socialnetwork.entity.Comment;
 import com.socialnetwork.socialnetwork.entity.Post;
 import com.socialnetwork.socialnetwork.entity.User;
+import com.socialnetwork.socialnetwork.exceptions.ResourceNotFoundException;
 import com.socialnetwork.socialnetwork.mapper.CommentMapper;
 import com.socialnetwork.socialnetwork.repository.*;
 import org.springframework.stereotype.Service;
@@ -30,7 +31,7 @@ public class CommentService {
         this.friendsRepository = friendshipRepository;
     }
 
-    public CommentDTO createComment(Integer postId, CreateCommentDTO commentDTO) {
+    public CommentDTO createComment(Integer postId, CreateCommentDTO commentDTO) throws ResourceNotFoundException {
         User currentUser = jwtService.getUser();
         Post post = postRepository.findById(postId)
                 .orElseThrow(() -> new NoSuchElementException("The post with the id of " +
