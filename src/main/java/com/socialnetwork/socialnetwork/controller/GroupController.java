@@ -7,6 +7,7 @@ import com.socialnetwork.socialnetwork.dto.post.PostDTO;
 import com.socialnetwork.socialnetwork.exceptions.BusinessLogicException;
 import com.socialnetwork.socialnetwork.exceptions.IAMProviderException;
 import com.socialnetwork.socialnetwork.exceptions.ResourceNotFoundException;
+import com.socialnetwork.socialnetwork.exceptions.ResourceNotFoundException;
 import com.socialnetwork.socialnetwork.service.GroupService;
 import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.*;
@@ -51,7 +52,7 @@ public class GroupController {
 
     @ResponseStatus(HttpStatus.OK)
     @DeleteMapping("/{idGroup}/members/{idUser}")
-    public void removeMember(@PathVariable Integer idGroup, @PathVariable Integer idUser) throws BusinessLogicException, ResourceNotFoundException, IAMProviderException {
+    public void removeMember(@PathVariable Integer idGroup, @PathVariable Integer idUser) throws BusinessLogicException, ResourceNotFoundException {
         groupService.removeMember(idGroup, idUser);
     }
 
