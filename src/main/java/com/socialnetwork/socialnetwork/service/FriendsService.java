@@ -62,7 +62,7 @@ public class FriendsService {
         return friendRequestMapper.entityToPreviewDTO(savedFriendRequest);
     }
 
-    public List<PreviewUserDTO> searchFriends(String searchTerm) {
+    public List<PreviewUserDTO> searchFriends(String searchTerm) throws ResourceNotFoundException {
         User currentUser = jwtService.getUser();
         List<User> foundFriends = friendsRepository.findUserFriendsWithSearch(currentUser.getId(), searchTerm);
         return foundFriends.stream()
@@ -70,7 +70,7 @@ public class FriendsService {
                 .toList();
     }
 
-    public List<FriendRequestDTO> getAllPendingRequestsForUser(){
+    public List<FriendRequestDTO> getAllPendingRequestsForUser() throws ResourceNotFoundException {
         User currentUser = jwtService.getUser();
         return friendRequestRepository.getPendingForUser(currentUser.getId())
                 .stream()

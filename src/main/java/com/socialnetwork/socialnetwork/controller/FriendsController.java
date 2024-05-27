@@ -25,13 +25,13 @@ public class FriendsController {
 
     @ResponseStatus(HttpStatus.OK)
     @GetMapping("/requests")
-    public List<FriendRequestDTO> getFriendRequests(){
+    public List<FriendRequestDTO> getFriendRequests() throws ResourceNotFoundException {
         return friendsService.getAllPendingRequestsForUser();
     }
 
     @ResponseStatus(HttpStatus.OK)
     @GetMapping("/search")
-    public List<PreviewUserDTO> searchFriends(@RequestParam("searchTerm") String searchTerm){
+    public List<PreviewUserDTO> searchFriends(@RequestParam("searchTerm") String searchTerm) throws ResourceNotFoundException {
         return friendsService.searchFriends(searchTerm);
     }
 
