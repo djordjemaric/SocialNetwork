@@ -10,10 +10,6 @@ import org.springframework.mock.web.MockMultipartFile;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 
-import javax.imageio.ImageIO;
-
-import java.awt.image.BufferedImage;
-import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.net.HttpURLConnection;
@@ -52,15 +48,6 @@ public class AIService {
         } catch (IOException e) {
             throw new RuntimeException(e);
         }
-    }
-
-    public static MultipartFile convertToMultipartFile(InputStream inputStream, String fileName, String contentType) throws IOException {
-        BufferedImage bufferedImage = ImageIO.read(inputStream);
-
-        ByteArrayOutputStream baos = new ByteArrayOutputStream();
-        ImageIO.write(bufferedImage, "image/jpg", baos);
-
-        return new MockMultipartFile(fileName, fileName, contentType, baos.toByteArray());
     }
 
     public static InputStream downloadImageFromUrl(String imageUrl) throws IOException {
