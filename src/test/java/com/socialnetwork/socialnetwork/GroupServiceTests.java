@@ -129,7 +129,7 @@ class GroupServiceTests {
         when(groupRepository.findById(group.getId())).thenReturn(Optional.of(group));
         when(groupMemberRepository.findByMemberAndGroup(user, group)).thenReturn(Optional.empty());
 
-        assertThrows(ResourceNotFoundException.class, () -> groupService.leaveGroup(group.getId()),
+        assertThrows(BusinessLogicException.class, () -> groupService.leaveGroup(group.getId()),
                 "User is not member of group");
 
         verify(jwtService).getUser();
@@ -184,7 +184,7 @@ class GroupServiceTests {
         when(groupRepository.existsByAdminIdAndGroupId(admin.getId(), group.getId())).thenReturn(true);
         when(groupMemberRepository.existsByUserIdAndGroupId(user.getId(), group.getId())).thenReturn(false);
 
-        assertThrows(ResourceNotFoundException.class, () -> groupService.removeMember(group.getId(), user.getId()),
+        assertThrows(BusinessLogicException.class, () -> groupService.removeMember(group.getId(), user.getId()),
                 "User with that id is not in the group.");
 
         verify(jwtService).getUser();

@@ -67,8 +67,8 @@ public class GroupService {
         }
 
         if (!groupMemberRepository.existsByUserIdAndGroupId(currentUser.getId(), idGroup)) {
-            throw new ResourceNotFoundException(ERROR_GETTING_GROUP_POSTS, "User " + currentUser.getEmail()
-                     + " is not a member of the group with id: " + idGroup);
+            throw new AccessDeniedException("User " + currentUser.getEmail()
+                    + " is not a member of the group with id: " + idGroup);
 
         }
 
@@ -83,8 +83,7 @@ public class GroupService {
         User currentUser = jwtService.getUser();
 
         if (!groupRepository.existsByIdAndAdminId(idGroup, currentUser.getId())) {
-            throw new ResourceNotFoundException(ERROR_DELETING_GROUP,
-                    "You can't delete a group that you are not an admin of.");
+            throw new AccessDeniedException("You can't delete a group that you are not an admin of.");
         }
 
         groupRepository.deleteById(idGroup);
@@ -101,7 +100,7 @@ public class GroupService {
         User currentUser = jwtService.getUser();
 
         Group group = groupRepository.findById(idGroup).orElseThrow(() ->
-               new ResourceNotFoundException(ERROR_CREATING_REQUEST_GROUP, "Group with id "
+               new BusinessLogicException(ERROR_CREATING_REQUEST_GROUP, "Group with id "
                     + idGroup + "does not exist"));
 
         if (groupRequestRepository.existsByUserIdAndGroupId(currentUser.getId(), idGroup)) {
@@ -139,14 +138,14 @@ public class GroupService {
 
     public void leaveGroup(Integer idGroup) throws BusinessLogicException, ResourceNotFoundException {
         Group group = groupRepository.findById(idGroup).orElseThrow(() ->
-                new ResourceNotFoundException(ERROR_LEAVING_GROUP, "Group with id "
+                new BusinessLogicException(ERROR_LEAVING_GROUP, "Group with id "
                     + idGroup + "does not exist"));
         User user = jwtService.getUser();
         if (group.getAdmin().getId().equals(user.getId())) {
             throw new BusinessLogicException(ERROR_LEAVING_GROUP, "Admin can't leave a group.");
         }
         GroupMember groupMember = groupMemberRepository.findByMemberAndGroup(user, group).orElseThrow(() ->
-                new ResourceNotFoundException(ERROR_LEAVING_GROUP, "You are not a member of that group!"));
+                new BusinessLogicException(ERROR_LEAVING_GROUP, "You are not a member of that group!"));
         groupMemberRepository.delete(groupMember);
     }
 
@@ -160,7 +159,7 @@ public class GroupService {
             throw new BusinessLogicException(ERROR_REMOVING_MEMBER, "Admin can not leave a group.");
         }
         if (!groupMemberRepository.existsByUserIdAndGroupId(idUser, idGroup)) {
-            throw new ResourceNotFoundException(ERROR_REMOVING_MEMBER, "User with an id: " + idUser
+            throw new BusinessLogicException(ERROR_REMOVING_MEMBER, "User with an id: " + idUser
                      + " is not a member of the group with id: " + idGroup);
         }
         groupMemberRepository.deleteGroupMemberByGroupIdAndMemberId(idGroup, idUser);
