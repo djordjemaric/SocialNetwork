@@ -71,6 +71,15 @@ public class PostMapper {
                 post.getComments());
     }
 
+    public CreatePostDTO AIGeneratedPostToCreatePostDTO(AIGeneratedPostDTO postDTO, String generatedtext, MultipartFile generatedImage){
+        return new CreatePostDTO(
+                postDTO.isPublic(),
+                generatedtext,
+                generatedImage,
+                postDTO.idGroup()
+                );
+    }
+
     public Post AIGeneratedPostDTOtoPostOnTimeline(AIGeneratedPostDTO postDTO, User user, String generatedText, String s3Key) {
         Post post = new Post();
         post.setText(generatedText);

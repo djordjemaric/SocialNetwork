@@ -62,15 +62,6 @@ public class PostService {
         }
     }
 
-    private String uploadImageAndGetKey(InputStream image) {
-        if (image == null) {
-            return null;
-        }
-        String extension = ".jpg";
-        return s3Service.uploadToBucket(extension, image);
-    }
-
-
     public PostDTO getById(Integer idPost) {
         User user = jwtService.getUser();
         Post post = postRepository.findById(idPost)
@@ -116,35 +107,21 @@ public class PostService {
     }
 
     public PostDTO createAIPostOnTimeline(AIGeneratedPostDTO postDTO) {
-        User user = jwtService.getUser();
         String generatedText = aiService.generateText(postDTO.txtPrompt());
-        String imgS3Key = null;
+        MultipartFile file = null;
         if (postDTO.imgPrompt() != null) {
-            InputStream stream = aiService.generateImg(postDTO.imgPrompt());
-            imgS3Key = uploadImageAndGetKey(stream);
+            file = aiService.generateImg(postDTO.imgPrompt());
         }
-        Post post = postMapper.AIGeneratedPostDTOtoPostOnTimeline(postDTO, user, generatedText, imgS3Key);
-        post = postRepository.save(post);
-        return postMapper.postToPostDTO(post);
+        return createPostOnTimeline(postMapper.AIGeneratedPostToCreatePostDTO(postDTO,generatedText,file));
     }
 
     public PostDTO createAIPostInGroup(AIGeneratedPostDTO postDTO) {
-        User user = jwtService.getUser();
-        Group group = groupRepository.findById(postDTO.idGroup()).orElseThrow(
-                () -> new NoSuchElementException("There is no group with the id of " + postDTO.idGroup()));
-
-        if (!groupMemberRepository.existsByUserIdAndGroupId(user.getId(), postDTO.idGroup())) {
-            throw new RuntimeException("You cannot create post because you are not a member of this group.");
-        }
         String generatedText = aiService.generateText(postDTO.txtPrompt());
-        String imgS3Key = null;
+        MultipartFile file=null;
         if (postDTO.imgPrompt() != null) {
-            InputStream stream = aiService.generateImg(postDTO.imgPrompt());
-            imgS3Key = uploadImageAndGetKey(stream);
+            file = aiService.generateImg(postDTO.imgPrompt());
         }
-        Post post = postMapper.AIGeneratedPostDTOtoPostInGroup(postDTO, user, group, generatedText, imgS3Key);
-        post = postRepository.save(post);
-        return postMapper.postToPostDTO(post);
+        return createPostInGroup(postMapper.AIGeneratedPostToCreatePostDTO(postDTO,generatedText,file));
     }
 
     public PostDTO updatePost(Integer idPost, UpdatePostDTO updatePostDTO) {

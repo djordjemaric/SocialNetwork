@@ -34,7 +34,7 @@ public class AIService {
         return chatClient.call(new Prompt(prompt)).getResult().getOutput().getContent();
     }
 
-    public InputStream generateImg(String prompt) {
+    public MultipartFile generateImg(String prompt) {
         try {
             ImageResponse imageResponse = imageClient.call(
                     new ImagePrompt(prompt,
@@ -46,7 +46,9 @@ public class AIService {
                                     .build())
             );
 
-            return downloadImageFromUrl(imageResponse.getResult().getOutput().getUrl());
+            String filename= prompt+".png";
+            InputStream inputStream = downloadImageFromUrl(imageResponse.getResult().getOutput().getUrl());
+            return new MockMultipartFile(filename,filename,"image/png",inputStream);
         } catch (IOException e) {
             throw new RuntimeException(e);
         }
