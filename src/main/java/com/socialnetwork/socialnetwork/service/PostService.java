@@ -7,13 +7,12 @@ import com.socialnetwork.socialnetwork.dto.post.UpdatePostDTO;
 import com.socialnetwork.socialnetwork.entity.Group;
 import com.socialnetwork.socialnetwork.entity.Post;
 import com.socialnetwork.socialnetwork.entity.User;
+import com.socialnetwork.socialnetwork.exceptions.ResourceNotFoundException;
 import com.socialnetwork.socialnetwork.mapper.PostMapper;
 import com.socialnetwork.socialnetwork.repository.FriendsRepository;
 import com.socialnetwork.socialnetwork.repository.GroupMemberRepository;
 import com.socialnetwork.socialnetwork.repository.GroupRepository;
 import com.socialnetwork.socialnetwork.repository.PostRepository;
-import org.springframework.ai.chat.ChatClient;
-import org.springframework.ai.chat.prompt.Prompt;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 
@@ -32,10 +31,9 @@ public class PostService {
     private final S3Service s3Service;
     private final FriendsRepository friendsRepository;
     private final GroupMemberRepository groupMemberRepository;
-    private final ChatClient chatClient;
     private final AIService aiService;
 
-    public PostService(PostRepository postRepository, PostMapper postMapper, GroupRepository groupRepository, JwtService jwtService, S3Service s3Service, FriendsRepository friendsRepository, GroupMemberRepository groupMemberRepository, ChatClient chatClient, AIService aiService) {
+    public PostService(PostRepository postRepository, PostMapper postMapper, GroupRepository groupRepository, JwtService jwtService, S3Service s3Service, FriendsRepository friendsRepository, GroupMemberRepository groupMemberRepository, AIService aiService) {
         this.postRepository = postRepository;
         this.postMapper = postMapper;
         this.groupRepository = groupRepository;
@@ -43,7 +41,6 @@ public class PostService {
         this.friendsRepository = friendsRepository;
         this.groupMemberRepository = groupMemberRepository;
         this.s3Service = s3Service;
-        this.chatClient = chatClient;
         this.aiService = aiService;
     }
 
@@ -66,9 +63,7 @@ public class PostService {
         }
     }
 
-//    public static  MultipartFile convertToMultipartFile(Image)
-
-    public PostDTO getById(Integer idPost) {
+    public PostDTO getById(Integer idPost) throws ResourceNotFoundException {
         User user = jwtService.getUser();
         Post post = postRepository.findById(idPost)
                 .orElseThrow(() -> new NoSuchElementException("The post with the id of " +
@@ -89,7 +84,7 @@ public class PostService {
         return postMapper.postToPostDTO(post);
     }
 
-    public PostDTO createPostInGroup(CreatePostDTO postDTO) {
+    public PostDTO createPostInGroup(CreatePostDTO postDTO) throws ResourceNotFoundException {
         User user = jwtService.getUser();
 
         Group group = groupRepository.findById(postDTO.idGroup()).orElseThrow(
@@ -104,7 +99,7 @@ public class PostService {
         return postMapper.postToPostDTO(post);
     }
 
-    public PostDTO createPostOnTimeline(CreatePostDTO postDTO) {
+    public PostDTO createPostOnTimeline(CreatePostDTO postDTO) throws ResourceNotFoundException {
         User user = jwtService.getUser();
         String imgS3Key = uploadImageAndGetKey(postDTO.img());
         Post post = postMapper.createPostDTOtoPostOnTimeline(user, imgS3Key, postDTO);
@@ -112,21 +107,21 @@ public class PostService {
         return postMapper.postToPostDTO(post);
     }
 
-    public PostDTO createAIPostOnTimeline(AIGeneratedPostDTO postDTO) {
+    public PostDTO createAIPostOnTimeline(AIGeneratedPostDTO postDTO) throws ResourceNotFoundException {
         String generatedText = aiService.generateText(postDTO.txtPrompt());
         //null prosledjujemo umesto MultipartFile dok se ne napravi metoda u AIServisu
-        CreatePostDTO createPostDTO = postMapper.openAIPostDTOtoCreatePostDTO(postDTO,generatedText,null);
+        CreatePostDTO createPostDTO = postMapper.openAIPostDTOtoCreatePostDTO(postDTO, generatedText, null);
         return createPostOnTimeline(createPostDTO);
     }
 
-    public PostDTO createAIPostInGroup(AIGeneratedPostDTO postDTO) {
+    public PostDTO createAIPostInGroup(AIGeneratedPostDTO postDTO) throws ResourceNotFoundException {
         String generatedText = aiService.generateText(postDTO.txtPrompt());
         //null prosledjujemo umesto MultipartFile dok se ne napravi metoda u AIServisu
-        CreatePostDTO createPostDTO = postMapper.openAIPostDTOtoCreatePostDTO(postDTO,generatedText,null);
+        CreatePostDTO createPostDTO = postMapper.openAIPostDTOtoCreatePostDTO(postDTO, generatedText, null);
         return createPostInGroup(createPostDTO);
     }
 
-    public PostDTO updatePost(Integer idPost, UpdatePostDTO updatePostDTO) {
+    public PostDTO updatePost(Integer idPost, UpdatePostDTO updatePostDTO) throws ResourceNotFoundException {
         User user = jwtService.getUser();
 
         Post post = postRepository.findById(idPost).orElseThrow(() ->
@@ -146,7 +141,7 @@ public class PostService {
     }
 
 
-    public void deletePost(Integer idPost) {
+    public void deletePost(Integer idPost) throws ResourceNotFoundException {
         Post post = postRepository.findById(idPost).orElseThrow(() ->
                 new NoSuchElementException("There is no post with the id of " + idPost));
         User user = jwtService.getUser();
@@ -162,7 +157,4 @@ public class PostService {
         }
         throw new RuntimeException("You don't have the permission to delete the post.");
     }
-
-
-
 }
