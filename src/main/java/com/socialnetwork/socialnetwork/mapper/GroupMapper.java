@@ -24,7 +24,7 @@ public class GroupMapper {
                 group.getId());
     }
 
-    public GroupDTO requestToGroupDTO(Group group) {
+    public GroupDTO groupToGroupDTO(Group group) {
         return new GroupDTO(group.getName(),
                 group.getAdmin().getEmail(),
                 group.isPublic(),

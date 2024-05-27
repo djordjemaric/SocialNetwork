@@ -7,7 +7,7 @@ import org.springframework.stereotype.Component;
 @Component
 public class UserMapper {
 
-    public PreviewUserDTO requestToPreviewUserDTO(User user) {
+    public PreviewUserDTO userToPreviewUserDTO(User user) {
         return new PreviewUserDTO(user.getId(), user.getEmail());
     }
 }

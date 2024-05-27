@@ -22,23 +22,23 @@ public class GroupRequestMapper {
     }
 
     public GroupRequestDTO requestToGroupRequestDTO(GroupRequest request) {
-        PreviewUserDTO userDTO = userMapper.requestToPreviewUserDTO(request.getUser());
-        GroupDTO groupDTO = groupMapper.requestToGroupDTO(request.getGroup());
+        PreviewUserDTO userDTO = userMapper.userToPreviewUserDTO(request.getUser());
+        GroupDTO groupDTO = groupMapper.groupToGroupDTO(request.getGroup());
 
         return new GroupRequestDTO(userDTO, groupDTO, request.getId());
     }
 
     public ResolvedGroupRequestDTO requestToResolvedGroupRequestDTOStatusCreated(GroupRequest request) {
-        PreviewUserDTO userDTO = userMapper.requestToPreviewUserDTO(request.getUser());
-        GroupDTO groupDTO = groupMapper.requestToGroupDTO(request.getGroup());
+        PreviewUserDTO userDTO = userMapper.userToPreviewUserDTO(request.getUser());
+        GroupDTO groupDTO = groupMapper.groupToGroupDTO(request.getGroup());
 
         return new ResolvedGroupRequestDTO(request.getId(), userDTO, groupDTO,
                 ResolvedGroupRequestStatus.REQUEST_TO_JOIN_GROUP_CREATED);
     }
 
     public ResolvedGroupRequestDTO groupMemberToResolvedGroupRequestDTOStatusAccepted(GroupMember groupMember) {
-        PreviewUserDTO userDTO = userMapper.requestToPreviewUserDTO(groupMember.getMember());
-        GroupDTO groupDTO = groupMapper.requestToGroupDTO(groupMember.getGroup());
+        PreviewUserDTO userDTO = userMapper.userToPreviewUserDTO(groupMember.getMember());
+        GroupDTO groupDTO = groupMapper.groupToGroupDTO(groupMember.getGroup());
 
         return new ResolvedGroupRequestDTO(groupMember.getId(), userDTO, groupDTO,
                 ResolvedGroupRequestStatus.REQUEST_TO_JOIN_GROUP_ACCEPTED);
