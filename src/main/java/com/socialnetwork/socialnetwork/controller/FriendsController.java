@@ -5,6 +5,7 @@ import com.socialnetwork.socialnetwork.dto.friendRequest.FriendRequestDTO;
 import com.socialnetwork.socialnetwork.dto.friendRequest.PreviewFriendRequestDTO;
 import com.socialnetwork.socialnetwork.dto.friendRequest.SentFriendRequestDTO;
 import com.socialnetwork.socialnetwork.dto.user.PreviewUserDTO;
+import com.socialnetwork.socialnetwork.exceptions.BusinessLogicException;
 import com.socialnetwork.socialnetwork.exceptions.ResourceNotFoundException;
 import com.socialnetwork.socialnetwork.service.FriendsService;
 import org.springframework.http.HttpStatus;
@@ -36,7 +37,7 @@ public class FriendsController {
 
     @ResponseStatus(HttpStatus.CREATED)
     @PostMapping("/requests")
-    public PreviewFriendRequestDTO sendFriendRequest(@RequestBody SentFriendRequestDTO friendRequestDTO) throws ResourceNotFoundException {
+    public PreviewFriendRequestDTO sendFriendRequest(@RequestBody SentFriendRequestDTO friendRequestDTO) throws ResourceNotFoundException, BusinessLogicException {
         return friendsService.createFriendRequest(friendRequestDTO);
     }
 
@@ -54,7 +55,7 @@ public class FriendsController {
 
     @ResponseStatus(HttpStatus.OK)
     @DeleteMapping("/{id}")
-    public void deleteFriend(@PathVariable Integer id) throws ResourceNotFoundException {
+    public void deleteFriend(@PathVariable Integer id) throws ResourceNotFoundException, BusinessLogicException {
         friendsService.deleteFriend(id);
     }
 }
