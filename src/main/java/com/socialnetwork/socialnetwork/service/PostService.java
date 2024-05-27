@@ -7,12 +7,15 @@ import com.socialnetwork.socialnetwork.dto.post.UpdatePostDTO;
 import com.socialnetwork.socialnetwork.entity.Group;
 import com.socialnetwork.socialnetwork.entity.Post;
 import com.socialnetwork.socialnetwork.entity.User;
+import com.socialnetwork.socialnetwork.exceptions.BusinessLogicException;
+import com.socialnetwork.socialnetwork.exceptions.ErrorCode;
 import com.socialnetwork.socialnetwork.exceptions.ResourceNotFoundException;
 import com.socialnetwork.socialnetwork.mapper.PostMapper;
 import com.socialnetwork.socialnetwork.repository.FriendsRepository;
 import com.socialnetwork.socialnetwork.repository.GroupMemberRepository;
 import com.socialnetwork.socialnetwork.repository.GroupRepository;
 import com.socialnetwork.socialnetwork.repository.PostRepository;
+import org.springframework.security.access.AccessDeniedException;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 
@@ -63,35 +66,35 @@ public class PostService {
         }
     }
 
-    public PostDTO getById(Integer idPost) throws ResourceNotFoundException {
+    public PostDTO getById(Integer idPost) throws ResourceNotFoundException, AccessDeniedException {
         User user = jwtService.getUser();
         Post post = postRepository.findById(idPost)
-                .orElseThrow(() -> new NoSuchElementException("The post with the id of " +
+                .orElseThrow(() -> new ResourceNotFoundException(ErrorCode.ERROR_FINDING_POST, "The post with the id of " +
                         idPost + " is not present in the database."));
 
         if (!post.isPublic() && post.getGroup() == null) {
             if (friendsRepository.areTwoUsersFriends(post.getOwner().getId(), user.getId()).isEmpty()) {
-                throw new RuntimeException("You cannot see the post because you are not friends with the post owner.");
+                throw new AccessDeniedException("You cannot see the post because you are not friends with the post owner.");
             }
         }
 
         if (post.getGroup() != null && !(post.getGroup().isPublic())) {
             if (!(groupMemberRepository.existsByUserIdAndGroupId(user.getId(), post.getGroup().getId()))) {
-                throw new RuntimeException("You cannot see the post because you are not a member of the "
+                throw new AccessDeniedException("You cannot see the post because you are not a member of the "
                         + post.getGroup().getName() + " group.");
             }
         }
         return postMapper.postToPostDTO(post);
     }
 
-    public PostDTO createPostInGroup(CreatePostDTO postDTO) throws ResourceNotFoundException {
+    public PostDTO createPostInGroup(CreatePostDTO postDTO) throws ResourceNotFoundException, AccessDeniedException, BusinessLogicException {
         User user = jwtService.getUser();
 
         Group group = groupRepository.findById(postDTO.idGroup()).orElseThrow(
-                () -> new NoSuchElementException("There is no group with the id of " + postDTO.idGroup()));
+                () -> new BusinessLogicException(ErrorCode.ERROR_CREATING_POST, "The group in which you tried to create a post doesn't exist."));
 
         if (!groupMemberRepository.existsByUserIdAndGroupId(user.getId(), postDTO.idGroup())) {
-            throw new RuntimeException("You cannot create post because you are not a member of this group.");
+            throw new AccessDeniedException("You cannot create post because you are not a member of this group.");
         }
         String imgS3Key = uploadImageAndGetKey(postDTO.img());
         Post post = postMapper.createPostDTOtoPostInGroup(user, group, imgS3Key, postDTO);
@@ -116,7 +119,7 @@ public class PostService {
         return createPostOnTimeline(postMapper.AIGeneratedPostToCreatePostDTO(postDTO,generatedText,file));
     }
 
-    public PostDTO createAIPostInGroup(AIGeneratedPostDTO postDTO) throws ResourceNotFoundException {
+    public PostDTO createAIPostInGroup(AIGeneratedPostDTO postDTO) throws ResourceNotFoundException, BusinessLogicException {
         String generatedText = aiService.generateText(postDTO.txtPrompt());
         MultipartFile file=null;
         if (postDTO.imgPrompt() != null) {
@@ -125,13 +128,13 @@ public class PostService {
         return createPostInGroup(postMapper.AIGeneratedPostToCreatePostDTO(postDTO,generatedText,file));
     }
 
-    public PostDTO updatePost(Integer idPost, UpdatePostDTO updatePostDTO) throws ResourceNotFoundException {
+    public PostDTO updatePost(Integer idPost, UpdatePostDTO updatePostDTO) throws ResourceNotFoundException, AccessDeniedException, BusinessLogicException {
         User user = jwtService.getUser();
 
         Post post = postRepository.findById(idPost).orElseThrow(() ->
-                new NoSuchElementException("There is no post with the id of " + idPost));
+                new BusinessLogicException(ErrorCode.ERROR_UPDATING_POST, "The post which you are trying to update doesn't exist."));
         if (!(Objects.equals(post.getOwner().getId(), user.getId()))) {
-            throw new RuntimeException("User is not the owner!");
+            throw new AccessDeniedException("Only the owner can update this post!");
         }
 
         if (updatePostDTO.img() != null && post.getImgS3Key() != null) {
@@ -145,9 +148,9 @@ public class PostService {
     }
 
 
-    public void deletePost(Integer idPost) throws ResourceNotFoundException {
+    public void deletePost(Integer idPost) throws ResourceNotFoundException, AccessDeniedException, BusinessLogicException {
         Post post = postRepository.findById(idPost).orElseThrow(() ->
-                new NoSuchElementException("There is no post with the id of " + idPost));
+                new BusinessLogicException(ErrorCode.ERROR_DELETING_POST, "The post which you are trying to delete doesn't exist."));
         User user = jwtService.getUser();
         if (post.getGroup() != null) {
             if (Objects.equals(post.getGroup().getAdmin().getId(), user.getId())) {
@@ -159,6 +162,6 @@ public class PostService {
             postRepository.deleteById(idPost);
             return;
         }
-        throw new RuntimeException("You don't have the permission to delete the post.");
+        throw new AccessDeniedException("You don't have the permission to delete this post.");
     }
 }

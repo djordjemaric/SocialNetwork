@@ -71,33 +71,12 @@ public class PostMapper {
                 post.getComments());
     }
 
-    public CreatePostDTO AIGeneratedPostToCreatePostDTO(AIGeneratedPostDTO postDTO, String generatedtext, MultipartFile generatedImage){
+    public CreatePostDTO AIGeneratedPostToCreatePostDTO(AIGeneratedPostDTO postDTO, String generatedtext, MultipartFile generatedImage) {
         return new CreatePostDTO(
                 postDTO.isPublic(),
                 generatedtext,
                 generatedImage,
                 postDTO.idGroup()
-                );
+        );
     }
-
-    public Post AIGeneratedPostDTOtoPostOnTimeline(AIGeneratedPostDTO postDTO, User user, String generatedText, String s3Key) {
-        Post post = new Post();
-        post.setText(generatedText);
-        post.setPublic(postDTO.isPublic());
-        post.setImgS3Key(s3Key);
-        post.setOwner(user);
-        return post;
-    }
-
-    public Post AIGeneratedPostDTOtoPostInGroup(AIGeneratedPostDTO postDTO, User user, Group group, String generatedText, String s3Key) {
-        Post post = new Post();
-        post.setText(generatedText);
-        post.setPublic(postDTO.isPublic());
-        post.setGroup(group);
-        post.setImgS3Key(s3Key);
-        post.setOwner(user);
-        return post;
-    }
-
-
 }
