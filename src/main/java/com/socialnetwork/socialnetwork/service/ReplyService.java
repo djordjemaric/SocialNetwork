@@ -8,6 +8,7 @@ import com.socialnetwork.socialnetwork.entity.Post;
 import com.socialnetwork.socialnetwork.entity.Reply;
 import com.socialnetwork.socialnetwork.entity.User;
 
+import com.socialnetwork.socialnetwork.exceptions.ResourceNotFoundException;
 import com.socialnetwork.socialnetwork.mapper.CommentMapper;
 import com.socialnetwork.socialnetwork.mapper.ReplyMapper;
 import com.socialnetwork.socialnetwork.repository.*;
@@ -39,7 +40,7 @@ public class ReplyService {
         this.commentMapper = commentMapper;
     }
 
-    public ReplyDTO createReply(Integer postId,Integer commentId, CreateReplyDTO replyDTO) {
+    public ReplyDTO createReply(Integer postId,Integer commentId, CreateReplyDTO replyDTO) throws ResourceNotFoundException {
         User currentUser = jwtService.getUser();
 
 

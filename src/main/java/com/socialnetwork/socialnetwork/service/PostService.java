@@ -7,6 +7,7 @@ import com.socialnetwork.socialnetwork.dto.post.UpdatePostDTO;
 import com.socialnetwork.socialnetwork.entity.Group;
 import com.socialnetwork.socialnetwork.entity.Post;
 import com.socialnetwork.socialnetwork.entity.User;
+import com.socialnetwork.socialnetwork.exceptions.ResourceNotFoundException;
 import com.socialnetwork.socialnetwork.mapper.PostMapper;
 import com.socialnetwork.socialnetwork.repository.FriendsRepository;
 import com.socialnetwork.socialnetwork.repository.GroupMemberRepository;
@@ -62,7 +63,7 @@ public class PostService {
         }
     }
 
-    public PostDTO getById(Integer idPost) {
+    public PostDTO getById(Integer idPost) throws ResourceNotFoundException {
         User user = jwtService.getUser();
         Post post = postRepository.findById(idPost)
                 .orElseThrow(() -> new NoSuchElementException("The post with the id of " +
@@ -83,7 +84,7 @@ public class PostService {
         return postMapper.postToPostDTO(post);
     }
 
-    public PostDTO createPostInGroup(CreatePostDTO postDTO) {
+    public PostDTO createPostInGroup(CreatePostDTO postDTO) throws ResourceNotFoundException {
         User user = jwtService.getUser();
 
         Group group = groupRepository.findById(postDTO.idGroup()).orElseThrow(
@@ -98,7 +99,7 @@ public class PostService {
         return postMapper.postToPostDTO(post);
     }
 
-    public PostDTO createPostOnTimeline(CreatePostDTO postDTO) {
+    public PostDTO createPostOnTimeline(CreatePostDTO postDTO) throws ResourceNotFoundException {
         User user = jwtService.getUser();
         String imgS3Key = uploadImageAndGetKey(postDTO.img());
         Post post = postMapper.createPostDTOtoPostOnTimeline(user, imgS3Key, postDTO);
@@ -106,7 +107,7 @@ public class PostService {
         return postMapper.postToPostDTO(post);
     }
 
-    public PostDTO createAIPostOnTimeline(AIGeneratedPostDTO postDTO) {
+    public PostDTO createAIPostOnTimeline(AIGeneratedPostDTO postDTO) throws ResourceNotFoundException {
         String generatedText = aiService.generateText(postDTO.txtPrompt());
         MultipartFile file = null;
         if (postDTO.imgPrompt() != null) {
@@ -115,7 +116,7 @@ public class PostService {
         return createPostOnTimeline(postMapper.AIGeneratedPostToCreatePostDTO(postDTO,generatedText,file));
     }
 
-    public PostDTO createAIPostInGroup(AIGeneratedPostDTO postDTO) {
+    public PostDTO createAIPostInGroup(AIGeneratedPostDTO postDTO) throws ResourceNotFoundException {
         String generatedText = aiService.generateText(postDTO.txtPrompt());
         MultipartFile file=null;
         if (postDTO.imgPrompt() != null) {
@@ -124,7 +125,7 @@ public class PostService {
         return createPostInGroup(postMapper.AIGeneratedPostToCreatePostDTO(postDTO,generatedText,file));
     }
 
-    public PostDTO updatePost(Integer idPost, UpdatePostDTO updatePostDTO) {
+    public PostDTO updatePost(Integer idPost, UpdatePostDTO updatePostDTO) throws ResourceNotFoundException {
         User user = jwtService.getUser();
 
         Post post = postRepository.findById(idPost).orElseThrow(() ->
@@ -144,7 +145,7 @@ public class PostService {
     }
 
 
-    public void deletePost(Integer idPost) {
+    public void deletePost(Integer idPost) throws ResourceNotFoundException {
         Post post = postRepository.findById(idPost).orElseThrow(() ->
                 new NoSuchElementException("There is no post with the id of " + idPost));
         User user = jwtService.getUser();
@@ -160,6 +161,4 @@ public class PostService {
         }
         throw new RuntimeException("You don't have the permission to delete the post.");
     }
-
-
 }

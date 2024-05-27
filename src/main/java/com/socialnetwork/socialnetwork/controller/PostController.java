@@ -6,6 +6,7 @@ import com.socialnetwork.socialnetwork.dto.post.CreateCommentDTO;
 import com.socialnetwork.socialnetwork.dto.post.CreatePostDTO;
 import com.socialnetwork.socialnetwork.dto.post.PostDTO;
 import com.socialnetwork.socialnetwork.dto.post.UpdatePostDTO;
+import com.socialnetwork.socialnetwork.exceptions.ResourceNotFoundException;
 import com.socialnetwork.socialnetwork.service.CommentService;
 import com.socialnetwork.socialnetwork.service.PostService;
 import com.socialnetwork.socialnetwork.service.ReplyService;
@@ -29,13 +30,13 @@ public class PostController {
 
     @ResponseStatus(HttpStatus.OK)
     @GetMapping("/{id}")
-    public PostDTO getById(@PathVariable Integer id) {
+    public PostDTO getById(@PathVariable Integer id) throws ResourceNotFoundException {
         return postService.getById(id);
     }
 
     @ResponseStatus(HttpStatus.CREATED)
     @PostMapping
-    public PostDTO save(@ModelAttribute CreatePostDTO postDTO) {
+    public PostDTO save(@ModelAttribute CreatePostDTO postDTO) throws ResourceNotFoundException {
         if (postDTO.idGroup() == null) {
             return postService.createPostOnTimeline(postDTO);
         }
@@ -43,7 +44,7 @@ public class PostController {
     }
 
     @PostMapping("/aiGenerated")
-    public PostDTO save(@RequestBody AIGeneratedPostDTO postDTO) {
+    public PostDTO save(@RequestBody AIGeneratedPostDTO postDTO) throws ResourceNotFoundException{
         if (postDTO.idGroup() == null) {
             return postService.createAIPostOnTimeline(postDTO);
         }
@@ -52,28 +53,26 @@ public class PostController {
 
     @ResponseStatus(HttpStatus.OK)
     @PutMapping("/{id}")
-    public PostDTO update(@PathVariable Integer id, @RequestBody UpdatePostDTO postDTO) {
+    public PostDTO update(@PathVariable Integer id, @RequestBody UpdatePostDTO postDTO) throws ResourceNotFoundException {
         return postService.updatePost(id, postDTO);
     }
 
     @ResponseStatus(HttpStatus.OK)
     @DeleteMapping("/{id}")
-    public void delete(@PathVariable Integer id) {
+    public void delete(@PathVariable Integer id) throws ResourceNotFoundException {
         postService.deletePost(id);
     }
 
     @ResponseStatus(HttpStatus.CREATED)
     @PostMapping("/{idPost}/comments")
-    public CommentDTO saveComment(@PathVariable Integer idPost, @RequestBody CreateCommentDTO commentDTO) {
-        return commentService.createComment(idPost, commentDTO);
+    public CommentDTO saveComment(@PathVariable Integer idPost, @RequestBody CreateCommentDTO commentDTO) throws ResourceNotFoundException {
+        return commentService.createComment(idPost,commentDTO);
 
     }
 
     @ResponseStatus(HttpStatus.CREATED)
     @PostMapping("/{idPost}/comments/{commentId}/replies")
-    public ReplyDTO saveReply(@PathVariable Integer idPost,@PathVariable Integer commentId, @RequestBody CreateReplyDTO replyDTO) {
+    public ReplyDTO saveReply(@PathVariable Integer idPost,@PathVariable Integer commentId, @RequestBody CreateReplyDTO replyDTO) throws ResourceNotFoundException {
         return replyService.createReply(idPost,commentId, replyDTO);
     }
-
-
 }
