@@ -45,6 +45,14 @@ public class PostController {
         return postService.createPostInGroup(postDTO);
     }
 
+    @PostMapping("/ai-generated")
+    public PostDTO save(@RequestBody AIGeneratedPostDTO postDTO) throws ResourceNotFoundException, BusinessLogicException {
+        if (postDTO.idGroup() == null) {
+            return postService.createAIPostOnTimeline(postDTO);
+        }
+        return postService.createAIPostInGroup(postDTO);
+    }
+
     @ResponseStatus(HttpStatus.OK)
     @PutMapping("/{id}")
     public PostDTO update(@PathVariable Integer id, @RequestBody UpdatePostDTO postDTO) throws ResourceNotFoundException, AccessDeniedException, BusinessLogicException {
@@ -69,5 +77,6 @@ public class PostController {
     public void delete(@PathVariable Integer id) throws ResourceNotFoundException, AccessDeniedException, BusinessLogicException {
         postService.deletePost(id);
     }
-
 }
+
+
