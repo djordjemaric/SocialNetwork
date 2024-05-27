@@ -2,6 +2,7 @@ package com.socialnetwork.socialnetwork.controller;
 
 import com.socialnetwork.socialnetwork.dto.group.CreateGroupDTO;
 import com.socialnetwork.socialnetwork.dto.group.GroupDTO;
+import com.socialnetwork.socialnetwork.dto.group.GroupRequestDTO;
 import com.socialnetwork.socialnetwork.dto.group.ResolvedGroupRequestDTO;
 import com.socialnetwork.socialnetwork.dto.post.PostDTO;
 import com.socialnetwork.socialnetwork.exceptions.BusinessLogicException;
@@ -18,7 +19,6 @@ import java.util.List;
 public class GroupController {
 
     private final GroupService groupService;
-
 
     public GroupController(GroupService groupService) {
         this.groupService = groupService;
@@ -40,6 +40,24 @@ public class GroupController {
     @GetMapping
     public List<GroupDTO> getGroupsByName(@RequestParam String name) {
         return groupService.findByName(name);
+    }
+
+    @ResponseStatus(HttpStatus.OK)
+    @GetMapping("/{id}/requests")
+    public List<GroupRequestDTO> getAllRequestForGroup(@PathVariable Integer id) throws ResourceNotFoundException {
+        return groupService.getAllRequestsForGroup(id);
+    }
+
+    @ResponseStatus(HttpStatus.OK)
+    @PostMapping("/{idGroup}/requests/{idRequest}/accept")
+    public void acceptRequest(@PathVariable Integer idGroup, @PathVariable Integer idRequest) throws ResourceNotFoundException {
+        groupService.acceptRequest(idGroup, idRequest);
+    }
+
+    @ResponseStatus(HttpStatus.OK)
+    @PostMapping("/{idGroup}/requests/{idRequest}/reject")
+    public void rejectRequest(@PathVariable Integer idGroup, @PathVariable Integer idRequest) throws ResourceNotFoundException {
+        groupService.rejectRequest(idGroup, idRequest);
     }
 
     @DeleteMapping("/{idGroup}/leave")

@@ -1,20 +1,16 @@
 package com.socialnetwork.socialnetwork.service;
 
-import com.socialnetwork.socialnetwork.dto.group.CreateGroupDTO;
-import com.socialnetwork.socialnetwork.dto.group.GroupDTO;
-import com.socialnetwork.socialnetwork.dto.group.ResolvedGroupRequestDTO;
-import com.socialnetwork.socialnetwork.dto.group.ResolvedGroupRequestStatus;
+import com.socialnetwork.socialnetwork.dto.group.*;
 import com.socialnetwork.socialnetwork.dto.post.PostDTO;
 import com.socialnetwork.socialnetwork.dto.user.PreviewUserDTO;
 import com.socialnetwork.socialnetwork.entity.*;
 import com.socialnetwork.socialnetwork.exceptions.BusinessLogicException;
 import com.socialnetwork.socialnetwork.exceptions.ResourceNotFoundException;
 import com.socialnetwork.socialnetwork.mapper.GroupMapper;
+import com.socialnetwork.socialnetwork.mapper.GroupRequestMapper;
 import com.socialnetwork.socialnetwork.mapper.PostMapper;
-import com.socialnetwork.socialnetwork.repository.GroupMemberRepository;
-import com.socialnetwork.socialnetwork.repository.GroupRepository;
-import com.socialnetwork.socialnetwork.repository.GroupRequestRepository;
-import com.socialnetwork.socialnetwork.repository.PostRepository;
+import com.socialnetwork.socialnetwork.repository.*;
+import org.hibernate.query.sqm.produce.function.FunctionArgumentException;
 import org.springframework.security.access.AccessDeniedException;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -29,19 +25,23 @@ public class GroupService {
     private final GroupRepository groupRepository;
     private final GroupRequestRepository groupRequestRepository;
     private final GroupMemberRepository groupMemberRepository;
+    private final PostRepository postRepository;
+    private final UserRepository userRepository;
     private final GroupMapper groupMapper;
     private final PostMapper postMapper;
-    private final PostRepository postRepository;
+    private final GroupRequestMapper groupRequestMapper;
     private final JwtService jwtService;
 
-    public GroupService(GroupRepository groupRepository, JwtService jwtService, GroupRequestRepository groupRequestRepository, GroupMemberRepository groupMemberRepository, GroupMapper groupMapper, PostMapper postMapper, PostRepository postRepository) {
+    public GroupService(GroupRepository groupRepository, GroupRequestRepository groupRequestRepository, PostRepository postRepository, UserRepository userRepository, GroupMapper groupMapper, GroupMemberRepository groupMemberRepository, PostMapper postMapper, GroupRequestMapper groupRequestMapper, JwtService jwtService) {
         this.groupRepository = groupRepository;
         this.groupRequestRepository = groupRequestRepository;
+        this.postRepository = postRepository;
+        this.userRepository = userRepository;
         this.groupMemberRepository = groupMemberRepository;
         this.groupMapper = groupMapper;
         this.jwtService = jwtService;
         this.postMapper = postMapper;
-        this.postRepository = postRepository;
+        this.groupRequestMapper = groupRequestMapper;
     }
 
     public GroupDTO createGroup(CreateGroupDTO group) throws BusinessLogicException, ResourceNotFoundException {
@@ -92,8 +92,7 @@ public class GroupService {
     public List<GroupDTO> findByName(String name) {
         List<Group> groups = groupRepository.findAllByNameStartingWith(name);
 
-        return groups.stream().map(group ->
-                new GroupDTO(group.getName(), group.getAdmin().getEmail(), group.isPublic(), group.getId())).toList();
+        return groups.stream().map(groupMapper::entityToGroupDto).toList();
     }
 
     public ResolvedGroupRequestDTO createRequestToJoinGroup(Integer idGroup) throws BusinessLogicException, ResourceNotFoundException {
@@ -121,19 +120,63 @@ public class GroupService {
     public ResolvedGroupRequestDTO addUserAsAMemberToPrivateGroup(User user, Group group) {
         GroupRequest groupRequest = groupRequestRepository.save(new GroupRequest(null, user, group));
 
-        return new ResolvedGroupRequestDTO(groupRequest.getId(),
-                new PreviewUserDTO(user.getId(), user.getEmail()),
-                new GroupDTO(group.getName(), group.getAdmin().getEmail(), group.isPublic(), group.getId()),
-                ResolvedGroupRequestStatus.REQUEST_TO_JOIN_GROUP_CREATED);
+        return groupRequestMapper.requestToResolvedGroupRequestDTOStatusCreated(groupRequest);
+    }
+
+
+    public List<GroupRequestDTO> getAllRequestsForGroup(Integer idGroup) throws ResourceNotFoundException {
+        User currentUser = jwtService.getUser();
+        Group group = groupRepository.findById(idGroup).orElseThrow(() -> new FunctionArgumentException("Group does not exist!"));
+
+        if (!groupRepository.existsByAdmin(currentUser)) {
+            throw new FunctionArgumentException("There is no group with given admin id!");
+        }
+        List<GroupRequest> groupRequests = groupRequestRepository.findAllByGroup(group);
+
+        return groupRequests.stream()
+                .map(groupRequestMapper::requestToGroupRequestDTO)
+                .toList();
+    }
+
+    public GroupRequest checkRequest(Integer idGroup, Integer idRequest) throws ResourceNotFoundException {
+        User currentUser = jwtService.getUser();
+
+        Group group = groupRepository.findById(idGroup).orElseThrow(() -> new FunctionArgumentException("Group does not exist!"));
+        GroupRequest request = groupRequestRepository.findById(idRequest).orElseThrow(() -> new FunctionArgumentException("Request does not exist!"));
+        User newMember = userRepository.findById(request.getUser().getId()).orElseThrow(() -> new FunctionArgumentException("User with that id does not exist!"));
+
+        if (!groupRepository.existsByAdmin(currentUser)) {
+            throw new FunctionArgumentException("That user is not an admin for that group!");
+        }
+
+        if (!groupRequestRepository.existsByUserAndGroup(newMember, group)) {
+            throw new FunctionArgumentException("That request does not exist");
+        }
+
+        if (group.isPublic()) {
+            throw new FunctionArgumentException("Given group is public");
+        }
+
+        return request;
+    }
+
+    public void acceptRequest(Integer idGroup, Integer idRequest) throws ResourceNotFoundException {
+         GroupRequest groupRequest = checkRequest(idGroup, idRequest);
+
+        groupMemberRepository.save(new GroupMember(null, groupRequest.getUser(), groupRequest.getGroup()));
+        groupRequestRepository.deleteById(idRequest);
+    }
+
+    public void rejectRequest(Integer idGroup, Integer idRequest) throws ResourceNotFoundException {
+        GroupRequest groupRequest = checkRequest(idGroup, idRequest);
+
+        groupRequestRepository.deleteById(groupRequest.getId());
     }
 
     public ResolvedGroupRequestDTO addUserAsAMemberToPublicGroup(User user, Group group) {
         GroupMember groupMember = groupMemberRepository.save(new GroupMember(null, user, group));
 
-        return new ResolvedGroupRequestDTO(groupMember.getId(),
-                new PreviewUserDTO(user.getId(), user.getEmail()),
-                new GroupDTO(group.getName(), group.getAdmin().getEmail(), group.isPublic(), group.getId()),
-                ResolvedGroupRequestStatus.REQUEST_TO_JOIN_GROUP_ACCEPTED);
+        return groupRequestMapper.groupMemberToResolvedGroupRequestDTOStatusAccepted(groupMember);
     }
 
     public void leaveGroup(Integer idGroup) throws BusinessLogicException, ResourceNotFoundException {
