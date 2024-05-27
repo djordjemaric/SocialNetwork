@@ -110,14 +110,14 @@ public class PostService {
     public PostDTO createAIPostOnTimeline(AIGeneratedPostDTO postDTO) throws ResourceNotFoundException {
         String generatedText = aiService.generateText(postDTO.txtPrompt());
         //null prosledjujemo umesto MultipartFile dok se ne napravi metoda u AIServisu
-        CreatePostDTO createPostDTO = postMapper.openAIPostDTOtoCreatePostDTO(postDTO, generatedText, null);
+        CreatePostDTO createPostDTO = postMapper.AIGeneratedPostDTOtoCreatePostDTO(postDTO, generatedText, null);
         return createPostOnTimeline(createPostDTO);
     }
 
     public PostDTO createAIPostInGroup(AIGeneratedPostDTO postDTO) throws ResourceNotFoundException {
         String generatedText = aiService.generateText(postDTO.txtPrompt());
         //null prosledjujemo umesto MultipartFile dok se ne napravi metoda u AIServisu
-        CreatePostDTO createPostDTO = postMapper.openAIPostDTOtoCreatePostDTO(postDTO, generatedText, null);
+        CreatePostDTO createPostDTO = postMapper.AIGeneratedPostDTOtoCreatePostDTO(postDTO, generatedText, null);
         return createPostInGroup(createPostDTO);
     }
 

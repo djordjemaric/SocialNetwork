@@ -71,7 +71,7 @@ public class PostMapper {
             post.getComments());
     }
 
-    public CreatePostDTO openAIPostDTOtoCreatePostDTO(AIGeneratedPostDTO postDTO, String generatedText, MultipartFile img){
+    public CreatePostDTO AIGeneratedPostDTOtoCreatePostDTO(AIGeneratedPostDTO postDTO, String generatedText, MultipartFile img){
         return new CreatePostDTO(
                 postDTO.isPublic(),
                 generatedText,
@@ -80,24 +80,6 @@ public class PostMapper {
         );
     }
 
-    public Post AIGeneratedPostDTOtoPostOnTimeline(AIGeneratedPostDTO postDTO, User user, String generatedText){
-        Post post=new Post();
-        post.setText(generatedText);
-        post.setPublic(postDTO.isPublic());
-        //imgPrompt handling
-        post.setOwner(user);
-        return post;
-    }
-
-    public Post AIGeneratedPostDTOtoPostInGroup(AIGeneratedPostDTO postDTO, User user, Group group, String generatedText){
-        Post post=new Post();
-        post.setText(generatedText);
-        post.setPublic(postDTO.isPublic());
-        post.setGroup(group);
-        //imgPrompt handling
-        post.setOwner(user);
-        return post;
-    }
 
 
 

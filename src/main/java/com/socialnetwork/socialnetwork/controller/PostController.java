@@ -43,7 +43,7 @@ public class PostController {
         return postService.createPostInGroup(postDTO);
     }
 
-    @PostMapping("/aiGenerated")
+    @PostMapping("/ai-generated")
     public PostDTO save(@RequestBody AIGeneratedPostDTO postDTO) throws ResourceNotFoundException{
         if (postDTO.idGroup() == null) {
             return postService.createAIPostOnTimeline(postDTO);
