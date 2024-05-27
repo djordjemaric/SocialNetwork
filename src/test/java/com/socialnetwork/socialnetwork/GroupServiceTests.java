@@ -6,7 +6,6 @@ import com.socialnetwork.socialnetwork.entity.Group;
 import com.socialnetwork.socialnetwork.entity.GroupMember;
 import com.socialnetwork.socialnetwork.entity.User;
 import com.socialnetwork.socialnetwork.exceptions.BusinessLogicException;
-import com.socialnetwork.socialnetwork.exceptions.IAMProviderException;
 import com.socialnetwork.socialnetwork.exceptions.ResourceNotFoundException;
 import com.socialnetwork.socialnetwork.mapper.GroupMapper;
 import com.socialnetwork.socialnetwork.repository.GroupMemberRepository;
@@ -73,7 +72,7 @@ class GroupServiceTests {
     }
 
     @Test
-    void createGroup_groupNameExists_throwsException() {
+    void createGroup_groupNameExists_throwsException() throws ResourceNotFoundException{
         when(jwtService.getUser()).thenReturn(admin);
         when(groupRepository.existsByName(createGroupDTO.name())).thenReturn(true);
 
@@ -85,7 +84,7 @@ class GroupServiceTests {
     }
 
     @Test
-    void createGroup_success() throws BusinessLogicException {
+    void createGroup_success() throws BusinessLogicException, ResourceNotFoundException {
         when(jwtService.getUser()).thenReturn(admin);
         when(groupRepository.existsByName(createGroupDTO.name())).thenReturn(false);
         when(groupMapper.dtoToEntity(admin, createGroupDTO)).thenReturn(group);
@@ -113,7 +112,7 @@ class GroupServiceTests {
     }
 
     @Test
-    void leaveGroup_asAdmin_throwsException() {
+    void leaveGroup_asAdmin_throwsException() throws ResourceNotFoundException {
         when(jwtService.getUser()).thenReturn(admin);
         when(groupRepository.findById(group.getId())).thenReturn(Optional.of(group));
 
@@ -125,7 +124,7 @@ class GroupServiceTests {
     }
 
     @Test
-    void leaveGroup_notMember_throwsException() {
+    void leaveGroup_notMember_throwsException() throws ResourceNotFoundException{
         when(jwtService.getUser()).thenReturn(user);
         when(groupRepository.findById(group.getId())).thenReturn(Optional.of(group));
         when(groupMemberRepository.findByMember(user)).thenReturn(Optional.empty());
@@ -154,7 +153,7 @@ class GroupServiceTests {
     }
 
     @Test
-    void removeMember_groupNotExists_throwsException() {
+    void removeMember_groupNotExists_throwsException() throws ResourceNotFoundException {
         when(jwtService.getUser()).thenReturn(admin);
         when(groupRepository.existsByAdminIdAndGroupId(admin.getId(), group.getId())).thenReturn(false);
 
@@ -168,7 +167,7 @@ class GroupServiceTests {
     }
 
     @Test
-    void removeMember_adminSelfRemoval_throwsException() {
+    void removeMember_adminSelfRemoval_throwsException() throws ResourceNotFoundException {
         when(jwtService.getUser()).thenReturn(admin);
         when(groupRepository.existsByAdminIdAndGroupId(admin.getId(), group.getId())).thenReturn(true);
 
@@ -180,7 +179,7 @@ class GroupServiceTests {
     }
 
     @Test
-    void removeMember_userNotInGroup_throwsException() {
+    void removeMember_userNotInGroup_throwsException() throws ResourceNotFoundException {
         when(jwtService.getUser()).thenReturn(admin);
         when(groupRepository.existsByAdminIdAndGroupId(admin.getId(), group.getId())).thenReturn(true);
         when(groupMemberRepository.existsByUserIdAndGroupId(user.getId(), group.getId())).thenReturn(false);
@@ -196,7 +195,7 @@ class GroupServiceTests {
     }
 
     @Test
-    void removeMember_success() throws BusinessLogicException, ResourceNotFoundException, IAMProviderException {
+    void removeMember_success() throws BusinessLogicException, ResourceNotFoundException {
         when(jwtService.getUser()).thenReturn(admin);
         when(groupRepository.existsByAdminIdAndGroupId(admin.getId(), group.getId())).thenReturn(true);
         when(groupMemberRepository.existsByUserIdAndGroupId(user.getId(), group.getId())).thenReturn(true);

@@ -44,7 +44,7 @@ public class GroupService {
         this.postRepository = postRepository;
     }
 
-    public GroupDTO createGroup(CreateGroupDTO group) throws BusinessLogicException {
+    public GroupDTO createGroup(CreateGroupDTO group) throws BusinessLogicException, ResourceNotFoundException {
         User currentUser = jwtService.getUser();
 
         if (groupRepository.existsByName(group.name())) {
