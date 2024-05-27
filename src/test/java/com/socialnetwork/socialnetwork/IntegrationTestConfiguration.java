@@ -1,6 +1,7 @@
 package com.socialnetwork.socialnetwork;
 
 import com.socialnetwork.socialnetwork.entity.User;
+import com.socialnetwork.socialnetwork.exceptions.ResourceNotFoundException;
 import com.socialnetwork.socialnetwork.service.JwtService;
 import org.junit.jupiter.api.*;
 import org.mockito.Mock;
@@ -48,7 +49,7 @@ public abstract class IntegrationTestConfiguration {
     protected JwtService jwtService;
 
     @BeforeEach
-    void setUp(){
+    void setUp() throws ResourceNotFoundException {
         User testUser = new User(1,"vica.ristic@gmail.com", "93246812-3021-704e-9c37-bf46100f22dc");
         when(jwtService.getUser()).thenReturn(testUser);
     }

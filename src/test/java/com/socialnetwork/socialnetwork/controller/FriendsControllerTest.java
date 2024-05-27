@@ -5,6 +5,7 @@ import com.socialnetwork.socialnetwork.SocialNetworkApplication;
 import com.socialnetwork.socialnetwork.dto.friendRequest.FriendRequestDTO;
 import com.socialnetwork.socialnetwork.entity.FriendRequest;
 import com.socialnetwork.socialnetwork.entity.User;
+import com.socialnetwork.socialnetwork.exceptions.ResourceNotFoundException;
 import com.socialnetwork.socialnetwork.repository.FriendRequestRepository;
 import com.socialnetwork.socialnetwork.repository.UserRepository;
 import org.junit.jupiter.api.*;
@@ -46,7 +47,7 @@ class FriendsControllerTest extends IntegrationTestConfiguration {
     private FriendRequestRepository friendRequestRepository;
 
     @Test
-    void testFriendsConnection(){
+    void testFriendsConnection() throws ResourceNotFoundException {
         User testUser1 = new User();
         testUser1.setUserSub("f3841812-e0f1-7025-b7bc-ce67d7fb933e");
         testUser1.setEmail("xanitev711@mcatag.com");
