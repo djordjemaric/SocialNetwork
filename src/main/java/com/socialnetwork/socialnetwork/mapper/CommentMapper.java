@@ -1,5 +1,6 @@
 package com.socialnetwork.socialnetwork.mapper;
 
+import com.socialnetwork.socialnetwork.dto.post.CommentDTO;
 import com.socialnetwork.socialnetwork.dto.post.CreateCommentDTO;
 import com.socialnetwork.socialnetwork.entity.Comment;
 import com.socialnetwork.socialnetwork.entity.Post;
@@ -8,7 +9,9 @@ import org.springframework.stereotype.Component;
 
 @Component
 public class CommentMapper {
-    public Comment createCommentDTOtoComment(User owner, Post post, CreateCommentDTO commentDTO){
+
+
+    public Comment commentDTOtoComment(User owner, Post post, CreateCommentDTO commentDTO){
         Comment comment = new Comment();
         comment.setCommOwner(owner);
         comment.setPost(post);
@@ -16,4 +19,7 @@ public class CommentMapper {
         return comment;
     }
 
+    public CommentDTO commentToCommentDTO(Comment comment){
+        return new CommentDTO(comment.getId(), comment.getText(), comment.getPost().getId(), comment.getCommOwner().getId());
+    }
 }

@@ -4,8 +4,11 @@ package com.socialnetwork.socialnetwork.service;
 
 import com.socialnetwork.socialnetwork.dto.LoginResponse;
 import com.socialnetwork.socialnetwork.entity.User;
+import com.socialnetwork.socialnetwork.exceptions.BusinessLogicException;
+import com.socialnetwork.socialnetwork.exceptions.ErrorCode;
+import com.socialnetwork.socialnetwork.exceptions.ResourceNotFoundException;
+import com.socialnetwork.socialnetwork.exceptions.IAMProviderException;
 import com.socialnetwork.socialnetwork.repository.UserRepository;
-import org.hibernate.query.sqm.produce.function.FunctionArgumentException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -23,29 +26,21 @@ public class UserService {
         this.cognitoService = cognitoService;
     }
 
-    public User getUserByEmail(String email) {
-
-        return userRepository.findByEmail(email)
-                .orElseThrow(() -> new FunctionArgumentException("Invalid email"));
-
-    }
-
     public List<User> getAllUsers() {
         return userRepository.findAll();
     }
 
-    public User getUserById(int id) {
+    public User getUserById(int id) throws ResourceNotFoundException {
         return userRepository.findById(id)
-                .orElseThrow(() -> new FunctionArgumentException("Invalid id"));
+                .orElseThrow(() -> new ResourceNotFoundException(ErrorCode.ERROR_FINDING_USER, "No user found with id: " + id));
     }
 
 
-    public User createUser(String email, String password) {
+    public User createUser(String email, String password) throws IAMProviderException, BusinessLogicException {
 
         if (userRepository.existsByEmail(email)) {
-            throw new FunctionArgumentException("User already exists");
+            throw new BusinessLogicException(ErrorCode.ERROR_REGISTERING_USER, "User already exists in database with email: " + email);
         }
-
         String userSub = cognitoService.registerUser(email, email, password);
 
         User user = new User();
@@ -55,7 +50,7 @@ public class UserService {
         return user;
     }
 
-    public LoginResponse loginUser(String email, String password) {
+    public LoginResponse loginUser(String email, String password) throws IAMProviderException {
         return cognitoService.loginUser(email, password);
     }
 

@@ -5,5 +5,4 @@ public record CommentDTO(
         Integer id,
         String text,
         Integer idPost,
-        Integer userId
-        ) {}
+        Integer userId) {}

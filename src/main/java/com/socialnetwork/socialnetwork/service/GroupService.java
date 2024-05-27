@@ -2,7 +2,9 @@ package com.socialnetwork.socialnetwork.service;
 
 import com.socialnetwork.socialnetwork.dto.group.*;
 import com.socialnetwork.socialnetwork.dto.post.PostDTO;
+import com.socialnetwork.socialnetwork.dto.user.PreviewUserDTO;
 import com.socialnetwork.socialnetwork.entity.*;
+import com.socialnetwork.socialnetwork.exceptions.ResourceNotFoundException;
 import com.socialnetwork.socialnetwork.mapper.GroupMapper;
 import com.socialnetwork.socialnetwork.mapper.GroupRequestMapper;
 import com.socialnetwork.socialnetwork.mapper.PostMapper;
@@ -34,12 +36,12 @@ public class GroupService {
         this.userRepository = userRepository;
         this.groupMemberRepository = groupMemberRepository;
         this.groupMapper = groupMapper;
+        this.jwtService = jwtService;
         this.postMapper = postMapper;
         this.groupRequestMapper = groupRequestMapper;
-        this.jwtService = jwtService;
     }
 
-    public GroupDTO createGroup(CreateGroupDTO group) {
+    public GroupDTO createGroup(CreateGroupDTO group) throws ResourceNotFoundException {
         User currentUser = jwtService.getUser();
 
         if (groupRepository.existsByName(group.name())) {
@@ -53,7 +55,7 @@ public class GroupService {
     }
 
 
-    public List<PostDTO> getAllPostsByGroupId(Integer idGroup) {
+    public List<PostDTO> getAllPostsByGroupId(Integer idGroup) throws ResourceNotFoundException {
         User currentUser = jwtService.getUser();
 
         if (!groupRepository.existsById(idGroup)) {
@@ -71,7 +73,7 @@ public class GroupService {
                 .toList();
     }
 
-    public void deleteGroup(Integer idGroup) {
+    public void deleteGroup(Integer idGroup) throws ResourceNotFoundException {
         User currentUser = jwtService.getUser();
 
         if (!groupRepository.existsByIdAndAdminId(idGroup, currentUser.getId())) {
@@ -89,7 +91,7 @@ public class GroupService {
     }
 
 
-    public ResolvedGroupRequestDTO createRequestToJoinGroup(Integer idGroup) {
+    public ResolvedGroupRequestDTO createRequestToJoinGroup(Integer idGroup) throws ResourceNotFoundException {
         User currentUser = jwtService.getUser();
 
         Group group = groupRepository.findById(idGroup).orElseThrow(() -> new FunctionArgumentException("Group does not exist!"));
@@ -116,7 +118,7 @@ public class GroupService {
     }
 
 
-    public List<GroupRequestDTO> getAllRequestsForGroup(Integer idGroup) {
+    public List<GroupRequestDTO> getAllRequestsForGroup(Integer idGroup) throws ResourceNotFoundException {
         User currentUser = jwtService.getUser();
         Group group = groupRepository.findById(idGroup).orElseThrow(() -> new FunctionArgumentException("Group does not exist!"));
 
@@ -130,7 +132,7 @@ public class GroupService {
                 .toList();
     }
 
-    public GroupRequest checkRequest(Integer idGroup, Integer idRequest) {
+    public GroupRequest checkRequest(Integer idGroup, Integer idRequest) throws ResourceNotFoundException {
         User currentUser = jwtService.getUser();
 
         Group group = groupRepository.findById(idGroup).orElseThrow(() -> new FunctionArgumentException("Group does not exist!"));
@@ -152,14 +154,14 @@ public class GroupService {
         return request;
     }
 
-    public void acceptRequest(Integer idGroup, Integer idRequest) {
+    public void acceptRequest(Integer idGroup, Integer idRequest) throws ResourceNotFoundException {
          GroupRequest groupRequest = checkRequest(idGroup, idRequest);
 
         groupMemberRepository.save(new GroupMember(null, groupRequest.getUser(), groupRequest.getGroup()));
         groupRequestRepository.deleteById(idRequest);
     }
 
-    public void rejectRequest(Integer idGroup, Integer idRequest) {
+    public void rejectRequest(Integer idGroup, Integer idRequest) throws ResourceNotFoundException {
         GroupRequest groupRequest = checkRequest(idGroup, idRequest);
 
         groupRequestRepository.deleteById(groupRequest.getId());
@@ -171,18 +173,18 @@ public class GroupService {
         return groupRequestMapper.groupMemberToResolvedGroupRequestDTOStatusAccepted(groupMember);
     }
 
-    public void leaveGroup(Integer idGroup) {
+    public void leaveGroup(Integer idGroup) throws ResourceNotFoundException {
         Group group = groupRepository.findById(idGroup).orElseThrow(() -> new FunctionArgumentException("Group does not exist"));
         User user = jwtService.getUser();
         if (group.getAdmin().getId().equals(user.getId())) {
             throw new FunctionArgumentException("Admin can't leave the group");
         }
-        GroupMember groupMember = groupMemberRepository.findByMember(user).orElseThrow(() -> new FunctionArgumentException("User is not member of group"));
+        GroupMember groupMember = groupMemberRepository.findByMemberAndGroup(user, group).orElseThrow(() -> new FunctionArgumentException("User is not member of group"));
         groupMemberRepository.delete(groupMember);
     }
 
     @Transactional
-    public void removeMember(Integer idGroup, Integer idUser) {
+    public void removeMember(Integer idGroup, Integer idUser) throws ResourceNotFoundException {
         User admin = jwtService.getUser();
         if (!groupRepository.existsByAdminIdAndGroupId(admin.getId(), idGroup)) {
             throw new NoSuchElementException("There are no groups with that id: " + idGroup + " and that admin: " + admin.getEmail());
