@@ -2,6 +2,8 @@ package com.socialnetwork.socialnetwork;
 
 import com.socialnetwork.socialnetwork.dto.group.GroupDTO;
 import com.socialnetwork.socialnetwork.dto.group.CreateGroupDTO;
+import com.socialnetwork.socialnetwork.dto.group.ResolvedGroupRequestDTO;
+import com.socialnetwork.socialnetwork.dto.group.ResolvedGroupRequestStatus;
 import com.socialnetwork.socialnetwork.dto.post.PostDTO;
 import com.socialnetwork.socialnetwork.entity.*;
 import com.socialnetwork.socialnetwork.mapper.GroupMapper;
@@ -16,10 +18,7 @@ import org.hibernate.query.sqm.produce.function.FunctionArgumentException;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
-import org.mockito.ArgumentCaptor;
-import org.mockito.Captor;
-import org.mockito.InjectMocks;
-import org.mockito.Mock;
+import org.mockito.*;
 import org.mockito.junit.jupiter.MockitoExtension;
 
 import java.util.*;
@@ -86,7 +85,6 @@ class GroupServiceTests {
         createGroupDTO = new CreateGroupDTO("Group1", true);
         expectedGroupDTO = new GroupDTO("Group1", "admin@admin.com", true, 1);
         expectedGroupDTO2 = new GroupDTO("Group2", "admin@admin.com", false, 2);
-        expectedPostDTO = new PostDTO(1,"NEKI TEXT","LALAL",admin.getEmail(),group.getName(),null);
     }
 
     @Test
@@ -231,7 +229,7 @@ class GroupServiceTests {
 
 
     @Test
-    void findGroupByName_success() { //ne
+    void findGroupByName_success() { //radii
         String name = "Group";
 
         List<Group> groups = Arrays.asList(group, group2);
@@ -249,18 +247,19 @@ class GroupServiceTests {
     }
 
     @Test
-    void getAllPostsByGroupId_success() {//radi ?
+    void getAllPostsByGroupId_success() {//radii
         when(jwtService.getUser()).thenReturn(admin);
         when(groupRepository.existsById(group.getId())).thenReturn(true);
         when(groupMemberRepository.existsByUserIdAndGroupId(admin.getId(), group.getId())).thenReturn(true);
         when(postRepository.findAllByGroup_Id(group.getId())).thenReturn(posts);
 
+        PostDTO expectedPostDTO1 = new PostDTO(post.getId(), post.getText(), post.getImgS3Key(), post.getOwner().getEmail(), post.getGroup().getName(), null);
         PostDTO expectedPostDTO2 = new PostDTO(post2.getId(), post2.getText(), post2.getImgS3Key(), post2.getOwner().getEmail(), post2.getGroup().getName(), null);
 
-        when(postMapper.postToPostDTO(post)).thenReturn(expectedPostDTO);
+        when(postMapper.postToPostDTO(post)).thenReturn(expectedPostDTO1);
         when(postMapper.postToPostDTO(post2)).thenReturn(expectedPostDTO2);
 
-        List<PostDTO> expectedPostDTOS = List.of(expectedPostDTO, expectedPostDTO2);
+        List<PostDTO> expectedPostDTOS = List.of(expectedPostDTO1, expectedPostDTO2);
 
         List<PostDTO> postDTOS = groupService.getAllPostsByGroupId(group.getId());
 
@@ -272,10 +271,8 @@ class GroupServiceTests {
         assertEquals(expectedPostDTOS, postDTOS);
     }
 
-
-
     @Test
-    void getAllPostsByGroupId_noGroup_throwsException() {
+    void getAllPostsByGroupId_noGroup_throwsException() { //radii
         when(jwtService.getUser()).thenReturn(admin);
         when(groupRepository.existsById(group.getId())).thenReturn(false);
 
@@ -290,7 +287,7 @@ class GroupServiceTests {
     }
 
     @Test
-    void getAllPostsByGroupId_notMember_throwsException() {//radi ?
+    void getAllPostsByGroupId_notMember_throwsException() {//radii
         when(jwtService.getUser()).thenReturn(admin);
         when(groupRepository.existsById(group.getId())).thenReturn(true);
         when(groupMemberRepository.existsByUserIdAndGroupId(admin.getId(), group.getId())).thenReturn(false);
@@ -307,10 +304,12 @@ class GroupServiceTests {
     }
 
     @Test
-    void deleteGroup_success() { //radi
+    void deleteGroup_success() { //radii
         when(jwtService.getUser()).thenReturn(admin);
 
         when(groupRepository.existsByIdAndAdminId(group.getId(),admin.getId())).thenReturn(true);
+
+        doNothing().when(groupRepository).deleteById(group.getId());
 
         assertDoesNotThrow(() -> groupService.deleteGroup(group.getId()));
 
@@ -321,7 +320,7 @@ class GroupServiceTests {
         verify(jwtService).getUser();
     }
     @Test
-    void deleteGroup_throwsException() { //radi
+    void deleteGroup_throwsException() { //radii
         when(jwtService.getUser()).thenReturn(admin);
 
         when(groupRepository.existsByIdAndAdminId(group.getId(),admin.getId())).thenReturn(false);
@@ -335,31 +334,55 @@ class GroupServiceTests {
         verify(jwtService).getUser();
     }
 
+
     @Test
-    void createRequestToJoinGroup_success() { //ne
+    void createRequestToJoinGroup_success() {//radii
+
         when(jwtService.getUser()).thenReturn(admin);
-
-        when(groupRepository.findById(groupCaptor.capture().getId()))
-                .thenAnswer(invocation -> invocation.getArgument(0));
-        when(groupRequestRepository.existsByUserIdAndGroupId(admin.getId(),groupCaptor.capture().getId())).thenReturn(false);
-        when(groupMemberRepository.existsByUserIdAndGroupId(admin.getId(),groupCaptor.capture().getId())).thenReturn(false);
-        when(groupCaptor.getValue().isPublic()).thenReturn(true);
-
+        when(groupRepository.findById(anyInt())).thenReturn(Optional.of(group));
+        when(groupRequestRepository.existsByUserIdAndGroupId(anyInt(), anyInt())).thenReturn(false);
+        when(groupMemberRepository.existsByUserIdAndGroupId(anyInt(), anyInt())).thenReturn(false);
         when(groupMemberRepository.save(groupMemberCaptor.capture()))
                 .thenAnswer(invocation -> invocation.getArgument(0));
 
-        // Verify that no exceptions are thrown
-        assertDoesNotThrow(() -> groupService.deleteGroup(group.getId()));
+        // Invoke the method with a group ID (assuming 1 is the group ID)
+        ResolvedGroupRequestDTO result = groupService.createRequestToJoinGroup(1);
 
-        // Verify that deleteById method is called
-        verify(groupRepository).deleteById(group.getId());
-
-        // Verify that existsByIdAndAdminId method is called with the correct arguments
-        verify(groupRepository).existsByIdAndAdminId(group.getId(), admin.getId());
-
-        // Verify that getUser method is called
+        // Verify that the getUser method was called
         verify(jwtService).getUser();
+
+        // Verify that the findById method was called with the correct argument
+        verify(groupRepository).findById(1);
+
+        // Verify that existsByUserIdAndGroupId was called with the correct arguments
+        verify(groupRequestRepository).existsByUserIdAndGroupId(admin.getId(), 1);
+        verify(groupMemberRepository).existsByUserIdAndGroupId(admin.getId(), 1);
+
+        // Verify that save method was called on groupMemberRepository with the correct argument
+        ArgumentCaptor<GroupMember> groupMemberCaptor = ArgumentCaptor.forClass(GroupMember.class);
+        verify(groupMemberRepository).save(groupMemberCaptor.capture());
+        GroupMember savedGroupMember = groupMemberCaptor.getValue();
+
+        // Assert that the saved group member has the expected properties
+        assertNotNull(savedGroupMember);
+        assertEquals(admin.getId(), savedGroupMember.getMember().getId());
+        assertEquals(group.getId(), savedGroupMember.getGroup().getId());
+
+        // Add more assertions based on the behavior of the group (public or private)
+        if (group.isPublic()) {
+            // For a public group, verify the returned ResolvedGroupRequestDTO
+            assertNotNull(result);
+            assertEquals(group.getId(), result.group().idGroup());
+            assertEquals(ResolvedGroupRequestStatus.REQUEST_TO_JOIN_GROUP_ACCEPTED, result.status());
+        } else {
+            // For a private group, verify that a group request was created
+            assertNotNull(result);
+            assertEquals(admin.getId(), result.user().id());
+            assertEquals(group.getId(), result.group().idGroup());
+            assertEquals(ResolvedGroupRequestStatus.REQUEST_TO_JOIN_GROUP_CREATED, result.status());
+        }
     }
+
 
 
 
