@@ -15,6 +15,7 @@ import com.socialnetwork.socialnetwork.entity.Group;
 import com.socialnetwork.socialnetwork.entity.Post;
 import com.socialnetwork.socialnetwork.entity.User;
 import com.socialnetwork.socialnetwork.service.GroupService;
+import org.hibernate.query.sqm.produce.function.FunctionArgumentException;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -28,13 +29,11 @@ import org.springframework.test.web.servlet.request.MockMvcRequestBuilders;
 import org.springframework.test.web.servlet.setup.MockMvcBuilders;
 
 import java.time.LocalDateTime;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Collections;
-import java.util.List;
+import java.util.*;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.mockito.Mockito.*;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
 @ExtendWith(MockitoExtension.class)
@@ -126,6 +125,39 @@ class GroupControllerTests {
     }
 
     @Test
+    void leaveGroup_success() throws Exception {
+
+        Integer idGroup = 1;
+
+        doNothing().when(groupService).leaveGroup(idGroup);
+
+        mockMvc.perform(MockMvcRequestBuilders.delete("/api/groups/{idGroup}/leave", idGroup)
+                        .contentType(MediaType.APPLICATION_JSON))
+                .andExpect(status().isOk());
+
+        verify(groupService).leaveGroup(idGroup);
+
+    }
+
+    @Test
+    void removeFromGroup_success() throws Exception {
+
+        Integer idGroup = 1;
+        Integer idUser = 3;
+
+        doNothing().when(groupService).removeMember(idGroup, idUser);
+
+        mockMvc.perform(MockMvcRequestBuilders.delete("/api/groups/{idGroup}/members/{idUser}",
+                        idGroup, idUser).contentType(MediaType.APPLICATION_JSON))
+                .andExpect(status().isOk());
+
+        verify(groupService).removeMember(idGroup, idUser);
+
+    }
+
+
+
+    @Test
     void findGroupsByName_success() throws Exception {
         String groupName = "Group";
 
@@ -148,6 +180,24 @@ class GroupControllerTests {
                 });
     }
 
+    @Test
+    void findGroupsByName_throwsException() throws Exception {
+        String groupName = "Test Group";
+        // Mock the method to throw the exception
+        doThrow(new FunctionArgumentException("Group search failed"))
+                .when(groupService).findByName(anyString());
+
+        MockHttpServletRequestBuilder mockRequest = MockMvcRequestBuilders.get("/api/groups")
+                .param("name", groupName)
+                .accept(MediaType.APPLICATION_JSON);
+
+        mockMvc.perform(mockRequest)
+                .andExpect(status().isBadRequest())
+                .andExpect(result -> {
+                    String responseBody = result.getResponse().getContentAsString();
+                    assertEquals("Group search failed", objectMapper.readTree(responseBody).get("message").asText());
+                });
+    }
 
     @Test
     void deleteGroup_success() throws Exception {
@@ -162,6 +212,26 @@ class GroupControllerTests {
 
         verify(groupService).deleteGroup(idGroup);
     }
+
+
+    @Test
+    void deleteGroup_throwsException() throws Exception {//ne radi
+        Integer idGroup = 1;
+
+        // Throw an exception when deleteGroup is called with idGroup
+        doThrow(new FunctionArgumentException("Invalid group ID")).when(groupService).deleteGroup(idGroup);
+
+        MockHttpServletRequestBuilder mockRequest = MockMvcRequestBuilders
+                .delete("/api/groups/{idGroup}", idGroup)
+                .contentType(MediaType.APPLICATION_JSON);
+
+        mockMvc.perform(mockRequest)
+                .andExpect(status().isBadRequest()) // Expecting a 400 Bad Request status
+                .andExpect(jsonPath("$.message").value("Invalid group ID")); // Verify the error message
+
+        verify(groupService).deleteGroup(idGroup);
+    }
+
 
 
     @Test
@@ -206,36 +276,5 @@ class GroupControllerTests {
     }
 
 
-
-    @Test
-    void leaveGroup_success() throws Exception {
-
-        Integer idGroup = 1;
-
-        doNothing().when(groupService).leaveGroup(idGroup);
-
-        mockMvc.perform(MockMvcRequestBuilders.delete("/api/groups/{idGroup}/leave", idGroup)
-                        .contentType(MediaType.APPLICATION_JSON))
-                .andExpect(status().isOk());
-
-        verify(groupService).leaveGroup(idGroup);
-
-    }
-
-    @Test
-    void removeFromGroup_success() throws Exception {
-
-        Integer idGroup = 1;
-        Integer idUser = 3;
-
-        doNothing().when(groupService).removeMember(idGroup, idUser);
-
-        mockMvc.perform(MockMvcRequestBuilders.delete("/api/groups/{idGroup}/members/{idUser}",
-                        idGroup, idUser).contentType(MediaType.APPLICATION_JSON))
-                .andExpect(status().isOk());
-
-        verify(groupService).removeMember(idGroup, idUser);
-
-    }
 
 }

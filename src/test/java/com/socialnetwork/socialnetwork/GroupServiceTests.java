@@ -2,12 +2,14 @@ package com.socialnetwork.socialnetwork;
 
 import com.socialnetwork.socialnetwork.dto.group.GroupDTO;
 import com.socialnetwork.socialnetwork.dto.group.CreateGroupDTO;
-import com.socialnetwork.socialnetwork.entity.Group;
-import com.socialnetwork.socialnetwork.entity.GroupMember;
-import com.socialnetwork.socialnetwork.entity.User;
+import com.socialnetwork.socialnetwork.dto.post.PostDTO;
+import com.socialnetwork.socialnetwork.entity.*;
 import com.socialnetwork.socialnetwork.mapper.GroupMapper;
+import com.socialnetwork.socialnetwork.mapper.PostMapper;
 import com.socialnetwork.socialnetwork.repository.GroupMemberRepository;
 import com.socialnetwork.socialnetwork.repository.GroupRepository;
+import com.socialnetwork.socialnetwork.repository.GroupRequestRepository;
+import com.socialnetwork.socialnetwork.repository.PostRepository;
 import com.socialnetwork.socialnetwork.service.GroupService;
 import com.socialnetwork.socialnetwork.service.JwtService;
 import org.hibernate.query.sqm.produce.function.FunctionArgumentException;
@@ -33,12 +35,18 @@ class GroupServiceTests {
 
     @Mock
     private GroupRepository groupRepository;
+    @Mock
+    private GroupRequestRepository groupRequestRepository;
 
     @Mock
     private GroupMapper groupMapper;
+    @Mock
+    private PostMapper postMapper;
 
     @Mock
     private GroupMemberRepository groupMemberRepository;
+    @Mock
+    private PostRepository postRepository;
 
     @InjectMocks
     private GroupService groupService;
@@ -46,14 +54,20 @@ class GroupServiceTests {
     private User admin;
     private User user;
     private Group group;
+    private Post post;
+    private Post post2;
+    private List<Post> posts;
     private Group group2;
     private GroupMember groupMember;
     private CreateGroupDTO createGroupDTO;
     private GroupDTO expectedGroupDTO;
+    private PostDTO expectedPostDTO;
     private GroupDTO expectedGroupDTO2;
 
     @Captor
     private ArgumentCaptor<Group> groupCaptor;
+    @Captor
+    private ArgumentCaptor<List<Post>> postsCaptor;
     @Captor
     private ArgumentCaptor<GroupMember> groupMemberCaptor;
     @Captor
@@ -65,10 +79,14 @@ class GroupServiceTests {
         user = new User(2, "user@user.com", "");
         group = new Group(1, "Group1", admin, true, null);
         group2 = new Group(2, "Group2", admin, false, null);
+        post = new Post(1,true,"NEKI TEXT","LALAL",admin,group,null);
+        post2 = new Post(2,false,"NEKI TEXT2","LALAL2",admin,group,null);
+        posts = List.of(post,post2);
         groupMember = new GroupMember(1, user, group);
         createGroupDTO = new CreateGroupDTO("Group1", true);
         expectedGroupDTO = new GroupDTO("Group1", "admin@admin.com", true, 1);
         expectedGroupDTO2 = new GroupDTO("Group2", "admin@admin.com", false, 2);
+        expectedPostDTO = new PostDTO(1,"NEKI TEXT","LALAL",admin.getEmail(),group.getName(),null);
     }
 
     @Test
@@ -81,80 +99,6 @@ class GroupServiceTests {
 
         verify(jwtService).getUser();
         verify(groupRepository).existsByName(createGroupDTO.name());
-    }
-
-    @Test
-    void findGroupByName_success() {
-        String name = "Group";
-
-        List<Group> groups = Arrays.asList(group, group2);
-
-        when(groupRepository.findAllByNameStartingWith(name)).thenReturn(groups);
-
-        List<GroupDTO> result = groupService.findByName(name);
-
-        verify(groupRepository).findAllByNameStartingWith(name);
-
-        assertNotNull(result);
-        assertEquals(2, result.size());
-        assertEquals(expectedGroupDTO, result.get(0));
-        assertEquals(expectedGroupDTO2, result.get(1));
-    }
-
-    @Test
-    void deleteGroup_success() {
-        when(jwtService.getUser()).thenReturn(admin);
-
-        doNothing().when(groupRepository).deleteById(group.getId());
-        when(groupRepository.existsByIdAndAdminId(group.getId(),admin.getId())).thenReturn(true);
-
-        // Verify that no exceptions are thrown
-        assertDoesNotThrow(() -> groupService.deleteGroup(group.getId()));
-
-        // Verify that deleteById method is called
-        verify(groupRepository).deleteById(group.getId());
-
-        // Verify that existsByIdAndAdminId method is called with the correct arguments
-        verify(groupRepository).existsByIdAndAdminId(group.getId(), admin.getId());
-
-        // Verify that getUser method is called
-        verify(jwtService).getUser();
-    }
-    @Test
-    void deleteGroup_throwsException() {
-        when(jwtService.getUser()).thenReturn(admin);
-
-        when(groupRepository.existsByIdAndAdminId(group.getId(),admin.getId())).thenReturn(false);
-
-        assertThrows(FunctionArgumentException.class, () -> groupService.deleteGroup(group.getId()),
-                "There is no group with given id or id of admin");
-
-
-        // Verify that existsByIdAndAdminId method is called with the correct arguments
-        verify(groupRepository).existsByIdAndAdminId(group.getId(), admin.getId());
-
-        // Verify that getUser method is called
-        verify(jwtService).getUser();
-    }
-
-    @Test
-    void createRequestToJoinGroup_success() {
-        when(jwtService.getUser()).thenReturn(admin);
-
-        doNothing().when(groupRepository).deleteById(group.getId());
-        when(groupRepository.existsByIdAndAdminId(group.getId(),admin.getId())).thenReturn(true);
-
-        // Verify that no exceptions are thrown
-        assertDoesNotThrow(() -> groupService.deleteGroup(group.getId()));
-
-        // Verify that deleteById method is called
-        verify(groupRepository).deleteById(group.getId());
-
-        // Verify that existsByIdAndAdminId method is called with the correct arguments
-        verify(groupRepository).existsByIdAndAdminId(group.getId(), admin.getId());
-
-        // Verify that getUser method is called
-        verify(jwtService).getUser();
     }
 
     @Test
@@ -283,5 +227,140 @@ class GroupServiceTests {
         assertEquals(group.getId(), idCaptor.getAllValues().get(0));
         assertEquals(user.getId(), idCaptor.getAllValues().get(1));
     }
+
+
+
+    @Test
+    void findGroupByName_success() { //ne
+        String name = "Group";
+
+        List<Group> groups = Arrays.asList(group, group2);
+
+        when(groupRepository.findAllByNameStartingWith(name)).thenReturn(groups);
+
+        List<GroupDTO> result = groupService.findByName(name);
+
+        verify(groupRepository).findAllByNameStartingWith(name);
+
+        assertNotNull(result);
+        assertEquals(2, result.size());
+        assertEquals(expectedGroupDTO, result.get(0));
+        assertEquals(expectedGroupDTO2, result.get(1));
+    }
+
+    @Test
+    void getAllPostsByGroupId_success() {//radi ?
+        when(jwtService.getUser()).thenReturn(admin);
+        when(groupRepository.existsById(group.getId())).thenReturn(true);
+        when(groupMemberRepository.existsByUserIdAndGroupId(admin.getId(), group.getId())).thenReturn(true);
+        when(postRepository.findAllByGroup_Id(group.getId())).thenReturn(posts);
+
+        PostDTO expectedPostDTO2 = new PostDTO(post2.getId(), post2.getText(), post2.getImgS3Key(), post2.getOwner().getEmail(), post2.getGroup().getName(), null);
+
+        when(postMapper.postToPostDTO(post)).thenReturn(expectedPostDTO);
+        when(postMapper.postToPostDTO(post2)).thenReturn(expectedPostDTO2);
+
+        List<PostDTO> expectedPostDTOS = List.of(expectedPostDTO, expectedPostDTO2);
+
+        List<PostDTO> postDTOS = groupService.getAllPostsByGroupId(group.getId());
+
+        verify(jwtService).getUser();
+        verify(groupRepository).existsById(group.getId());
+        verify(groupMemberRepository).existsByUserIdAndGroupId(admin.getId(), group.getId());
+        verify(postRepository).findAllByGroup_Id(group.getId());
+
+        assertEquals(expectedPostDTOS, postDTOS);
+    }
+
+
+
+    @Test
+    void getAllPostsByGroupId_noGroup_throwsException() {
+        when(jwtService.getUser()).thenReturn(admin);
+        when(groupRepository.existsById(group.getId())).thenReturn(false);
+
+        FunctionArgumentException exception = assertThrows(FunctionArgumentException.class, () -> {
+            groupService.getAllPostsByGroupId(group.getId());
+        });
+
+        assertEquals("Group with that id does not exists", exception.getMessage());
+
+        verify(jwtService).getUser();
+        verify(groupRepository).existsById(group.getId());
+    }
+
+    @Test
+    void getAllPostsByGroupId_notMember_throwsException() {//radi ?
+        when(jwtService.getUser()).thenReturn(admin);
+        when(groupRepository.existsById(group.getId())).thenReturn(true);
+        when(groupMemberRepository.existsByUserIdAndGroupId(admin.getId(), group.getId())).thenReturn(false);
+
+        FunctionArgumentException exception = assertThrows(FunctionArgumentException.class, () -> {
+            groupService.getAllPostsByGroupId(group.getId());
+        });
+
+        assertEquals("User is not member of give group!", exception.getMessage());
+
+        verify(jwtService).getUser();
+        verify(groupRepository).existsById(group.getId());
+        verify(groupMemberRepository).existsByUserIdAndGroupId(admin.getId(), group.getId());
+    }
+
+    @Test
+    void deleteGroup_success() { //radi
+        when(jwtService.getUser()).thenReturn(admin);
+
+        when(groupRepository.existsByIdAndAdminId(group.getId(),admin.getId())).thenReturn(true);
+
+        assertDoesNotThrow(() -> groupService.deleteGroup(group.getId()));
+
+        verify(groupRepository).deleteById(group.getId());
+
+        verify(groupRepository).existsByIdAndAdminId(group.getId(), admin.getId());
+
+        verify(jwtService).getUser();
+    }
+    @Test
+    void deleteGroup_throwsException() { //radi
+        when(jwtService.getUser()).thenReturn(admin);
+
+        when(groupRepository.existsByIdAndAdminId(group.getId(),admin.getId())).thenReturn(false);
+
+        assertThrows(FunctionArgumentException.class, () -> groupService.deleteGroup(group.getId()),
+                "There is no group with given id or id of admin");
+
+
+        verify(groupRepository).existsByIdAndAdminId(group.getId(), admin.getId());
+
+        verify(jwtService).getUser();
+    }
+
+    @Test
+    void createRequestToJoinGroup_success() { //ne
+        when(jwtService.getUser()).thenReturn(admin);
+
+        when(groupRepository.findById(groupCaptor.capture().getId()))
+                .thenAnswer(invocation -> invocation.getArgument(0));
+        when(groupRequestRepository.existsByUserIdAndGroupId(admin.getId(),groupCaptor.capture().getId())).thenReturn(false);
+        when(groupMemberRepository.existsByUserIdAndGroupId(admin.getId(),groupCaptor.capture().getId())).thenReturn(false);
+        when(groupCaptor.getValue().isPublic()).thenReturn(true);
+
+        when(groupMemberRepository.save(groupMemberCaptor.capture()))
+                .thenAnswer(invocation -> invocation.getArgument(0));
+
+        // Verify that no exceptions are thrown
+        assertDoesNotThrow(() -> groupService.deleteGroup(group.getId()));
+
+        // Verify that deleteById method is called
+        verify(groupRepository).deleteById(group.getId());
+
+        // Verify that existsByIdAndAdminId method is called with the correct arguments
+        verify(groupRepository).existsByIdAndAdminId(group.getId(), admin.getId());
+
+        // Verify that getUser method is called
+        verify(jwtService).getUser();
+    }
+
+
 
 }
