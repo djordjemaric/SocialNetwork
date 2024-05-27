@@ -1,6 +1,6 @@
 package com.socialnetwork.socialnetwork.exceptions;
 
-public class ResourceNotFoundException extends RuntimeException{
+public class ResourceNotFoundException extends Exception{
     private final ErrorCode errorCode;
 
     public ResourceNotFoundException(ErrorCode errorCode, String message){
