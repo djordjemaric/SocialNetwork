@@ -11,6 +11,7 @@ public enum ErrorCode {
     ERROR_FINDING_USER_BY_JWT,
     //Post
     ERROR_FINDING_POST,
-    //Group
-    ERROR_FINDING_GROUP,
+    ERROR_CREATING_POST,
+    ERROR_UPDATING_POST,
+    ERROR_DELETING_POST
 }

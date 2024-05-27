@@ -62,7 +62,7 @@ public class PostService {
         }
     }
 
-    public PostDTO getById(Integer idPost) throws ResourceNotFoundException, BusinessLogicException, AccessDeniedException {
+    public PostDTO getById(Integer idPost) throws ResourceNotFoundException, AccessDeniedException {
         User user = jwtService.getUser();
         Post post = postRepository.findById(idPost)
                 .orElseThrow(() -> new ResourceNotFoundException(ErrorCode.ERROR_FINDING_POST, "The post with the id of " +
@@ -70,7 +70,7 @@ public class PostService {
 
         if (!post.isPublic() && post.getGroup() == null) {
             if (friendsRepository.areTwoUsersFriends(post.getOwner().getId(), user.getId()).isEmpty()) {
-                throw new BusinessLogicException(ErrorCode.ERROR_USERS_NOT_FRIENDS, "You cannot see the post because you are not friends with the post owner.");
+                throw new AccessDeniedException("You cannot see the post because you are not friends with the post owner.");
             }
         }
 
@@ -83,11 +83,11 @@ public class PostService {
         return postMapper.postToPostDTO(post);
     }
 
-    public PostDTO createPostInGroup(CreatePostDTO postDTO) throws ResourceNotFoundException, AccessDeniedException {
+    public PostDTO createPostInGroup(CreatePostDTO postDTO) throws ResourceNotFoundException, AccessDeniedException, BusinessLogicException {
         User user = jwtService.getUser();
 
         Group group = groupRepository.findById(postDTO.idGroup()).orElseThrow(
-                () -> new ResourceNotFoundException(ErrorCode.ERROR_FINDING_GROUP, "There is no group with the id of " + postDTO.idGroup()));
+                () -> new BusinessLogicException(ErrorCode.ERROR_CREATING_POST, "The group in which you tried to create a post doesn't exist."));
 
         if (!groupMemberRepository.existsByUserIdAndGroupId(user.getId(), postDTO.idGroup())) {
             throw new AccessDeniedException("You cannot create post because you are not a member of this group.");
@@ -106,13 +106,13 @@ public class PostService {
         return postMapper.postToPostDTO(post);
     }
 
-    public PostDTO updatePost(Integer idPost, UpdatePostDTO updatePostDTO) throws ResourceNotFoundException, AccessDeniedException {
+    public PostDTO updatePost(Integer idPost, UpdatePostDTO updatePostDTO) throws ResourceNotFoundException, AccessDeniedException, BusinessLogicException {
         User user = jwtService.getUser();
 
         Post post = postRepository.findById(idPost).orElseThrow(() ->
-                new ResourceNotFoundException(ErrorCode.ERROR_FINDING_POST, "There is no post with the id of " + idPost));
+                new BusinessLogicException(ErrorCode.ERROR_UPDATING_POST, "The post which you are trying to update doesn't exist."));
         if (!(Objects.equals(post.getOwner().getId(), user.getId()))) {
-            throw new AccessDeniedException("User is not the owner!");
+            throw new AccessDeniedException("Only the owner can update this post!");
         }
 
         if (updatePostDTO.img() != null && post.getImgS3Key() != null) {
@@ -126,9 +126,9 @@ public class PostService {
     }
 
 
-    public void deletePost(Integer idPost) throws ResourceNotFoundException, AccessDeniedException {
+    public void deletePost(Integer idPost) throws ResourceNotFoundException, AccessDeniedException, BusinessLogicException {
         Post post = postRepository.findById(idPost).orElseThrow(() ->
-                new ResourceNotFoundException(ErrorCode.ERROR_FINDING_POST, "There is no post with the id of " + idPost));
+                new BusinessLogicException(ErrorCode.ERROR_DELETING_POST, "The post which you are trying to delete doesn't exist."));
         User user = jwtService.getUser();
         if (post.getGroup() != null) {
             if (Objects.equals(post.getGroup().getAdmin().getId(), user.getId())) {

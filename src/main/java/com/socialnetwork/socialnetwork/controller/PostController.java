@@ -38,7 +38,7 @@ public class PostController {
 
     @ResponseStatus(HttpStatus.CREATED)
     @PostMapping
-    public PostDTO save(@ModelAttribute CreatePostDTO postDTO) throws ResourceNotFoundException, AccessDeniedException {
+    public PostDTO save(@ModelAttribute CreatePostDTO postDTO) throws ResourceNotFoundException, AccessDeniedException, BusinessLogicException {
         if (postDTO.idGroup() == null) {
             return postService.createPostOnTimeline(postDTO);
         }
@@ -47,7 +47,7 @@ public class PostController {
 
     @ResponseStatus(HttpStatus.OK)
     @PutMapping("/{id}")
-    public PostDTO update(@PathVariable Integer id, @RequestBody UpdatePostDTO postDTO) throws ResourceNotFoundException, AccessDeniedException {
+    public PostDTO update(@PathVariable Integer id, @RequestBody UpdatePostDTO postDTO) throws ResourceNotFoundException, AccessDeniedException, BusinessLogicException {
         return postService.updatePost(id, postDTO);
     }
 
@@ -66,7 +66,7 @@ public class PostController {
 
     @ResponseStatus(HttpStatus.OK)
     @DeleteMapping("/{id}")
-    public void delete(@PathVariable Integer id) throws ResourceNotFoundException, AccessDeniedException {
+    public void delete(@PathVariable Integer id) throws ResourceNotFoundException, AccessDeniedException, BusinessLogicException {
         postService.deletePost(id);
     }
 
