@@ -127,28 +127,28 @@ class GroupServiceTests {
     void leaveGroup_notMember_throwsException() throws ResourceNotFoundException{
         when(jwtService.getUser()).thenReturn(user);
         when(groupRepository.findById(group.getId())).thenReturn(Optional.of(group));
-        when(groupMemberRepository.findByMember(user)).thenReturn(Optional.empty());
+        when(groupMemberRepository.findByMemberAndGroup(user, group)).thenReturn(Optional.empty());
 
         assertThrows(ResourceNotFoundException.class, () -> groupService.leaveGroup(group.getId()),
                 "User is not member of group");
 
         verify(jwtService).getUser();
         verify(groupRepository).findById(group.getId());
-        verify(groupMemberRepository).findByMember(user);
+        verify(groupMemberRepository).findByMemberAndGroup(user, group);
     }
 
     @Test
     void leaveGroup_success() throws BusinessLogicException, ResourceNotFoundException {
         when(jwtService.getUser()).thenReturn(user);
         when(groupRepository.findById(group.getId())).thenReturn(Optional.of(group));
-        when(groupMemberRepository.findByMember(user)).thenReturn(Optional.of(groupMember));
+        when(groupMemberRepository.findByMemberAndGroup(user, group)).thenReturn(Optional.of(groupMember));
 
         groupService.leaveGroup(group.getId());
 
         verify(jwtService).getUser();
         verify(groupRepository).findById(idCaptor.capture());
         assertEquals(group.getId(), idCaptor.getValue());
-        verify(groupMemberRepository).findByMember(user);
+        verify(groupMemberRepository).findByMemberAndGroup(user, group);
         verify(groupMemberRepository).delete(groupMember);
     }
 

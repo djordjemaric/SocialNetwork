@@ -145,8 +145,7 @@ public class GroupService {
         if (group.getAdmin().getId().equals(user.getId())) {
             throw new BusinessLogicException(ERROR_LEAVING_GROUP, "Admin can't leave a group.");
         }
-        GroupMember groupMember = groupMemberRepository.findByMember(user).orElseThrow(() ->
-                new ResourceNotFoundException(ERROR_LEAVING_GROUP, "You are not a member of that group!"));
+        GroupMember groupMember = groupMemberRepository.findByMemberAndGroup(user, group).orElseThrow(() -> new FunctionArgumentException("User is not member of group"));
         groupMemberRepository.delete(groupMember);
     }
 
