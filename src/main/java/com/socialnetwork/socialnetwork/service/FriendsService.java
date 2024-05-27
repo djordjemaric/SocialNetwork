@@ -74,6 +74,7 @@ public class FriendsService {
 
     public List<FriendRequestDTO> getAllPendingRequestsForUser(){
         User currentUser = jwtService.getUser();
+
         return friendRequestRepository.getPendingForUser(currentUser.getId())
                 .stream()
                 .map(friendRequestMapper::entityToDTO)
