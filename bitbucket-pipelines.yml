@@ -52,7 +52,7 @@ pipelines:
       - step: *test
       - step: *testOIDC
       - step: *pushToECR
-  deploy-to-ecs:
-    - step: *build
-    - step: *testOIDC
-    - step: *pushToECR
+    deploy-to-ecs:
+      - step: *build
+      - step: *testOIDC
+      - step: *pushToECR
