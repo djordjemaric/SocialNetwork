@@ -43,10 +43,24 @@ public class PostController {
         return postService.createPostInGroup(postDTO);
     }
 
+    @PostMapping("/ai-generated")
+    public PostDTO save(@RequestBody AIGeneratedPostDTO postDTO) throws ResourceNotFoundException{
+        if (postDTO.idGroup() == null) {
+            return postService.createAIPostOnTimeline(postDTO);
+        }
+        return postService.createAIPostInGroup(postDTO);
+    }
+
     @ResponseStatus(HttpStatus.OK)
     @PutMapping("/{id}")
     public PostDTO update(@PathVariable Integer id, @RequestBody UpdatePostDTO postDTO) throws ResourceNotFoundException {
         return postService.updatePost(id, postDTO);
+    }
+
+    @ResponseStatus(HttpStatus.OK)
+    @DeleteMapping("/{id}")
+    public void delete(@PathVariable Integer id) throws ResourceNotFoundException {
+        postService.deletePost(id);
     }
 
     @ResponseStatus(HttpStatus.CREATED)
@@ -61,10 +75,4 @@ public class PostController {
     public ReplyDTO saveReply(@PathVariable Integer idPost,@PathVariable Integer commentId, @RequestBody CreateReplyDTO replyDTO) throws ResourceNotFoundException {
         return replyService.createReply(idPost,commentId, replyDTO);
     }
-    @ResponseStatus(HttpStatus.OK)
-    @DeleteMapping("/{id}")
-    public void delete(@PathVariable Integer id) throws ResourceNotFoundException {
-        postService.deletePost(id);
-    }
-
-    }
+}

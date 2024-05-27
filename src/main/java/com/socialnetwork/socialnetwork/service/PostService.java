@@ -1,6 +1,7 @@
 package com.socialnetwork.socialnetwork.service;
 
 import com.socialnetwork.socialnetwork.dto.post.CreatePostDTO;
+import com.socialnetwork.socialnetwork.dto.post.AIGeneratedPostDTO;
 import com.socialnetwork.socialnetwork.dto.post.PostDTO;
 import com.socialnetwork.socialnetwork.dto.post.UpdatePostDTO;
 import com.socialnetwork.socialnetwork.entity.Group;
@@ -30,8 +31,9 @@ public class PostService {
     private final S3Service s3Service;
     private final FriendsRepository friendsRepository;
     private final GroupMemberRepository groupMemberRepository;
+    private final AIService aiService;
 
-    public PostService(PostRepository postRepository, PostMapper postMapper, GroupRepository groupRepository, JwtService jwtService, S3Service s3Service, FriendsRepository friendsRepository, GroupMemberRepository groupMemberRepository) {
+    public PostService(PostRepository postRepository, PostMapper postMapper, GroupRepository groupRepository, JwtService jwtService, S3Service s3Service, FriendsRepository friendsRepository, GroupMemberRepository groupMemberRepository, AIService aiService) {
         this.postRepository = postRepository;
         this.postMapper = postMapper;
         this.groupRepository = groupRepository;
@@ -39,24 +41,26 @@ public class PostService {
         this.friendsRepository = friendsRepository;
         this.groupMemberRepository = groupMemberRepository;
         this.s3Service = s3Service;
+        this.aiService = aiService;
     }
+
     private String uploadImageAndGetKey(MultipartFile image) {
-        if(image==null){
+        if (image == null) {
             return null;
         }
-            String filename = image.getOriginalFilename();
-            if (filename == null) {
-                throw new IllegalArgumentException("Filename cannot be null");
-            }
+        String filename = image.getOriginalFilename();
+        if (filename == null) {
+            throw new IllegalArgumentException("Filename cannot be null");
+        }
 
-            String extension = filename
-                    .substring(filename.lastIndexOf("."));
+        String extension = filename
+                .substring(filename.lastIndexOf("."));
 
-            try (InputStream inputStream = image.getInputStream()) {
-                return s3Service.uploadToBucket(extension, inputStream);
-            } catch (IOException e) {
-                throw new RuntimeException(e);
-            }
+        try (InputStream inputStream = image.getInputStream()) {
+            return s3Service.uploadToBucket(extension, inputStream);
+        } catch (IOException e) {
+            throw new RuntimeException(e);
+        }
     }
 
     public PostDTO getById(Integer idPost) throws ResourceNotFoundException {
@@ -103,6 +107,20 @@ public class PostService {
         return postMapper.postToPostDTO(post);
     }
 
+    public PostDTO createAIPostOnTimeline(AIGeneratedPostDTO postDTO) throws ResourceNotFoundException {
+        String generatedText = aiService.generateText(postDTO.txtPrompt());
+        //null prosledjujemo umesto MultipartFile dok se ne napravi metoda u AIServisu
+        CreatePostDTO createPostDTO = postMapper.AIGeneratedPostDTOtoCreatePostDTO(postDTO, generatedText, null);
+        return createPostOnTimeline(createPostDTO);
+    }
+
+    public PostDTO createAIPostInGroup(AIGeneratedPostDTO postDTO) throws ResourceNotFoundException {
+        String generatedText = aiService.generateText(postDTO.txtPrompt());
+        //null prosledjujemo umesto MultipartFile dok se ne napravi metoda u AIServisu
+        CreatePostDTO createPostDTO = postMapper.AIGeneratedPostDTOtoCreatePostDTO(postDTO, generatedText, null);
+        return createPostInGroup(createPostDTO);
+    }
+
     public PostDTO updatePost(Integer idPost, UpdatePostDTO updatePostDTO) throws ResourceNotFoundException {
         User user = jwtService.getUser();
 
@@ -113,7 +131,7 @@ public class PostService {
         }
 
         if (updatePostDTO.img() != null && post.getImgS3Key() != null) {
-           s3Service.deleteFromBucket(post.getImgS3Key());
+            s3Service.deleteFromBucket(post.getImgS3Key());
         }
 
         String imgS3Key = uploadImageAndGetKey(updatePostDTO.img());

@@ -1,6 +1,7 @@
 package com.socialnetwork.socialnetwork.mapper;
 
 import com.socialnetwork.socialnetwork.dto.post.CreatePostDTO;
+import com.socialnetwork.socialnetwork.dto.post.AIGeneratedPostDTO;
 import com.socialnetwork.socialnetwork.dto.post.PostDTO;
 import com.socialnetwork.socialnetwork.dto.post.UpdatePostDTO;
 import com.socialnetwork.socialnetwork.entity.Group;
@@ -8,6 +9,7 @@ import com.socialnetwork.socialnetwork.entity.Post;
 import com.socialnetwork.socialnetwork.entity.User;
 import com.socialnetwork.socialnetwork.service.S3Service;
 import org.springframework.stereotype.Component;
+import org.springframework.web.multipart.MultipartFile;
 
 @Component
 public class PostMapper {
@@ -68,4 +70,17 @@ public class PostMapper {
             groupName,
             post.getComments());
     }
+
+    public CreatePostDTO AIGeneratedPostDTOtoCreatePostDTO(AIGeneratedPostDTO postDTO, String generatedText, MultipartFile img){
+        return new CreatePostDTO(
+                postDTO.isPublic(),
+                generatedText,
+                img,
+                postDTO.idGroup()
+        );
+    }
+
+
+
+
 }
