@@ -2,7 +2,6 @@ package com.socialnetwork.socialnetwork.service;
 
 import com.socialnetwork.socialnetwork.dto.group.*;
 import com.socialnetwork.socialnetwork.dto.post.PostDTO;
-import com.socialnetwork.socialnetwork.dto.user.PreviewUserDTO;
 import com.socialnetwork.socialnetwork.entity.*;
 import com.socialnetwork.socialnetwork.exceptions.ResourceNotFoundException;
 import com.socialnetwork.socialnetwork.mapper.GroupMapper;
