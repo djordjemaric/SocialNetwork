@@ -8,6 +8,7 @@ import com.socialnetwork.socialnetwork.dto.user.PreviewUserDTO;
 import com.socialnetwork.socialnetwork.entity.FriendRequest;
 import com.socialnetwork.socialnetwork.entity.Friends;
 import com.socialnetwork.socialnetwork.entity.User;
+import com.socialnetwork.socialnetwork.exceptions.ResourceNotFoundException;
 import com.socialnetwork.socialnetwork.mapper.FriendRequestMapper;
 import com.socialnetwork.socialnetwork.mapper.FriendsMapper;
 import com.socialnetwork.socialnetwork.repository.FriendRequestRepository;
@@ -39,7 +40,7 @@ public class FriendsService {
     }
 
 //    add 404 exception
-    public PreviewFriendRequestDTO createFriendRequest(SentFriendRequestDTO requestDTO){
+    public PreviewFriendRequestDTO createFriendRequest(SentFriendRequestDTO requestDTO) throws ResourceNotFoundException {
         User friend = userRepository.findByEmail(requestDTO.friendsEmail())
                 .orElseThrow(() -> new RuntimeException("User not found"));
 
@@ -64,7 +65,7 @@ public class FriendsService {
         return friendRequestMapper.entityToPreviewDTO(savedFriendRequest);
     }
 
-    public List<PreviewUserDTO> searchFriends(String searchTerm) {
+    public List<PreviewUserDTO> searchFriends(String searchTerm) throws ResourceNotFoundException {
         User currentUser = jwtService.getUser();
         List<User> foundFriends = friendsRepository.findUserFriendsWithSearch(currentUser.getId(), searchTerm);
         return foundFriends.stream()
@@ -72,7 +73,7 @@ public class FriendsService {
                 .toList();
     }
 
-    public List<FriendRequestDTO> getAllPendingRequestsForUser(){
+    public List<FriendRequestDTO> getAllPendingRequestsForUser() throws ResourceNotFoundException {
         User currentUser = jwtService.getUser();
         return friendRequestRepository.getPendingForUser(currentUser.getId())
                 .stream()
@@ -81,7 +82,7 @@ public class FriendsService {
     }
 
     @Transactional
-    public ResolvedFriendRequestDTO acceptRequest(Integer friendRequestId){
+    public ResolvedFriendRequestDTO acceptRequest(Integer friendRequestId) throws ResourceNotFoundException {
         User currentUser = jwtService.getUser();
 
         FriendRequest friendRequest = friendRequestRepository.findByIdAndTo_Id(friendRequestId, currentUser.getId())
@@ -94,7 +95,7 @@ public class FriendsService {
         return new ResolvedFriendRequestDTO("Successfully became friends with: " + friendsEntity.getFriend().getEmail());
     }
 
-    public ResolvedFriendRequestDTO declineRequest(Integer friendRequestId) {
+    public ResolvedFriendRequestDTO declineRequest(Integer friendRequestId) throws ResourceNotFoundException {
         User currentUser = jwtService.getUser();
 
         FriendRequest friendRequest = friendRequestRepository.findByIdAndTo_Id(friendRequestId, currentUser.getId())
@@ -105,7 +106,7 @@ public class FriendsService {
         return new ResolvedFriendRequestDTO("Successfully declined a request with: " + friendRequest.getFrom().getEmail());
     }
 
-    public void deleteFriend(Integer friendId){
+    public void deleteFriend(Integer friendId) throws ResourceNotFoundException {
         userRepository.findById(friendId).
                 orElseThrow(() -> new RuntimeException("Bad request"));
 

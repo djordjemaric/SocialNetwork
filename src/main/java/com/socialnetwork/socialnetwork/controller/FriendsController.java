@@ -5,6 +5,7 @@ import com.socialnetwork.socialnetwork.dto.friendRequest.FriendRequestDTO;
 import com.socialnetwork.socialnetwork.dto.friendRequest.PreviewFriendRequestDTO;
 import com.socialnetwork.socialnetwork.dto.friendRequest.SentFriendRequestDTO;
 import com.socialnetwork.socialnetwork.dto.user.PreviewUserDTO;
+import com.socialnetwork.socialnetwork.exceptions.ResourceNotFoundException;
 import com.socialnetwork.socialnetwork.service.FriendsService;
 import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.*;
@@ -23,37 +24,37 @@ public class FriendsController {
 
     @ResponseStatus(HttpStatus.OK)
     @GetMapping("/requests")
-    public List<FriendRequestDTO> getFriendRequests(){
+    public List<FriendRequestDTO> getFriendRequests() throws ResourceNotFoundException {
         return friendsService.getAllPendingRequestsForUser();
     }
 
     @ResponseStatus(HttpStatus.OK)
     @GetMapping("/search")
-    public List<PreviewUserDTO> searchFriends(@RequestParam("searchTerm") String searchTerm){
+    public List<PreviewUserDTO> searchFriends(@RequestParam("searchTerm") String searchTerm) throws ResourceNotFoundException {
         return friendsService.searchFriends(searchTerm);
     }
 
     @ResponseStatus(HttpStatus.CREATED)
     @PostMapping("/requests")
-    public PreviewFriendRequestDTO sendFriendRequest(@RequestBody SentFriendRequestDTO friendRequestDTO){
+    public PreviewFriendRequestDTO sendFriendRequest(@RequestBody SentFriendRequestDTO friendRequestDTO) throws ResourceNotFoundException {
         return friendsService.createFriendRequest(friendRequestDTO);
     }
 
     @ResponseStatus(HttpStatus.OK)
     @PostMapping("/requests/{friendRequestId}/accept")
-    public ResolvedFriendRequestDTO acceptFriendRequest(@PathVariable Integer friendRequestId){
+    public ResolvedFriendRequestDTO acceptFriendRequest(@PathVariable Integer friendRequestId) throws ResourceNotFoundException {
         return friendsService.acceptRequest(friendRequestId);
     }
 
     @ResponseStatus(HttpStatus.OK)
     @PostMapping("/requests/{friendRequestId}/decline")
-    public ResolvedFriendRequestDTO declineFriendRequest(@PathVariable Integer friendRequestId){
+    public ResolvedFriendRequestDTO declineFriendRequest(@PathVariable Integer friendRequestId) throws ResourceNotFoundException {
         return friendsService.declineRequest(friendRequestId);
     }
 
     @ResponseStatus(HttpStatus.OK)
     @DeleteMapping("/{id}")
-    public void deleteFriend(@PathVariable Integer id){
+    public void deleteFriend(@PathVariable Integer id) throws ResourceNotFoundException {
         friendsService.deleteFriend(id);
     }
 }
