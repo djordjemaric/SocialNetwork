@@ -2,16 +2,13 @@ package com.socialnetwork.socialnetwork.service;
 
 import com.socialnetwork.socialnetwork.dto.group.*;
 import com.socialnetwork.socialnetwork.dto.post.PostDTO;
-import com.socialnetwork.socialnetwork.dto.user.PreviewUserDTO;
 import com.socialnetwork.socialnetwork.entity.*;
 import com.socialnetwork.socialnetwork.exceptions.BusinessLogicException;
-import com.socialnetwork.socialnetwork.exceptions.ErrorCode;
 import com.socialnetwork.socialnetwork.exceptions.ResourceNotFoundException;
 import com.socialnetwork.socialnetwork.mapper.GroupMapper;
 import com.socialnetwork.socialnetwork.mapper.GroupRequestMapper;
 import com.socialnetwork.socialnetwork.mapper.PostMapper;
 import com.socialnetwork.socialnetwork.repository.*;
-import org.hibernate.query.sqm.produce.function.FunctionArgumentException;
 import org.springframework.security.access.AccessDeniedException;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -63,7 +60,7 @@ public class GroupService {
         User currentUser = jwtService.getUser();
 
         if (!groupRepository.existsById(idGroup)) {
-            throw new BusinessLogicException(ERROR_FINDING_GROUP, "Group with id "
+            throw new BusinessLogicException(ERROR_GETTING_GROUP_POSTS, "Group with id "
                     + idGroup + "does not exist.");
         }
 
@@ -128,7 +125,7 @@ public class GroupService {
     public List<GroupRequestDTO> getAllRequestsForGroup(Integer idGroup) throws BusinessLogicException, ResourceNotFoundException {
         User currentUser = jwtService.getUser();
         Group group = groupRepository.findById(idGroup).orElseThrow(() ->
-                new BusinessLogicException(ERROR_FINDING_GROUP, "Group with id "
+                new BusinessLogicException(ERROR_GETTING_GROUP_REQUESTS, "Group with id "
                         + idGroup + "does not exist"));
 
         if (!groupRepository.existsByAdmin(currentUser)) {
@@ -145,28 +142,28 @@ public class GroupService {
         User currentUser = jwtService.getUser();
 
         Group group = groupRepository.findById(idGroup).orElseThrow(() ->
-                new BusinessLogicException(ERROR_FINDING_GROUP, "Group with id "
+                new BusinessLogicException(ERROR_MANAGING_GROUP_REQUEST, "Group with id "
                         + idGroup + "does not exist"));
 
         GroupRequest request = groupRequestRepository.findById(idRequest).orElseThrow(() ->
-                new BusinessLogicException(ERROR_FINDING_GROUP_REQUEST, "Group request with id "
+                new BusinessLogicException(ERROR_MANAGING_GROUP_REQUEST, "Group request with id "
                         + idRequest + "does not exist"));
 
         User newMember = userRepository.findById(request.getUser().getId()).orElseThrow(() ->
-                new BusinessLogicException(ErrorCode.ERROR_FINDING_USER, "User with id " + request.getUser().getId() + "does not exist"));
+                new BusinessLogicException(ERROR_MANAGING_GROUP_REQUEST, "User with id " + request.getUser().getId() + "does not exist"));
 
         if (!groupRepository.existsByAdmin(currentUser)) {
-            throw new ResourceNotFoundException(ERROR_FINDING_GROUP, "Group for given admin " + currentUser
+            throw new BusinessLogicException(ERROR_MANAGING_GROUP_REQUEST, "Group for given admin " + currentUser
                     + " does not exist");
         }
 
         if (!groupRequestRepository.existsByUserAndGroup(newMember, group)) {
-            throw new ResourceNotFoundException(ERROR_FINDING_GROUP_REQUEST, "Request for given user " + newMember +
+            throw new BusinessLogicException(ERROR_MANAGING_GROUP_REQUEST, "Request for given user " + newMember +
                     " and group " + group + " does not exist");
         }
 
         if (group.isPublic()) {
-            throw new BusinessLogicException(ERROR_GROUP_IS_PUBLIC, "You can't accept or reject a request if group is public");
+            throw new BusinessLogicException(ERROR_MANAGING_GROUP_REQUEST, "You can't accept or reject a request if group is public");
         }
 
         return request;
