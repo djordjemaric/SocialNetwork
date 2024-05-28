@@ -52,7 +52,16 @@ definitions:
               AWS_OIDC_ROLE_ARN: 'arn:aws:iam::211125711045:role/bitbucket_oidc_role'
               IMAGE_NAME: social-network
               TAGS: 'latest ${BITBUCKET_COMMIT}'
-
+    - step: &deployToECS
+        trigger: manual
+        name: Deploy image to ECS
+        oidc: true
+        script:
+          - pipe: atlassian/aws-ecs-deploy:1.0.0
+            variables:
+              CLUSTER_NAME: 'arn:aws:ecs:eu-central-1:211125711045:cluster/SocialNetworkCluster'
+              SERVICE_NAME: 'arn:aws:ecs:eu-central-1:211125711045:service/SocialNetworkCluster/SocialNetworkService'
+              TASK_DEFINITION: 'arn:aws:ecs:eu-central-1:211125711045:task-definition/social-network-task:14'
 
 pipelines:
   branches:
@@ -61,3 +70,8 @@ pipelines:
       - step: *test
       - step: *testOIDC
       - step: *pushToECR
+    deploy-to-ecs:
+      - step: *build
+      - step: *testOIDC
+      - step: *pushToECR
+      - step: *deployToECS
