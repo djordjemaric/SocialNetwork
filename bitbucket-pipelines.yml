@@ -57,13 +57,13 @@ definitions:
         name: Deploy image to ECS
         oidc: true
         script:
-          - pipe: atlassian/aws-ecs-deploy:1.0.0
+          - pipe: atlassian/aws-ecs-deploy:1.12.1
             variables:
               AWS_DEFAULT_REGION: 'eu-central-1'
+              AWS_OIDC_ROLE_ARN: 'arn:aws:iam::211125711045:role/bitbucket_oidc_role'
               CLUSTER_NAME: 'arn:aws:ecs:eu-central-1:211125711045:cluster/SocialNetworkCluster'
               SERVICE_NAME: 'arn:aws:ecs:eu-central-1:211125711045:service/SocialNetworkCluster/SocialNetworkService'
               FORCE_NEW_DEPLOYMENT: 'true'
-
 pipelines:
   branches:
     master:
