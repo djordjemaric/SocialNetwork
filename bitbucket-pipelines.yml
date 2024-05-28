@@ -32,6 +32,8 @@ definitions:
           - mvn -B clean verify --file pom.xml
         artifacts:
           - target/site/jacoco/*
+        services:
+          - docker
     - step: &pushToECR
         trigger: manual
         name: Build image and push to ECR
@@ -46,6 +48,11 @@ definitions:
               TAGS: 'latest ${BITBUCKET_COMMIT}'
 
 pipelines:
+  default:
+    - step: *build
+    - step: *test
+    - step: *testOIDC
+    - step: *pushToECR
   branches:
     master:
       - step: *build
