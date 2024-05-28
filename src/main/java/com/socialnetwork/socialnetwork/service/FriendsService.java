@@ -72,6 +72,7 @@ public class FriendsService {
 
     public List<FriendRequestDTO> getAllPendingRequestsForUser() throws ResourceNotFoundException {
         User currentUser = jwtService.getUser();
+
         return friendRequestRepository.getPendingForUser(currentUser.getId())
                 .stream()
                 .map(friendRequestMapper::entityToDTO)

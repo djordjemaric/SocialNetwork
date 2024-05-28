@@ -24,4 +24,12 @@ public class GroupMapper {
                 group.getId());
     }
 
+    public GroupDTO groupToGroupDTO(Group group) {
+        return new GroupDTO(group.getName(),
+                group.getAdmin().getEmail(),
+                group.isPublic(),
+                group.getId());
+    }
+
+
 }
