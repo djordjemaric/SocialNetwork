@@ -59,9 +59,10 @@ definitions:
         script:
           - pipe: atlassian/aws-ecs-deploy:1.0.0
             variables:
+              AWS_DEFAULT_REGION: 'eu-central-1'
               CLUSTER_NAME: 'arn:aws:ecs:eu-central-1:211125711045:cluster/SocialNetworkCluster'
               SERVICE_NAME: 'arn:aws:ecs:eu-central-1:211125711045:service/SocialNetworkCluster/SocialNetworkService'
-#              TASK_DEFINITION: 'arn:aws:ecs:eu-central-1:211125711045:task-definition/social-network-task:14'
+              FORCE_NEW_DEPLOYMENT: 'true'
 
 pipelines:
   branches:
@@ -73,4 +74,5 @@ pipelines:
     deploy-to-ecs-ci-cd:
       - step: *build
       - step: *testOIDC
+      - step: *pushToECR
       - step: *deployToECS
