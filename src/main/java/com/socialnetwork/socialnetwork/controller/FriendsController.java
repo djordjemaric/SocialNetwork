@@ -9,6 +9,7 @@ import com.socialnetwork.socialnetwork.exceptions.BusinessLogicException;
 import com.socialnetwork.socialnetwork.exceptions.ErrorCode;
 import com.socialnetwork.socialnetwork.exceptions.ResourceNotFoundException;
 import com.socialnetwork.socialnetwork.service.FriendsService;
+import jakarta.validation.Valid;
 import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.*;
 
@@ -38,7 +39,7 @@ public class FriendsController {
 
     @ResponseStatus(HttpStatus.CREATED)
     @PostMapping("/requests")
-    public PreviewFriendRequestDTO sendFriendRequest(@RequestBody SentFriendRequestDTO friendRequestDTO) throws ResourceNotFoundException, BusinessLogicException {
+    public PreviewFriendRequestDTO sendFriendRequest(@RequestBody @Valid SentFriendRequestDTO friendRequestDTO) throws ResourceNotFoundException, BusinessLogicException {
         return friendsService.createFriendRequest(friendRequestDTO);
     }
 
