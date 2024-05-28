@@ -1,38 +1,61 @@
 package com.socialnetwork.socialnetwork.configuration;
 
-import com.socialnetwork.socialnetwork.exceptions.BusinessLogicException;
+import com.socialnetwork.socialnetwork.exceptions.*;
 import com.socialnetwork.socialnetwork.exceptions.IAMProviderException;
-import com.socialnetwork.socialnetwork.exceptions.ResourceNotFoundException;
-import org.hibernate.query.sqm.produce.function.FunctionArgumentException;
+import jakarta.validation.ConstraintViolationException;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.ControllerAdvice;
 import org.springframework.web.bind.annotation.ExceptionHandler;
-import org.springframework.web.context.request.WebRequest;
 import org.springframework.web.servlet.mvc.method.annotation.ResponseEntityExceptionHandler;
 
-import java.util.LinkedHashMap;
-import java.util.Map;
+import java.nio.file.AccessDeniedException;
+import java.text.DateFormat;
+import java.text.SimpleDateFormat;
+import java.util.Date;
 
 @ControllerAdvice
 public class GlobalExceptionHandler extends ResponseEntityExceptionHandler {
 
-    @ExceptionHandler({BusinessLogicException.class})
-    public ResponseEntity<Object> businessLogicExceptionHandler(BusinessLogicException exception){
-        switch(exception.getErrorCode()){
-            case ERROR_REGISTERING_USER: return ResponseEntity.status(HttpStatus.CONFLICT).body(exception.getMessage());
-        }
-        return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(exception.getMessage());
+    @ExceptionHandler({BusinessLogicException.class, IAMProviderException.class})
+    public ResponseEntity<Object> businessLogicAndIamExceptionHandler(SocialNetworkException exception){
+        ExceptionResponse exceptionResponse = new ExceptionResponse(exception.getErrorCode(), exception.getMessage(), getCurrentTimestamp());
+        return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(exception.getMessage());
     }
 
-    @ExceptionHandler({IAMProviderException.class})
-    public ResponseEntity<Object> iamProviderExceptionHandler(IAMProviderException exception){
-        return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(exception.getMessage());
+    @ExceptionHandler({ConstraintViolationException.class})
+    public ResponseEntity<Object> constraintViolationExceptionHandler(ConstraintViolationException exception){
+        ExceptionResponse exceptionResponse = new ExceptionResponse(ErrorCode.VALIDATION_ERROR, exception.getMessage(), getCurrentTimestamp());
+        return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(exception.getMessage());
+    }
+
+    @ExceptionHandler({AccessDeniedException.class})
+    public ResponseEntity<ExceptionResponse> accessDeniedExceptionHandler(AccessDeniedException exception){
+        ExceptionResponse exceptionResponse = new ExceptionResponse(ErrorCode.ERROR_ACCESS_DENIED, exception.getMessage(), getCurrentTimestamp());
+        return ResponseEntity.status(HttpStatus.FORBIDDEN).body(exceptionResponse);
     }
 
     @ExceptionHandler({ResourceNotFoundException.class})
-    public ResponseEntity<Object> resourceNotFoundExceptionHandler(ResourceNotFoundException exception){
-        return ResponseEntity.status(HttpStatus.NOT_FOUND).body(exception.getMessage());
+    public ResponseEntity<ExceptionResponse> resourceNotFoundExceptionHandler(ResourceNotFoundException exception){
+        ExceptionResponse exceptionResponse = new ExceptionResponse(exception.getErrorCode(), exception.getMessage(), getCurrentTimestamp());
+        return ResponseEntity.status(HttpStatus.NOT_FOUND).body(exceptionResponse);
     }
 
+    @ExceptionHandler({Exception.class})
+    public ResponseEntity<ExceptionResponse> genericExceptionHandler(Exception exception){
+        ExceptionResponse exceptionResponse = new ExceptionResponse(ErrorCode.SERVER_ERROR, exception.getMessage(), getCurrentTimestamp());
+        return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(exceptionResponse);
+    }
+
+    @ExceptionHandler({Error.class})
+    public ResponseEntity<ExceptionResponse> genericErrorHandler(Error error){
+        ExceptionResponse exceptionResponse = new ExceptionResponse(ErrorCode.SERVER_ERROR, error.getMessage(), getCurrentTimestamp());
+        return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(exceptionResponse);
+    }
+
+    private String getCurrentTimestamp(){
+        DateFormat dateFormat = new SimpleDateFormat("yyyy-mm-dd hh:mm:ss");
+        Date currentDate = new Date();
+        return dateFormat.format(currentDate);
+    }
 }
