@@ -126,7 +126,7 @@ public class GroupService {
                 new BusinessLogicException(ERROR_GETTING_GROUP_REQUESTS, "Group with id "
                         + idGroup + "does not exist"));
 
-        if (!group.getAdmin().equals(currentUser)) {
+        if (!group.getAdmin().getId().equals(currentUser.getId())) {
             throw new AccessDeniedException("You are not an admin of a given group " + group.getName());
         }
         List<GroupRequest> groupRequests = groupRequestRepository.findAllByGroup(group);
@@ -150,7 +150,7 @@ public class GroupService {
         User newMember = userRepository.findById(request.getUser().getId()).orElseThrow(() ->
                 new BusinessLogicException(ERROR_MANAGING_GROUP_REQUEST, "User with id " + request.getUser().getId() + "does not exist"));
 
-        if (!group.getAdmin().equals(currentUser)) {
+        if (!group.getAdmin().getId().equals(currentUser.getId())) {
             throw new AccessDeniedException("You are not an admin of a given group " + group.getName());
         }
 

@@ -2,6 +2,7 @@ package com.socialnetwork.socialnetwork;
 
 import com.socialnetwork.socialnetwork.entity.User;
 import com.socialnetwork.socialnetwork.exceptions.ResourceNotFoundException;
+import com.socialnetwork.socialnetwork.repository.UserRepository;
 import com.socialnetwork.socialnetwork.service.JwtService;
 import org.junit.jupiter.api.*;
 import org.mockito.Mock;
@@ -41,6 +42,9 @@ public abstract class IntegrationTestConfiguration {
     @Autowired
     protected TestRestTemplate restTemplate;
 
+    @Autowired
+    protected UserRepository userRepository;
+
     @Container
     @ServiceConnection
     protected static PostgreSQLContainer<?> postgres = new PostgreSQLContainer<>("postgres:14.2-alpine");
@@ -50,8 +54,11 @@ public abstract class IntegrationTestConfiguration {
 
     @BeforeEach
     void setUp() throws ResourceNotFoundException {
-        User testUser = new User(1,"vica.ristic@gmail.com", "93246812-3021-704e-9c37-bf46100f22dc");
-        when(jwtService.getUser()).thenReturn(testUser);
+        User testUser = new User();
+        testUser.setUserSub("93246812-3021-704e-9c37-bf46100f22dc");
+        testUser.setEmail("vica.ristic@gmail.com");
+        User savedUser = userRepository.save(testUser);
+        when(jwtService.getUser()).thenReturn(savedUser);
     }
 
     @Test
