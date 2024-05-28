@@ -21,7 +21,7 @@ public class SecurityConfiguration {
                     .csrf(AbstractHttpConfigurer::disable)
                     .authorizeHttpRequests(
                             auth -> auth
-                                .requestMatchers("/api/users/login", "/api/users/signup").permitAll()
+                                .requestMatchers("/api/users/login", "/api/users/signup", "/").permitAll()
                                 .anyRequest().authenticated()
                     )
                     .oauth2ResourceServer(oauth2 -> oauth2.jwt(withDefaults()))
