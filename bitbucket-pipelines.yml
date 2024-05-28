@@ -44,7 +44,7 @@ definitions:
               AWS_OIDC_ROLE_ARN: 'arn:aws:iam::211125711045:role/bitbucket_oidc_role'
               IMAGE_NAME: social-network
               TAGS: 'latest ${BITBUCKET_COMMIT}'
-              
+
 
 pipelines:
   branches:
