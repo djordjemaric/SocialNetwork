@@ -25,8 +25,6 @@ definitions:
         script:
           - *createOIDC
           - aws sts get-caller-identity
-
-
     - step: &test
         name: Run Tests and Generate Coverage Report
         caches:
@@ -53,7 +51,6 @@ definitions:
               IMAGE_NAME: social-network
               TAGS: 'latest ${BITBUCKET_COMMIT}'
     - step: &deployToECS
-        trigger: manual
         name: Deploy image to ECS
         oidc: true
         script:
