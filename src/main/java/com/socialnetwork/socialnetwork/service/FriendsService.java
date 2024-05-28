@@ -8,6 +8,9 @@ import com.socialnetwork.socialnetwork.dto.user.PreviewUserDTO;
 import com.socialnetwork.socialnetwork.entity.FriendRequest;
 import com.socialnetwork.socialnetwork.entity.Friends;
 import com.socialnetwork.socialnetwork.entity.User;
+import com.socialnetwork.socialnetwork.exceptions.BusinessLogicException;
+import com.socialnetwork.socialnetwork.exceptions.ErrorCode;
+import com.socialnetwork.socialnetwork.exceptions.ResourceNotFoundException;
 import com.socialnetwork.socialnetwork.mapper.FriendRequestMapper;
 import com.socialnetwork.socialnetwork.mapper.FriendsMapper;
 import com.socialnetwork.socialnetwork.repository.FriendRequestRepository;
@@ -38,33 +41,28 @@ public class FriendsService {
         this.jwtService = jwtService;
     }
 
-//    add 404 exception
-    public PreviewFriendRequestDTO createFriendRequest(SentFriendRequestDTO requestDTO){
+    public PreviewFriendRequestDTO createFriendRequest(SentFriendRequestDTO requestDTO) throws ResourceNotFoundException, BusinessLogicException {
         User friend = userRepository.findByEmail(requestDTO.friendsEmail())
-                .orElseThrow(() -> new RuntimeException("User not found"));
+                .orElseThrow(() -> new ResourceNotFoundException(ErrorCode.ERROR_FINDING_USER, "User not found. Wrong email sent"));
 
-//        extracting user from JwtService
         User currentUser = jwtService.getUser();
 
         if(currentUser.getId().equals(friend.getId())){
-            throw new RuntimeException("Can't send request to yourself");
+            throw new BusinessLogicException(ErrorCode.ERROR_CREATING_FRIEND_REQUEST, "Can't send request to yourself");
         }
 
-//        checking if they are alreaady friends
         if(friendsRepository.areTwoUsersFriends(currentUser.getId(),friend.getId()).isPresent()){
-            throw new RuntimeException("These users are already friends");
+            throw new BusinessLogicException(ErrorCode.ERROR_CREATING_FRIEND_REQUEST, "These users are already friends");
         }
-//        check if there is a existing request between these two
         if(friendRequestRepository.doesRequestExistsBetweenUsers(currentUser.getId(), friend.getId()).isPresent()){
-            throw new RuntimeException("There is already a pending request between these users");
+            throw new BusinessLogicException(ErrorCode.ERROR_CREATING_FRIEND_REQUEST, "There is already a pending request between these users");
         }
 
-//      Create and return a request
         FriendRequest savedFriendRequest = friendRequestRepository.save(friendRequestMapper.friendRequestFromUsers(currentUser, friend));
         return friendRequestMapper.entityToPreviewDTO(savedFriendRequest);
     }
 
-    public List<PreviewUserDTO> searchFriends(String searchTerm) {
+    public List<PreviewUserDTO> searchFriends(String searchTerm) throws ResourceNotFoundException {
         User currentUser = jwtService.getUser();
         List<User> foundFriends = friendsRepository.findUserFriendsWithSearch(currentUser.getId(), searchTerm);
         return foundFriends.stream()
@@ -72,8 +70,9 @@ public class FriendsService {
                 .toList();
     }
 
-    public List<FriendRequestDTO> getAllPendingRequestsForUser(){
+    public List<FriendRequestDTO> getAllPendingRequestsForUser() throws ResourceNotFoundException {
         User currentUser = jwtService.getUser();
+
         return friendRequestRepository.getPendingForUser(currentUser.getId())
                 .stream()
                 .map(friendRequestMapper::entityToDTO)
@@ -81,11 +80,11 @@ public class FriendsService {
     }
 
     @Transactional
-    public ResolvedFriendRequestDTO acceptRequest(Integer friendRequestId){
+    public ResolvedFriendRequestDTO acceptRequest(Integer friendRequestId) throws ResourceNotFoundException {
         User currentUser = jwtService.getUser();
 
         FriendRequest friendRequest = friendRequestRepository.findByIdAndTo_Id(friendRequestId, currentUser.getId())
-                .orElseThrow(() -> new RuntimeException("Bad request"));
+                .orElseThrow(() -> new ResourceNotFoundException(ErrorCode.ERROR_FINDING_FRIEND_REQUEST, "Friend request id and current user do not match"));
 
         friendRequestRepository.deleteById(friendRequestId);
 
@@ -94,24 +93,24 @@ public class FriendsService {
         return new ResolvedFriendRequestDTO("Successfully became friends with: " + friendsEntity.getFriend().getEmail());
     }
 
-    public ResolvedFriendRequestDTO declineRequest(Integer friendRequestId) {
+    public ResolvedFriendRequestDTO declineRequest(Integer friendRequestId) throws ResourceNotFoundException {
         User currentUser = jwtService.getUser();
 
         FriendRequest friendRequest = friendRequestRepository.findByIdAndTo_Id(friendRequestId, currentUser.getId())
-                .orElseThrow(() -> new RuntimeException("Bad request"));
+                .orElseThrow(() -> new ResourceNotFoundException(ErrorCode.ERROR_FINDING_FRIEND_REQUEST, "Friend request id and current user do not match"));
 
         friendRequestRepository.deleteById(friendRequestId);
 
         return new ResolvedFriendRequestDTO("Successfully declined a request with: " + friendRequest.getFrom().getEmail());
     }
 
-    public void deleteFriend(Integer friendId){
+    public void deleteFriend(Integer friendId) throws ResourceNotFoundException, BusinessLogicException {
         userRepository.findById(friendId).
-                orElseThrow(() -> new RuntimeException("Bad request"));
+                orElseThrow(() -> new ResourceNotFoundException(ErrorCode.ERROR_FINDING_USER, "User not found"));
 
         User currentUser = jwtService.getUser();
         Friends friendsEntity = friendsRepository.areTwoUsersFriends(currentUser.getId(), friendId).
-                orElseThrow(() -> new RuntimeException("Bad request"));
+                orElseThrow(() -> new BusinessLogicException(ErrorCode.ERROR_USERS_NOT_FRIENDS, "You are not friends with this user"));
 
         friendsRepository.deleteById(friendsEntity.getId());
 
