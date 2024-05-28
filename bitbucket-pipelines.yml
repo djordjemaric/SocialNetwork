@@ -32,6 +32,18 @@ definitions:
           - mvn -B clean verify --file pom.xml
         artifacts:
           - target/site/jacoco/*
+    - step: &pushToECR
+        trigger: manual
+        name: Build image and push to ECR
+        oidc: true
+        script:
+          - docker build --build-arg="JAR_FILE=target/*.jar" -t social-network:latest -t social-network:$BITBUCKET_COMMIT .
+          - pipe: atlassian/aws-ecr-push-image:2.4.0
+            variables:
+              AWS_DEFAULT_REGION: eu-central-1
+              AWS_OIDC_ROLE_ARN: 'arn:aws:iam::211125711045:role/bitbucket_oidc_role'
+              IMAGE_NAME: social-network
+              TAGS: 'latest ${BITBUCKET_COMMIT}'
 
 pipelines:
   branches:
@@ -39,3 +51,4 @@ pipelines:
       - step: *build
       - step: *test
       - step: *testOIDC
+      - step: *pushToECR

@@ -1,6 +1,8 @@
 package com.socialnetwork.socialnetwork.service;
 
 import com.socialnetwork.socialnetwork.entity.User;
+import com.socialnetwork.socialnetwork.exceptions.ErrorCode;
+import com.socialnetwork.socialnetwork.exceptions.ResourceNotFoundException;
 import com.socialnetwork.socialnetwork.repository.UserRepository;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContext;
@@ -17,10 +19,11 @@ public class JwtService {
         this.userRepository = userRepository;
     }
 
-    public User getUser(){
+    public User getUser() throws ResourceNotFoundException {
         String userSub = getUserSub();
         return userRepository.findByUserSub(userSub)
-                .orElseThrow(() -> new RuntimeException("User not found"));
+                .orElseThrow(() -> new ResourceNotFoundException(ErrorCode.ERROR_FINDING_USER_BY_JWT,"User not found. Wrong JWT token"));
+
     }
 
     public String getUserSub(){
