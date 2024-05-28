@@ -1,6 +1,9 @@
 image: maven:3.9.6-amazoncorretto-17
 
 definitions:
+  services:
+    docker:
+      memory: 2048
   script: &createOIDC
     export AWS_REGION=eu-central-1 
             && export AWS_ROLE_ARN=arn:aws:iam::211125711045:role/bitbucket_oidc_role 
