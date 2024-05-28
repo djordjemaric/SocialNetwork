@@ -1,6 +1,9 @@
 image: maven:3.9.6-amazoncorretto-17
 
 definitions:
+  services:
+    docker:
+      memory: 2048
   script: &createOIDC
     export AWS_REGION=eu-central-1 
             && export AWS_ROLE_ARN=arn:aws:iam::211125711045:role/bitbucket_oidc_role 
@@ -29,9 +32,14 @@ definitions:
         caches:
           - maven
         script:
+          - export DOCKER_BUILDKIT=0
+          - export TESTCONTAINERS_RYUK_DISABLED=true
+          - export TESTCONTAINERS_CHECKS_DISABLE=true
           - mvn -B clean verify --file pom.xml
         artifacts:
           - target/site/jacoco/*
+        services:
+          - docker
     - step: &pushToECR
         trigger: manual
         name: Build image and push to ECR
