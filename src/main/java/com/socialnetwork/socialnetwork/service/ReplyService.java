@@ -14,6 +14,7 @@ import com.socialnetwork.socialnetwork.exceptions.ResourceNotFoundException;
 import com.socialnetwork.socialnetwork.mapper.CommentMapper;
 import com.socialnetwork.socialnetwork.mapper.ReplyMapper;
 import com.socialnetwork.socialnetwork.repository.*;
+import org.springframework.security.access.AccessDeniedException;
 import org.springframework.stereotype.Service;
 
 import javax.management.RuntimeErrorException;
@@ -42,23 +43,23 @@ public class ReplyService {
         this.commentMapper = commentMapper;
     }
 
-    public ReplyDTO createReply(Integer postId,Integer commentId, CreateReplyDTO replyDTO) throws ResourceNotFoundException, BusinessLogicException {
+    public ReplyDTO createReply(Integer postId,Integer commentId, CreateReplyDTO replyDTO) throws ResourceNotFoundException, BusinessLogicException,AccessDeniedException {
         User currentUser = jwtService.getUser();
 
 
         Comment comment=commentRepository.findByIdAndPost_Id(commentId, postId)
-                .orElseThrow(() -> new BusinessLogicException(ErrorCode.ERROR_SEEING_COMMENT,"This comment is not associated with this post."));
+                .orElseThrow(() -> new BusinessLogicException(ErrorCode.ERROR_CREATING_REPLY,"This comment is not associated with this post."));
         Post post = comment.getPost();
 
         if (!post.isPublic() && post.getGroup() == null) {
             if (friendsRepository.areTwoUsersFriends(post.getOwner().getId(), currentUser.getId()).isEmpty()) {
-                throw new BusinessLogicException(ErrorCode.ERROR_SEEING_POST,"You cannot see the post because you are not friends with the post owner.");
+                throw new AccessDeniedException("You cannot see the post because you are not friends with the post owner.");
             }
         }
 
         if (post.getGroup() != null && !(post.getGroup().isPublic())) {
             if (!(groupMemberRepository.existsByUserIdAndGroupId(currentUser.getId(), post.getGroup().getId()))) {
-                throw new BusinessLogicException(ErrorCode.ERROR_SEEING_POST_IN_GROUP,"You cannot see the post because you are not a member of the "
+                throw new AccessDeniedException("You cannot see the post because you are not a member of the "
                         + post.getGroup().getName() + " group.");
             }
         }

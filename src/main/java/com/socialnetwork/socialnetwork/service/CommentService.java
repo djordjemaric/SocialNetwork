@@ -34,19 +34,19 @@ public class CommentService {
         this.friendsRepository = friendshipRepository;
     }
 
-    public CommentDTO createComment(Integer postId, CreateCommentDTO commentDTO) throws ResourceNotFoundException, BusinessLogicException {
+    public CommentDTO createComment(Integer postId, CreateCommentDTO commentDTO) throws ResourceNotFoundException, BusinessLogicException,AccessDeniedException {
         User currentUser = jwtService.getUser();
         Post post = postRepository.findById(postId)
-                .orElseThrow(() -> new ResourceNotFoundException(ErrorCode.ERROR_FINDING_POST, "The post with the id of " +
+                .orElseThrow(() -> new BusinessLogicException(ErrorCode.ERROR_CREATING_COMMENT, "The post with the id of " +
                         postId + " is not present in the database."));
         if (!post.isPublic() && post.getGroup() == null) {
             if (friendsRepository.areTwoUsersFriends(post.getOwner().getId(), currentUser.getId()).isEmpty()) {
-                throw new BusinessLogicException(ErrorCode.ERROR_SEEING_POST,"You cannot see the post because you are not friends with the post owner.");
+                throw new AccessDeniedException("You cannot see the post because you are not friends with the post owner.");
             }
         }
         if (post.getGroup() != null && !(post.getGroup().isPublic())) {
             if (!(groupMemberRepository.existsByUserIdAndGroupId(currentUser.getId(), post.getGroup().getId()))) {
-                throw new BusinessLogicException(ErrorCode.ERROR_SEEING_POST_IN_GROUP,"You cannot see the post because you are not a member of the "
+                throw new AccessDeniedException("You cannot see the post because you are not a member of the "
                         + post.getGroup().getName() + " group.");
             }
         }
