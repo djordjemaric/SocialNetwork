@@ -17,6 +17,8 @@ public enum ErrorCode {
     //Comment
     ERROR_SEEING_POST,
     ERROR_SEEING_POST_IN_GROUP,
+    //Reply
+    ERROR_SEEING_COMMENT,
     //Group
     ERROR_GETTING_GROUP_REQUESTS,
     ERROR_CREATING_GROUP,
