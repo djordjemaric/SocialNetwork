@@ -59,9 +59,9 @@ class FriendsControllerTest extends IntegrationTestConfiguration {
         testFriendRequest.setTo(currentTestUser);
         friendRequestRepository.save(testFriendRequest);
 
-        FriendRequestDTO[] niz = restTemplate.getForObject(friendsApiURL + "/requests", FriendRequestDTO[].class);
+        FriendRequestDTO[] frResponseArray = restTemplate.getForObject(friendsApiURL + "/requests", FriendRequestDTO[].class);
 
-        assertThat(niz.length).isEqualTo(1);
-        assertThat(niz[0].requestSender()).isEqualTo(testUser1.getEmail());
+        assertThat(frResponseArray.length).isEqualTo(1);
+        assertThat(frResponseArray[0].requestSender()).isEqualTo(testUser1.getEmail());
     }
 }
