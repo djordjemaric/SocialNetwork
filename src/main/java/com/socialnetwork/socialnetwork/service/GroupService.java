@@ -58,13 +58,11 @@ public class GroupService {
 
     public List<PostDTO> getAllPostsByGroupId(Integer idGroup) throws ResourceNotFoundException, BusinessLogicException {
         User currentUser = jwtService.getUser();
+        Group group = groupRepository.findById(idGroup).orElseThrow(() ->
+                new BusinessLogicException(ERROR_GETTING_GROUP_POSTS, "Group with id "
+                        + idGroup + "does not exist"));
 
-        if (!groupRepository.existsById(idGroup)) {
-            throw new BusinessLogicException(ERROR_GETTING_GROUP_POSTS, "Group with id "
-                    + idGroup + "does not exist.");
-        }
-
-        if (!groupMemberRepository.existsByUserIdAndGroupId(currentUser.getId(), idGroup)) {
+        if (!groupMemberRepository.existsByUserIdAndGroupId(currentUser.getId(), idGroup) && !group.isPublic() ) {
             throw new AccessDeniedException("User " + currentUser.getEmail()
                     + " is not a member of the group with id: " + idGroup);
 
@@ -128,8 +126,8 @@ public class GroupService {
                 new BusinessLogicException(ERROR_GETTING_GROUP_REQUESTS, "Group with id "
                         + idGroup + "does not exist"));
 
-        if (!groupRepository.existsByAdmin(currentUser)) {
-            throw new AccessDeniedException("You can't get requests for given group, you are not the admin of given group");
+        if (!group.getAdmin().equals(currentUser)) {
+            throw new AccessDeniedException("You are not an admin of a given group " + group.getName());
         }
         List<GroupRequest> groupRequests = groupRequestRepository.findAllByGroup(group);
 
@@ -152,9 +150,8 @@ public class GroupService {
         User newMember = userRepository.findById(request.getUser().getId()).orElseThrow(() ->
                 new BusinessLogicException(ERROR_MANAGING_GROUP_REQUEST, "User with id " + request.getUser().getId() + "does not exist"));
 
-        if (!groupRepository.existsByAdmin(currentUser)) {
-            throw new BusinessLogicException(ERROR_MANAGING_GROUP_REQUEST, "Group for given admin " + currentUser
-                    + " does not exist");
+        if (!group.getAdmin().equals(currentUser)) {
+            throw new AccessDeniedException("You are not an admin of a given group " + group.getName());
         }
 
         if (!groupRequestRepository.existsByUserAndGroup(newMember, group)) {

@@ -53,6 +53,7 @@ definitions:
               IMAGE_NAME: social-network
               TAGS: 'latest ${BITBUCKET_COMMIT}'
 
+
 pipelines:
   branches:
     master:
