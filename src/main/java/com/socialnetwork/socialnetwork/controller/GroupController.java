@@ -44,19 +44,19 @@ public class GroupController {
 
     @ResponseStatus(HttpStatus.OK)
     @GetMapping("/{id}/requests")
-    public List<GroupRequestDTO> getAllRequestForGroup(@PathVariable Integer id) throws ResourceNotFoundException {
+    public List<GroupRequestDTO> getAllRequestForGroup(@PathVariable Integer id) throws ResourceNotFoundException, BusinessLogicException {
         return groupService.getAllRequestsForGroup(id);
     }
 
     @ResponseStatus(HttpStatus.OK)
     @PostMapping("/{idGroup}/requests/{idRequest}/accept")
-    public void acceptRequest(@PathVariable Integer idGroup, @PathVariable Integer idRequest) throws ResourceNotFoundException {
+    public void acceptRequest(@PathVariable Integer idGroup, @PathVariable Integer idRequest) throws ResourceNotFoundException, BusinessLogicException {
         groupService.acceptRequest(idGroup, idRequest);
     }
 
     @ResponseStatus(HttpStatus.OK)
     @PostMapping("/{idGroup}/requests/{idRequest}/reject")
-    public void rejectRequest(@PathVariable Integer idGroup, @PathVariable Integer idRequest) throws ResourceNotFoundException {
+    public void rejectRequest(@PathVariable Integer idGroup, @PathVariable Integer idRequest) throws ResourceNotFoundException, BusinessLogicException {
         groupService.rejectRequest(idGroup, idRequest);
     }
 
