@@ -32,6 +32,7 @@ definitions:
         caches:
           - maven
         script:
+          - export DOCKER_BUILDKIT=0
           - mvn -B clean verify --file pom.xml
         artifacts:
           - target/site/jacoco/*
