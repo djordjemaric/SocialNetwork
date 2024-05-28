@@ -1,4 +1,4 @@
-package com.socialnetwork.socialnetwork.configuration;
+package com.socialnetwork.socialnetwork.exceptions;
 
 import com.socialnetwork.socialnetwork.exceptions.*;
 import com.socialnetwork.socialnetwork.exceptions.IAMProviderException;
@@ -18,15 +18,15 @@ import java.util.Date;
 public class GlobalExceptionHandler extends ResponseEntityExceptionHandler {
 
     @ExceptionHandler({BusinessLogicException.class, IAMProviderException.class})
-    public ResponseEntity<Object> businessLogicAndIamExceptionHandler(SocialNetworkException exception){
+    public ResponseEntity<ExceptionResponse> businessLogicAndIamExceptionHandler(SocialNetworkException exception){
         ExceptionResponse exceptionResponse = new ExceptionResponse(exception.getErrorCode(), exception.getMessage(), getCurrentTimestamp());
-        return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(exception.getMessage());
+        return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(exceptionResponse);
     }
 
     @ExceptionHandler({ConstraintViolationException.class})
-    public ResponseEntity<Object> constraintViolationExceptionHandler(ConstraintViolationException exception){
+    public ResponseEntity<ExceptionResponse> constraintViolationExceptionHandler(ConstraintViolationException exception){
         ExceptionResponse exceptionResponse = new ExceptionResponse(ErrorCode.VALIDATION_ERROR, exception.getMessage(), getCurrentTimestamp());
-        return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(exception.getMessage());
+        return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(exceptionResponse);
     }
 
     @ExceptionHandler({AccessDeniedException.class})
