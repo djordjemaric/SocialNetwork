@@ -33,6 +33,8 @@ definitions:
           - maven
         script:
           - export DOCKER_BUILDKIT=0
+          - export TESTCONTAINERS_RYUK_DISABLED=true
+          - export TESTCONTAINERS_CHECKS_DISABLE=true
           - mvn -B clean verify --file pom.xml
         artifacts:
           - target/site/jacoco/*
@@ -53,10 +55,7 @@ definitions:
 
 pipelines:
   default:
-    - step: *build
     - step: *test
-    - step: *testOIDC
-    - step: *pushToECR
   branches:
     master:
       - step: *build
