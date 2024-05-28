@@ -43,7 +43,8 @@ public abstract class IntegrationTestConfiguration {
         User testUser = new User();
         testUser.setEmail("vica.ristic@gmail.com");
         testUser.setUserSub("93246812-3021-704e-9c37-bf46100f22dc");
-        when(jwtService.getUser()).thenReturn(userRepository.save(testUser));
+        User savedUser = userRepository.save(testUser);
+        when(jwtService.getUser()).thenReturn(savedUser);
     }
 
     @Test
