@@ -38,7 +38,6 @@ public class PostControllerTests extends IntegrationTestConfiguration {
     }
 
 
-    //getById
     @Test
     @DisplayName("Testing if user gets the post he asked for")
     public void doesGetByIdReturnTheCorrectPost() throws ResourceNotFoundException {
@@ -110,7 +109,6 @@ public class PostControllerTests extends IntegrationTestConfiguration {
     }
 
 
-    //save
     @Test
     @DisplayName("Testing if user-generated post can be created successfully")
     public void isPostSaved() throws ResourceNotFoundException {
@@ -191,7 +189,6 @@ public class PostControllerTests extends IntegrationTestConfiguration {
     }
 
 
-    //update
     @Test
     @DisplayName("Testing if the post can be updated successfully")
     public void isPostUpdated() throws ResourceNotFoundException {
@@ -275,7 +272,6 @@ public class PostControllerTests extends IntegrationTestConfiguration {
     }
 
 
-    //delete
     @Test
     @DisplayName("Testing if post can be deleted")
     public void isPostDeleted() throws ResourceNotFoundException {
