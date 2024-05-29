@@ -58,7 +58,7 @@ definitions:
           - *createOIDC
           - aws ecs describe-task-definition --task-definition social-network-task > taskDefinition.json
         artifacts:
-          - target/aws/taskDefinition.json
+          - target/aws/*
     - step: &cleaningJSON
         image: stedolan/jq
         script:
