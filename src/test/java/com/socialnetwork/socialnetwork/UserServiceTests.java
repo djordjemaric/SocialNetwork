@@ -1,10 +1,12 @@
 package com.socialnetwork.socialnetwork;
 
-import com.socialnetwork.socialnetwork.dto.LoginResponse;
+import com.socialnetwork.socialnetwork.dto.user.LoginResponse;
+import com.socialnetwork.socialnetwork.dto.user.PreviewUserDTO;
 import com.socialnetwork.socialnetwork.entity.User;
 import com.socialnetwork.socialnetwork.exceptions.BusinessLogicException;
 import com.socialnetwork.socialnetwork.exceptions.IAMProviderException;
 import com.socialnetwork.socialnetwork.exceptions.ResourceNotFoundException;
+import com.socialnetwork.socialnetwork.mapper.UserMapper;
 import com.socialnetwork.socialnetwork.repository.UserRepository;
 import com.socialnetwork.socialnetwork.service.CognitoService;
 import com.socialnetwork.socialnetwork.service.UserService;
@@ -31,6 +33,9 @@ public class UserServiceTests {
 
     @Mock
     private UserRepository userRepository;
+
+    @Mock
+    private UserMapper userMapper;
 
     @InjectMocks
     private UserService userService;
@@ -79,23 +84,22 @@ public class UserServiceTests {
 
     @Test
     void createUser_success() throws IAMProviderException, BusinessLogicException {
+        User newUser = new User(2, "user2@user.com", "sample-user-sub");
+        PreviewUserDTO expectedDTO = new PreviewUserDTO(newUser.getId(), newUser.getEmail());
+        when(userMapper.userToPreviewUserDTO(userArgumentCaptor.capture())).thenReturn(expectedDTO);
         when(userRepository.existsByEmail(stringArgumentCaptor.capture())).thenReturn(false);
         when(cognitoService.registerUser(stringArgumentCaptor.capture(),
-                                         stringArgumentCaptor.capture(),
                                          stringArgumentCaptor.capture()))
                                         .thenReturn("sample-user-sub");
-        User newUser = new User(2, "user2@user.com", "sample-user-sub");
-        User resultUser = userService.createUser(newUser.getEmail(), "test");
 
+        PreviewUserDTO resultDTO = userService.createUser(newUser.getEmail(), "test");
 
-        assertEquals(newUser.getUserSub(), resultUser.getUserSub());
-        assertEquals(newUser.getEmail(), resultUser.getEmail());
+        assertEquals(expectedDTO.email(), resultDTO.email());
         verify(userRepository).existsByEmail(stringArgumentCaptor.getAllValues().get(0));
-        verify(cognitoService).registerUser(stringArgumentCaptor.getAllValues().get(0), stringArgumentCaptor.getAllValues().get(0), "test");
-        verify(userRepository).save(resultUser);
+        verify(cognitoService).registerUser(stringArgumentCaptor.getAllValues().get(0), "test");
 
         assertEquals(stringArgumentCaptor.getAllValues().get(0), newUser.getEmail());
-        assertEquals(stringArgumentCaptor.getAllValues().get(3), "test");
+        assertEquals(stringArgumentCaptor.getAllValues().get(2), "test");
     }
 
     @Test
