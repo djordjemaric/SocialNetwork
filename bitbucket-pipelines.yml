@@ -62,9 +62,11 @@ definitions:
 
     - step: &cleaningJSON
         image: stedolan/jq
-        name: Cleaning inital json file
+        name: Cleaning initial json file
         script:
-          - jq '.taskDefinition | del(.taskDefinitionArn, .requiresAttributes, .compatibilities, .registeredAt, .registeredBy, .revision, .status)' taskDefinitionTainted.json > taskDefinition.json
+          - COMMIT_HASH=$(echo $BITBUCKET_COMMIT)
+          - jq '.taskDefinition | .containerDefinitions[0].image = "211125711045.dkr.ecr.eu-central-1.amazonaws.com/social-network:" + env.COMMIT_HASH | del(.taskDefinitionArn, .requiresAttributes, .compatibilities, .registeredAt, .registeredBy, .revision, .status)' taskDefinitionTainted.json > taskDefinition.json
+          - cat taskDefinition.json
         artifacts:
           - taskDefinition.json
     - step: &deployToECS
@@ -73,7 +75,6 @@ definitions:
         oidc: true
         script:
           - *createOIDC
-          - cat taskDefinition.json
           - pipe: atlassian/aws-ecs-deploy:1.12.1
             variables:
               AWS_DEFAULT_REGION: 'eu-central-1'
