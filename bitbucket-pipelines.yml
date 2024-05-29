@@ -64,24 +64,23 @@ definitions:
         image: stedolan/jq
         name: Cleaning inital json file
         script:
-          - jq 'del(.taskDefinitionArn, .requiresAttributes, .compatibilities, .registeredAt, .registeredBy, .revision, .status)' taskDefinition.json > taskDefinitionCleaned.json
+          - jq '.taskDefinition' taskDefinition.json > taskDefinition.json
         artifacts:
-          - taskDefinitionCleaned.json
+          - taskDefinition.json
     - step: &deployToECS
         image: amazon/aws-cli
         name: Deploy image to ECS
         oidc: true
         script:
           - *createOIDC
-          - cat taskDefinitionCleaned.json
-          - aws ecs register-task-definition --family 'social-network-task' --cli-input-json file://taskDefinitionCleaned.json
+          - cat taskDefinition.json
           - pipe: atlassian/aws-ecs-deploy:1.12.1
             variables:
               AWS_DEFAULT_REGION: 'eu-central-1'
               AWS_OIDC_ROLE_ARN: 'arn:aws:iam::211125711045:role/bitbucket_oidc_role'
               CLUSTER_NAME: 'SocialNetworkCluster'
               SERVICE_NAME: 'SocialNetworkService'
-              TASK_DEFINITION: 'taskDefinitionCleaned.json'
+              TASK_DEFINITION: 'taskDefinition.json'
 pipelines:
   branches:
     master:
