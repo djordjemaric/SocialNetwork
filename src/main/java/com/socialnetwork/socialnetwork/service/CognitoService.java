@@ -1,7 +1,7 @@
 package com.socialnetwork.socialnetwork.service;
 
 
-import com.socialnetwork.socialnetwork.dto.LoginResponse;
+import com.socialnetwork.socialnetwork.dto.user.LoginResponse;
 import com.socialnetwork.socialnetwork.exceptions.ErrorCode;
 import com.socialnetwork.socialnetwork.exceptions.IAMProviderException;
 import org.springframework.beans.factory.annotation.Value;
@@ -24,11 +24,11 @@ public class CognitoService {
         this.cognitoIdentityProvider = cognitoIdentityProvider;
     }
 
-    public String registerUser(String username, String email, String password) throws IAMProviderException {
+    public String registerUser(String email, String password) throws IAMProviderException {
         // Set up the AWS Cognito registration request
         SignUpRequest signUpRequest = SignUpRequest.builder().
                 clientId(clientId)
-                .username(username)
+                .username(email)
                 .password(password)
                 .userAttributes(
                         AttributeType.builder().name("email").value(email).build()

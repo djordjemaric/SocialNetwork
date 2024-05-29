@@ -25,8 +25,6 @@ definitions:
         script:
           - *createOIDC
           - aws sts get-caller-identity
-
-
     - step: &test
         name: Run Tests and Generate Coverage Report
         caches:
@@ -52,8 +50,17 @@ definitions:
               AWS_OIDC_ROLE_ARN: 'arn:aws:iam::211125711045:role/bitbucket_oidc_role'
               IMAGE_NAME: social-network
               TAGS: 'latest ${BITBUCKET_COMMIT}'
-
-
+    - step: &deployToECS
+        name: Deploy image to ECS
+        oidc: true
+        script:
+          - pipe: atlassian/aws-ecs-deploy:1.12.1
+            variables:
+              AWS_DEFAULT_REGION: 'eu-central-1'
+              AWS_OIDC_ROLE_ARN: 'arn:aws:iam::211125711045:role/bitbucket_oidc_role'
+              CLUSTER_NAME: 'SocialNetworkCluster'
+              SERVICE_NAME: 'SocialNetworkService'
+              FORCE_NEW_DEPLOYMENT: 'true'
 pipelines:
   branches:
     master:
@@ -61,3 +68,8 @@ pipelines:
       - step: *test
       - step: *testOIDC
       - step: *pushToECR
+    deploy-to-ecs-ci-cd:
+      - step: *build
+      - step: *testOIDC
+      - step: *pushToECR
+      - step: *deployToECS

@@ -21,7 +21,6 @@ import org.springframework.web.multipart.MultipartFile;
 
 import java.io.IOException;
 import java.io.InputStream;
-import java.util.NoSuchElementException;
 import java.util.Objects;
 
 @Service
@@ -73,7 +72,7 @@ public class PostService {
                         idPost + " is not present in the database."));
 
         if (!post.isPublic() && post.getGroup() == null) {
-            if (friendsRepository.areTwoUsersFriends(post.getOwner().getId(), user.getId()).isEmpty()) {
+            if (!Objects.equals(user.getId(), post.getOwner().getId()) && friendsRepository.areTwoUsersFriends(post.getOwner().getId(), user.getId()).isEmpty()) {
                 throw new AccessDeniedException("You cannot see the post because you are not friends with the post owner.");
             }
         }
