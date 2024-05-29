@@ -1,19 +1,20 @@
 package com.socialnetwork.socialnetwork.exceptions;
 
-import com.socialnetwork.socialnetwork.exceptions.*;
-import com.socialnetwork.socialnetwork.exceptions.IAMProviderException;
+import jakarta.validation.ConstraintViolation;
 import jakarta.validation.ConstraintViolationException;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.validation.ObjectError;
 import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.annotation.ControllerAdvice;
 import org.springframework.web.bind.annotation.ExceptionHandler;
-import org.springframework.web.servlet.mvc.method.annotation.ResponseEntityExceptionHandler;
 
 import java.nio.file.AccessDeniedException;
 import java.text.DateFormat;
 import java.text.SimpleDateFormat;
 import java.util.Date;
+import java.util.List;
+import java.util.stream.Collectors;
 
 @ControllerAdvice
 public class GlobalExceptionHandler {
@@ -25,13 +26,25 @@ public class GlobalExceptionHandler {
 
     @ExceptionHandler(ConstraintViolationException.class)
     public ResponseEntity<ExceptionResponse> constraintViolationExceptionHandler(ConstraintViolationException exception){
-        ExceptionResponse exceptionResponse = new ExceptionResponse(ErrorCode.VALIDATION_ERROR, exception.getMessage(), getCurrentTimestamp());
+        List<String> errorMessages = exception.getConstraintViolations()
+                .stream()
+                .map(ConstraintViolation::getMessage)
+                .toList();
+        ExceptionResponse exceptionResponse = new ExceptionResponse(ErrorCode.VALIDATION_ERROR, errorMessages.toString(), getCurrentTimestamp());
         return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(exceptionResponse);
     }
 
     @ExceptionHandler(MethodArgumentNotValidException.class)
     public ResponseEntity<ExceptionResponse> methodArgumentException(MethodArgumentNotValidException exception){
-        ExceptionResponse exceptionResponse = new ExceptionResponse(ErrorCode.VALIDATION_ERROR, exception.getMessage(), getCurrentTimestamp());
+        List<ObjectError> allErrors = exception.getBindingResult().getAllErrors();
+
+        StringBuilder errorMessage = new StringBuilder("");
+        for( ObjectError error : allErrors )
+        {
+            errorMessage.append(error.getDefaultMessage()).append(";");
+        }
+
+        ExceptionResponse exceptionResponse = new ExceptionResponse(ErrorCode.VALIDATION_ERROR, errorMessage.toString(), getCurrentTimestamp());
         return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(exceptionResponse);
     }
 
