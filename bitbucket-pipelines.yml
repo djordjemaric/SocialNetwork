@@ -64,7 +64,7 @@ definitions:
         script:
           - jq 'del(.taskDefinitionArn, .requiresAttributes, .compatibilities, .registeredAt, .registeredBy, .revision, .status)' target/aws/taskDefinition.json > taskDefinitionCleaned.json
         artifacts:
-          - target/aws/taskDefinitionCleaned.json
+          - target/aws/*
     - step: &deployToECS
         image: amazon/aws-cli
         name: Deploy image to ECS
