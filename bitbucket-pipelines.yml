@@ -68,8 +68,4 @@ pipelines:
       - step: *test
       - step: *testOIDC
       - step: *pushToECR
-    deploy-to-ecs-ci-cd:
-      - step: *build
-      - step: *testOIDC
-      - step: *pushToECR
       - step: *deployToECS
