@@ -1,7 +1,6 @@
 package com.socialnetwork.socialnetwork.controller;
 
 import com.socialnetwork.socialnetwork.IntegrationTestConfiguration;
-import com.socialnetwork.socialnetwork.SocialNetworkApplication;
 import com.socialnetwork.socialnetwork.dto.friendRequest.FriendRequestDTO;
 import com.socialnetwork.socialnetwork.dto.friendRequest.PreviewFriendRequestDTO;
 import com.socialnetwork.socialnetwork.dto.friendRequest.ResolvedFriendRequestDTO;
@@ -11,12 +10,12 @@ import com.socialnetwork.socialnetwork.entity.FriendRequest;
 import com.socialnetwork.socialnetwork.entity.Friends;
 import com.socialnetwork.socialnetwork.entity.User;
 import com.socialnetwork.socialnetwork.exceptions.ErrorCode;
+import com.socialnetwork.socialnetwork.exceptions.ExceptionResponse;
 import com.socialnetwork.socialnetwork.exceptions.ResourceNotFoundException;
 import com.socialnetwork.socialnetwork.repository.FriendRequestRepository;
 import com.socialnetwork.socialnetwork.repository.FriendsRepository;
 import org.junit.jupiter.api.*;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.http.HttpEntity;
 import org.springframework.http.HttpMethod;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -24,7 +23,6 @@ import org.springframework.http.ResponseEntity;
 import java.util.List;
 
 import static org.assertj.core.api.AssertionsForClassTypes.assertThat;
-import static org.junit.jupiter.api.Assertions.*;
 
 
 
@@ -123,108 +121,108 @@ class FriendsControllerTest extends IntegrationTestConfiguration {
 
     }
 
-//    @Test
-//    @DisplayName("Sending a request to a non existing user")
-//    @Order(4)
-//    void userSendingToANonExistingFriend() throws ResourceNotFoundException {
-//
-//        ResponseEntity<ExceptionResponse> response = restTemplate.postForEntity(friendsApiURL + "/requests", new SentFriendRequestDTO("anonymous@test.com"), ExceptionResponse.class);
-//        assertThat(response.getStatusCode()).isEqualTo(HttpStatus.NOT_FOUND);
-//        assertThat(response.getBody()).isNotNull();
-//        assertThat(response.getBody().errorCode()).isEqualTo(ErrorCode.ERROR_CREATING_FRIEND_REQUEST);
-//        assertThat(response.getBody().message()).isEqualTo("User not found. Wrong email sent");
-//    }
+    @Test
+    @DisplayName("Sending a request to a non existing user")
+    @Order(4)
+    void userSendingToANonExistingFriend() throws ResourceNotFoundException {
 
-//    @Test
-//    @DisplayName("Sending a friend request to yourself")
-//    @Order(5)
-//    void userSendingToHimself() throws ResourceNotFoundException {
-//
-//        ResponseEntity<ExceptionResponse> response = restTemplate.postForEntity(friendsApiURL + "/requests", new SentFriendRequestDTO("vica.ristic@gmail.com"), ExceptionResponse.class);
-//        assertThat(response.getStatusCode()).isEqualTo(HttpStatus.BAD_REQUEST);
-//        assertThat(response.getBody()).isNotNull();
-//        assertThat(response.getBody().errorCode()).isEqualTo(ErrorCode.ERROR_CREATING_FRIEND_REQUEST);
-//        assertThat(response.getBody().message()).isEqualTo("Can't send request to yourself");
-//    }
+        ResponseEntity<ExceptionResponse> response = restTemplate.postForEntity(friendsApiURL + "/requests", new SentFriendRequestDTO("anonymous@test.com"), ExceptionResponse.class);
+        assertThat(response.getStatusCode()).isEqualTo(HttpStatus.NOT_FOUND);
+        assertThat(response.getBody()).isNotNull();
+        assertThat(response.getBody().errorCode()).isEqualTo(ErrorCode.ERROR_FINDING_USER);
+        assertThat(response.getBody().message()).isEqualTo("User not found. Wrong email sent");
+    }
 
-//    @Test
-//    @DisplayName("Checking users are already friends")
-//    @Order(6)
-//    void usersAreAlreadyFriendsBothWays() throws ResourceNotFoundException {
-//
-//        User currentUser = jwtService.getUser();
-//
-//        User testUser1 = new User();
-//        testUser1.setUserSub("f3841812-e0f1-7025-b7bc-ce67d7fb933e");
-//        testUser1.setEmail("xanitev711@mcatag.com");
-//        userRepository.save(testUser1);
-//
-//        User testUser2 = new User();
-//        testUser2.setUserSub("73140822-2011-705f-ce8c-675fa425e435");
-//        testUser2.setEmail("mapsesisto@gufum.com");
-//        userRepository.save(testUser2);
-//
-//        Friends friends1 = new Friends();
-//        friends1.setFriend(currentUser);
-//        friends1.setFriendTo(testUser1);
-//        friendsRepository.save(friends1);
-//
-//        Friends friends2 = new Friends();
-//        friends2.setFriend(testUser2);
-//        friends2.setFriendTo(currentUser);
-//        friendsRepository.save(friends2);
-//
-//        ResponseEntity<ExceptionResponse> response1 = restTemplate.postForEntity(friendsApiURL + "/requests", new SentFriendRequestDTO("xanitev711@mcatag.com"), ExceptionResponse.class);
-//        assertThat(response1.getStatusCode()).isEqualTo(HttpStatus.BAD_REQUEST);
-//        assertThat(response1.getBody()).isNotNull();
-//        assertThat(response1.getBody().errorCode()).isEqualTo(ErrorCode.ERROR_CREATING_FRIEND_REQUEST);
-//        assertThat(response1.getBody().message()).isEqualTo("These users are already friends");
-//
-//        ResponseEntity<ExceptionResponse> response2 = restTemplate.postForEntity(friendsApiURL + "/requests", new SentFriendRequestDTO("mapsesisto@gufum.com"), ExceptionResponse.class);
-//        assertThat(response2.getStatusCode()).isEqualTo(HttpStatus.BAD_REQUEST);
-//        assertThat(response2.getBody()).isNotNull();
-//        assertThat(response2.getBody().errorCode()).isEqualTo(ErrorCode.ERROR_CREATING_FRIEND_REQUEST);
-//        assertThat(response2.getBody().message()).isEqualTo("These users are already friends");
-//    }
+    @Test
+    @DisplayName("Sending a friend request to yourself")
+    @Order(5)
+    void userSendingToHimself() throws ResourceNotFoundException {
 
-//    @Test
-//    @DisplayName("There is already a pending exception")
-//    @Order(7)
-//    void thereIsAlreadyPendingRequest() throws ResourceNotFoundException {
-//        User currentUser = jwtService.getUser();
-//
-//        User testUser1 = new User();
-//        testUser1.setUserSub("f3841812-e0f1-7025-b7bc-ce67d7fb933e");
-//        testUser1.setEmail("xanitev711@mcatag.com");
-//        userRepository.save(testUser1);
-//
-//        User testUser2 = new User();
-//        testUser2.setUserSub("73140822-2011-705f-ce8c-675fa425e435");
-//        testUser2.setEmail("mapsesisto@gufum.com");
-//        userRepository.save(testUser2);
-//
-//        FriendRequest friendRequest1 = new FriendRequest();
-//        friendRequest1.setTo(testUser1);
-//        friendRequest1.setFrom(currentUser);
-//        friendRequestRepository.save(friendRequest1);
-//
-//        FriendRequest friendRequest2 = new FriendRequest();
-//        friendRequest2.setTo(currentUser);
-//        friendRequest2.setFrom(testUser2);
-//        friendRequestRepository.save(friendRequest2);
-//
-//        ResponseEntity<ExceptionResponse> response1 = restTemplate.postForEntity(friendsApiURL + "/requests", new SentFriendRequestDTO("xanitev711@mcatag.com"), ExceptionResponse.class);
-//        assertThat(response1.getStatusCode()).isEqualTo(HttpStatus.BAD_REQUEST);
-//        assertThat(response1.getBody()).isNotNull();
-//        assertThat(response1.getBody().errorCode()).isEqualTo(ErrorCode.ERROR_CREATING_FRIEND_REQUEST);
-//        assertThat(response1.getBody().message()).isEqualTo("There is already a pending request between these users");
-//
-//        ResponseEntity<ExceptionResponse> response2 = restTemplate.postForEntity(friendsApiURL + "/requests", new SentFriendRequestDTO("mapsesisto@gufum.com"), ExceptionResponse.class);
-//        assertThat(response2.getStatusCode()).isEqualTo(HttpStatus.BAD_REQUEST);
-//        assertThat(response2.getBody()).isNotNull();
-//        assertThat(response2.getBody().errorCode()).isEqualTo(ErrorCode.ERROR_CREATING_FRIEND_REQUEST);
-//        assertThat(response2.getBody().message()).isEqualTo("There is already a pending request between these users");
-//    }
+        ResponseEntity<ExceptionResponse> response = restTemplate.postForEntity(friendsApiURL + "/requests", new SentFriendRequestDTO("vica.ristic@gmail.com"), ExceptionResponse.class);
+        assertThat(response.getStatusCode()).isEqualTo(HttpStatus.BAD_REQUEST);
+        assertThat(response.getBody()).isNotNull();
+        assertThat(response.getBody().errorCode()).isEqualTo(ErrorCode.ERROR_CREATING_FRIEND_REQUEST);
+        assertThat(response.getBody().message()).isEqualTo("Can't send request to yourself");
+    }
+
+    @Test
+    @DisplayName("Checking users are already friends")
+    @Order(6)
+    void usersAreAlreadyFriendsBothWays() throws ResourceNotFoundException {
+
+        User currentUser = jwtService.getUser();
+
+        User testUser1 = new User();
+        testUser1.setUserSub("f3841812-e0f1-7025-b7bc-ce67d7fb933e");
+        testUser1.setEmail("xanitev711@mcatag.com");
+        userRepository.save(testUser1);
+
+        User testUser2 = new User();
+        testUser2.setUserSub("73140822-2011-705f-ce8c-675fa425e435");
+        testUser2.setEmail("mapsesisto@gufum.com");
+        userRepository.save(testUser2);
+
+        Friends friends1 = new Friends();
+        friends1.setFriend(currentUser);
+        friends1.setFriendTo(testUser1);
+        friendsRepository.save(friends1);
+
+        Friends friends2 = new Friends();
+        friends2.setFriend(testUser2);
+        friends2.setFriendTo(currentUser);
+        friendsRepository.save(friends2);
+
+        ResponseEntity<ExceptionResponse> response1 = restTemplate.postForEntity(friendsApiURL + "/requests", new SentFriendRequestDTO("xanitev711@mcatag.com"), ExceptionResponse.class);
+        assertThat(response1.getStatusCode()).isEqualTo(HttpStatus.BAD_REQUEST);
+        assertThat(response1.getBody()).isNotNull();
+        assertThat(response1.getBody().errorCode()).isEqualTo(ErrorCode.ERROR_CREATING_FRIEND_REQUEST);
+        assertThat(response1.getBody().message()).isEqualTo("These users are already friends");
+
+        ResponseEntity<ExceptionResponse> response2 = restTemplate.postForEntity(friendsApiURL + "/requests", new SentFriendRequestDTO("mapsesisto@gufum.com"), ExceptionResponse.class);
+        assertThat(response2.getStatusCode()).isEqualTo(HttpStatus.BAD_REQUEST);
+        assertThat(response2.getBody()).isNotNull();
+        assertThat(response2.getBody().errorCode()).isEqualTo(ErrorCode.ERROR_CREATING_FRIEND_REQUEST);
+        assertThat(response2.getBody().message()).isEqualTo("These users are already friends");
+    }
+
+    @Test
+    @DisplayName("There is already a pending exception")
+    @Order(7)
+    void thereIsAlreadyPendingRequest() throws ResourceNotFoundException {
+        User currentUser = jwtService.getUser();
+
+        User testUser1 = new User();
+        testUser1.setUserSub("f3841812-e0f1-7025-b7bc-ce67d7fb933e");
+        testUser1.setEmail("xanitev711@mcatag.com");
+        userRepository.save(testUser1);
+
+        User testUser2 = new User();
+        testUser2.setUserSub("73140822-2011-705f-ce8c-675fa425e435");
+        testUser2.setEmail("mapsesisto@gufum.com");
+        userRepository.save(testUser2);
+
+        FriendRequest friendRequest1 = new FriendRequest();
+        friendRequest1.setTo(testUser1);
+        friendRequest1.setFrom(currentUser);
+        friendRequestRepository.save(friendRequest1);
+
+        FriendRequest friendRequest2 = new FriendRequest();
+        friendRequest2.setTo(currentUser);
+        friendRequest2.setFrom(testUser2);
+        friendRequestRepository.save(friendRequest2);
+
+        ResponseEntity<ExceptionResponse> response1 = restTemplate.postForEntity(friendsApiURL + "/requests", new SentFriendRequestDTO("xanitev711@mcatag.com"), ExceptionResponse.class);
+        assertThat(response1.getStatusCode()).isEqualTo(HttpStatus.BAD_REQUEST);
+        assertThat(response1.getBody()).isNotNull();
+        assertThat(response1.getBody().errorCode()).isEqualTo(ErrorCode.ERROR_CREATING_FRIEND_REQUEST);
+        assertThat(response1.getBody().message()).isEqualTo("There is already a pending request between these users");
+
+        ResponseEntity<ExceptionResponse> response2 = restTemplate.postForEntity(friendsApiURL + "/requests", new SentFriendRequestDTO("mapsesisto@gufum.com"), ExceptionResponse.class);
+        assertThat(response2.getStatusCode()).isEqualTo(HttpStatus.BAD_REQUEST);
+        assertThat(response2.getBody()).isNotNull();
+        assertThat(response2.getBody().errorCode()).isEqualTo(ErrorCode.ERROR_CREATING_FRIEND_REQUEST);
+        assertThat(response2.getBody().message()).isEqualTo("There is already a pending request between these users");
+    }
 
     @Test
     @DisplayName("User searching his friends")
@@ -295,71 +293,71 @@ class FriendsControllerTest extends IntegrationTestConfiguration {
         assertThat(friendsRepository.areTwoUsersFriends(currentUser.getId(), testUser1.getId()).isEmpty()).isTrue();
     }
 
-//    @Test
-//    @DisplayName("Error while deleting friend that does not exist")
-//    @Order(10)
-//    void deletingFriendThatDoesNotExist() throws ResourceNotFoundException {
-//        User currentUser = jwtService.getUser();
-//
-//        ResponseEntity<ExceptionResponse> response = restTemplate.exchange(friendsApiURL+ "/5", HttpMethod.DELETE,null, ExceptionResponse.class);
-//        assertThat(response.getStatusCode()).isEqualTo(HttpStatus.NOT_FOUND);
-//        assertThat(response.getBody()).isNotNull();
-//        assertThat(response.getBody().errorCode()).isEqualTo(ErrorCode.ERROR_FINDING_USER);
-//        assertThat(response.getBody().message()).isEqualTo("User not found");
-//    }
+    @Test
+    @DisplayName("Error while deleting friend that does not exist")
+    @Order(10)
+    void deletingFriendThatDoesNotExist() throws ResourceNotFoundException {
+        User currentUser = jwtService.getUser();
 
-//    @Test
-//    @DisplayName("Error while deleting user that is not a friend")
-//    @Order(11)
-//    void deletingUserThatIsNotFriend() throws ResourceNotFoundException {
-//        User currentUser = jwtService.getUser();
-//
-//        User testUser1 = new User();
-//        testUser1.setUserSub("f3841812-e0f1-7025-b7bc-ce67d7fb933e");
-//        testUser1.setEmail("xanitev711@mcatag.com");
-//        testUser1 = userRepository.save(testUser1);
-//
-//        ResponseEntity<ExceptionResponse> response = restTemplate.exchange(friendsApiURL+ "/" + testUser1.getId(), HttpMethod.DELETE,null, ExceptionResponse.class);
-//        assertThat(response.getStatusCode()).isEqualTo(HttpStatus.BAD_REQUEST);
-//        assertThat(response.getBody()).isNotNull();
-//        assertThat(response.getBody().errorCode()).isEqualTo(ErrorCode.ERROR_USERS_NOT_FRIENDS);
-//        assertThat(response.getBody().message()).isEqualTo("You are not friends with this user");
-//    }
+        ResponseEntity<ExceptionResponse> response = restTemplate.exchange(friendsApiURL+ "/5", HttpMethod.DELETE,null, ExceptionResponse.class);
+        assertThat(response.getStatusCode()).isEqualTo(HttpStatus.NOT_FOUND);
+        assertThat(response.getBody()).isNotNull();
+        assertThat(response.getBody().errorCode()).isEqualTo(ErrorCode.ERROR_FINDING_USER);
+        assertThat(response.getBody().message()).isEqualTo("User not found");
+    }
 
-//    @Test
-//    @DisplayName("Error while accepting friend request")
-//    @Order(12)
-//    void errorAcceptingRequest() throws ResourceNotFoundException {
-//
-//        User testUser1 = new User();
-//        testUser1.setUserSub("f3841812-e0f1-7025-b7bc-ce67d7fb933e");
-//        testUser1.setEmail("xanitev711@mcatag.com");
-//        userRepository.save(testUser1);
-//
-//        User testUser2 = new User();
-//        testUser2.setUserSub("73140822-2011-705f-ce8c-675fa425e435");
-//        testUser2.setEmail("mapsesisto@gufum.com");
-//        userRepository.save(testUser2);
-//
-//        FriendRequest friendRequest = new FriendRequest();
-//        friendRequest.setFrom(testUser1);
-//        friendRequest.setTo(testUser2);
-//        friendRequest = friendRequestRepository.save(friendRequest);
-//
+    @Test
+    @DisplayName("Error while deleting user that is not a friend")
+    @Order(11)
+    void deletingUserThatIsNotFriend() throws ResourceNotFoundException {
+        User currentUser = jwtService.getUser();
+
+        User testUser1 = new User();
+        testUser1.setUserSub("f3841812-e0f1-7025-b7bc-ce67d7fb933e");
+        testUser1.setEmail("xanitev711@mcatag.com");
+        testUser1 = userRepository.save(testUser1);
+
+        ResponseEntity<ExceptionResponse> response = restTemplate.exchange(friendsApiURL+ "/" + testUser1.getId(), HttpMethod.DELETE,null, ExceptionResponse.class);
+        assertThat(response.getStatusCode()).isEqualTo(HttpStatus.BAD_REQUEST);
+        assertThat(response.getBody()).isNotNull();
+        assertThat(response.getBody().errorCode()).isEqualTo(ErrorCode.ERROR_USERS_NOT_FRIENDS);
+        assertThat(response.getBody().message()).isEqualTo("You are not friends with this user");
+    }
+
+    @Test
+    @DisplayName("Error while accepting friend request")
+    @Order(12)
+    void errorAcceptingRequest() throws ResourceNotFoundException {
+
+        User testUser1 = new User();
+        testUser1.setUserSub("f3841812-e0f1-7025-b7bc-ce67d7fb933e");
+        testUser1.setEmail("xanitev711@mcatag.com");
+        userRepository.save(testUser1);
+
+        User testUser2 = new User();
+        testUser2.setUserSub("73140822-2011-705f-ce8c-675fa425e435");
+        testUser2.setEmail("mapsesisto@gufum.com");
+        userRepository.save(testUser2);
+
+        FriendRequest friendRequest = new FriendRequest();
+        friendRequest.setFrom(testUser1);
+        friendRequest.setTo(testUser2);
+        friendRequest = friendRequestRepository.save(friendRequest);
+
 //        wrong id for friend request
-//        ResponseEntity<ExceptionResponse> response1 = restTemplate.postForEntity(friendsApiURL+ "/requests/5/accept", null,  ExceptionResponse.class);
-//        assertThat(response1.getStatusCode()).isEqualTo(HttpStatus.NOT_FOUND);
-//        assertThat(response1.getBody()).isNotNull();
-//        assertThat(response1.getBody().errorCode()).isEqualTo(ErrorCode.ERROR_FINDING_FRIEND_REQUEST);
-//        assertThat(response1.getBody().message()).isEqualTo("Friend request id and current user do not match");
-//
+        ResponseEntity<ExceptionResponse> response1 = restTemplate.postForEntity(friendsApiURL+ "/requests/5/accept", null,  ExceptionResponse.class);
+        assertThat(response1.getStatusCode()).isEqualTo(HttpStatus.NOT_FOUND);
+        assertThat(response1.getBody()).isNotNull();
+        assertThat(response1.getBody().errorCode()).isEqualTo(ErrorCode.ERROR_FINDING_FRIEND_REQUEST);
+        assertThat(response1.getBody().message()).isEqualTo("Friend request id and current user do not match");
+
 //        trying to accept some else's request
-//        ResponseEntity<ExceptionResponse> response2 = restTemplate.postForEntity(friendsApiURL+ "/requests/" + friendRequest.getId() + "/accept", null, ExceptionResponse.class);
-//        assertThat(response2.getStatusCode()).isEqualTo(HttpStatus.NOT_FOUND);
-//        assertThat(response2.getBody()).isNotNull();
-//        assertThat(response2.getBody().errorCode()).isEqualTo(ErrorCode.ERROR_FINDING_FRIEND_REQUEST);
-//        assertThat(response2.getBody().message()).isEqualTo("Friend request id and current user do not match");
-//    }
+        ResponseEntity<ExceptionResponse> response2 = restTemplate.postForEntity(friendsApiURL+ "/requests/" + friendRequest.getId() + "/accept", null, ExceptionResponse.class);
+        assertThat(response2.getStatusCode()).isEqualTo(HttpStatus.NOT_FOUND);
+        assertThat(response2.getBody()).isNotNull();
+        assertThat(response2.getBody().errorCode()).isEqualTo(ErrorCode.ERROR_FINDING_FRIEND_REQUEST);
+        assertThat(response2.getBody().message()).isEqualTo("Friend request id and current user do not match");
+    }
 
 
     @Test
@@ -385,40 +383,40 @@ class FriendsControllerTest extends IntegrationTestConfiguration {
         assertThat(friendRequestRepository.doesRequestExistsBetweenUsers(currentUser.getId(), testUser1.getId()).isEmpty()).isTrue();
     }
 
-//    @Test
-//    @DisplayName("Error while declining friend request")
-//    @Order(14)
-//    void errorDecliningRequest() throws ResourceNotFoundException {
-//
-//        User testUser1 = new User();
-//        testUser1.setUserSub("f3841812-e0f1-7025-b7bc-ce67d7fb933e");
-//        testUser1.setEmail("xanitev711@mcatag.com");
-//        userRepository.save(testUser1);
-//
-//        User testUser2 = new User();
-//        testUser2.setUserSub("73140822-2011-705f-ce8c-675fa425e435");
-//        testUser2.setEmail("mapsesisto@gufum.com");
-//        userRepository.save(testUser2);
-//
-//        FriendRequest friendRequest = new FriendRequest();
-//        friendRequest.setFrom(testUser1);
-//        friendRequest.setTo(testUser2);
-//        friendRequestRepository.save(friendRequest);
-//
-//        //wrong id for friend request
-//        ResponseEntity<ExceptionResponse> response1 = restTemplate.postForEntity(friendsApiURL+ "/requests/5/decline", null,  ExceptionResponse.class);
-//        assertThat(response1.getStatusCode()).isEqualTo(HttpStatus.NOT_FOUND);
-//        assertThat(response1.getBody()).isNotNull();
-//        assertThat(response1.getBody().errorCode()).isEqualTo(ErrorCode.ERROR_FINDING_FRIEND_REQUEST);
-//        assertThat(response1.getBody().message()).isEqualTo("Friend request id and current user do not match");
-//
-//        //trying to decline some else's request
-//        ResponseEntity<ExceptionResponse> response2 = restTemplate.postForEntity(friendsApiURL+ "/requests/" + friendRequest.getId() + "/decline", null, ExceptionResponse.class);
-//        assertThat(response2.getStatusCode()).isEqualTo(HttpStatus.NOT_FOUND);
-//        assertThat(response2.getBody()).isNotNull();
-//        assertThat(response2.getBody().errorCode()).isEqualTo(ErrorCode.ERROR_FINDING_FRIEND_REQUEST);
-//        assertThat(response2.getBody().message()).isEqualTo("Friend request id and current user do not match");
-//    }
+    @Test
+    @DisplayName("Error while declining friend request")
+    @Order(14)
+    void errorDecliningRequest() throws ResourceNotFoundException {
+
+        User testUser1 = new User();
+        testUser1.setUserSub("f3841812-e0f1-7025-b7bc-ce67d7fb933e");
+        testUser1.setEmail("xanitev711@mcatag.com");
+        userRepository.save(testUser1);
+
+        User testUser2 = new User();
+        testUser2.setUserSub("73140822-2011-705f-ce8c-675fa425e435");
+        testUser2.setEmail("mapsesisto@gufum.com");
+        userRepository.save(testUser2);
+
+        FriendRequest friendRequest = new FriendRequest();
+        friendRequest.setFrom(testUser1);
+        friendRequest.setTo(testUser2);
+        friendRequestRepository.save(friendRequest);
+
+        //wrong id for friend request
+        ResponseEntity<ExceptionResponse> response1 = restTemplate.postForEntity(friendsApiURL+ "/requests/5/decline", null,  ExceptionResponse.class);
+        assertThat(response1.getStatusCode()).isEqualTo(HttpStatus.NOT_FOUND);
+        assertThat(response1.getBody()).isNotNull();
+        assertThat(response1.getBody().errorCode()).isEqualTo(ErrorCode.ERROR_FINDING_FRIEND_REQUEST);
+        assertThat(response1.getBody().message()).isEqualTo("Friend request id and current user do not match");
+
+        //trying to decline some else's request
+        ResponseEntity<ExceptionResponse> response2 = restTemplate.postForEntity(friendsApiURL+ "/requests/" + friendRequest.getId() + "/decline", null, ExceptionResponse.class);
+        assertThat(response2.getStatusCode()).isEqualTo(HttpStatus.NOT_FOUND);
+        assertThat(response2.getBody()).isNotNull();
+        assertThat(response2.getBody().errorCode()).isEqualTo(ErrorCode.ERROR_FINDING_FRIEND_REQUEST);
+        assertThat(response2.getBody().message()).isEqualTo("Friend request id and current user do not match");
+    }
 
 
     @Test
