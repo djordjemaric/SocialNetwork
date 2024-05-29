@@ -3,9 +3,9 @@ package com.socialnetwork.socialnetwork.dto.friendRequest;
 import jakarta.validation.constraints.NotBlank;
 
 public record PreviewFriendRequestDTO(
-        @NotBlank
+        @NotBlank(message = "sender should not be blank")
         String sender,
-        @NotBlank
+        @NotBlank(message = "receiver should not be blank")
         String receiver
 ) {
 }
