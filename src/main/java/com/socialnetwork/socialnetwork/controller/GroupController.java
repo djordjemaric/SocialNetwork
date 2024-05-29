@@ -8,6 +8,7 @@ import com.socialnetwork.socialnetwork.dto.post.PostDTO;
 import com.socialnetwork.socialnetwork.exceptions.BusinessLogicException;
 import com.socialnetwork.socialnetwork.exceptions.ResourceNotFoundException;
 import com.socialnetwork.socialnetwork.service.GroupService;
+import jakarta.validation.Valid;
 import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.*;
 
@@ -26,7 +27,7 @@ public class GroupController {
 
     @ResponseStatus(HttpStatus.CREATED)
     @PostMapping
-    public GroupDTO createGroup(@RequestBody CreateGroupDTO createGroupDto) throws BusinessLogicException, ResourceNotFoundException {
+    public GroupDTO createGroup(@RequestBody @Valid CreateGroupDTO createGroupDto) throws BusinessLogicException, ResourceNotFoundException {
         return groupService.createGroup(createGroupDto);
     }
 
@@ -44,19 +45,19 @@ public class GroupController {
 
     @ResponseStatus(HttpStatus.OK)
     @GetMapping("/{id}/requests")
-    public List<GroupRequestDTO> getAllRequestForGroup(@PathVariable Integer id) throws ResourceNotFoundException {
+    public List<GroupRequestDTO> getAllRequestForGroup(@PathVariable Integer id) throws ResourceNotFoundException, BusinessLogicException {
         return groupService.getAllRequestsForGroup(id);
     }
 
     @ResponseStatus(HttpStatus.OK)
     @PostMapping("/{idGroup}/requests/{idRequest}/accept")
-    public void acceptRequest(@PathVariable Integer idGroup, @PathVariable Integer idRequest) throws ResourceNotFoundException {
+    public void acceptRequest(@PathVariable Integer idGroup, @PathVariable Integer idRequest) throws ResourceNotFoundException, BusinessLogicException {
         groupService.acceptRequest(idGroup, idRequest);
     }
 
     @ResponseStatus(HttpStatus.OK)
     @PostMapping("/{idGroup}/requests/{idRequest}/reject")
-    public void rejectRequest(@PathVariable Integer idGroup, @PathVariable Integer idRequest) throws ResourceNotFoundException {
+    public void rejectRequest(@PathVariable Integer idGroup, @PathVariable Integer idRequest) throws ResourceNotFoundException, BusinessLogicException {
         groupService.rejectRequest(idGroup, idRequest);
     }
 

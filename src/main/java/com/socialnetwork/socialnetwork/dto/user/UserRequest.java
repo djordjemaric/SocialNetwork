@@ -1,4 +1,4 @@
-package com.socialnetwork.socialnetwork.dto;
+package com.socialnetwork.socialnetwork.dto.user;
 
 import jakarta.validation.constraints.NotBlank;
 

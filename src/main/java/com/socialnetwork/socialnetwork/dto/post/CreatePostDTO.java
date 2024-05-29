@@ -6,7 +6,7 @@ import org.springframework.web.multipart.MultipartFile;
 
 public record CreatePostDTO(
         boolean isPublic,
-        @NotBlank
+        @NotBlank(message = "text should not be blank")
         String text,
         MultipartFile img,
         Integer idGroup) {
