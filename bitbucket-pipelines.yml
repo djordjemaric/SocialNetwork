@@ -55,13 +55,13 @@ definitions:
         name: Getting task definition file from AWS
         script:
           - *createOIDC
-          - aws ecs describe-task-definition --task-definition social-network-task > target/aws/taskDefinition.json
+          - aws ecs describe-task-definition --task-definition social-network-task > taskDefinition.json
         artifacts:
           - target/aws/taskDefinition.json
     - step: &cleaningJSON
         image: stedolan/jq
         script:
-          - jq 'del(.taskDefinitionArn, .requiresAttributes, .compatibilities, .registeredAt, .registeredBy, .revision, .status)' target/aws/taskDefinition.json > target/aws/taskDefinitionCleaned.json
+          - jq 'del(.taskDefinitionArn, .requiresAttributes, .compatibilities, .registeredAt, .registeredBy, .revision, .status)' target/aws/taskDefinition.json > taskDefinitionCleaned.json
         artifacts:
           - target/aws/taskDefinitionCleaned.json
     - step: &deployToECS
