@@ -12,7 +12,6 @@ import com.socialnetwork.socialnetwork.repository.*;
 import org.springframework.security.access.AccessDeniedException;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
-
 import java.util.List;
 
 import static com.socialnetwork.socialnetwork.exceptions.ErrorCode.*;
@@ -146,18 +145,18 @@ public class GroupService {
         GroupRequest request = groupRequestRepository.findById(idRequest).orElseThrow(() ->
                 new BusinessLogicException(ERROR_MANAGING_GROUP_REQUEST, "Group request with id "
                         + idRequest + "does not exist"));
-
-        User newMember = userRepository.findById(request.getUser().getId()).orElseThrow(() ->
-                new BusinessLogicException(ERROR_MANAGING_GROUP_REQUEST, "User with id " + request.getUser().getId() + "does not exist"));
+//
+//        User newMember = userRepository.findById(request.getUser().getId()).orElseThrow(() ->
+//                new BusinessLogicException(ERROR_MANAGING_GROUP_REQUEST, "User with id " + request.getUser().getId() + "does not exist"));
 
         if (!group.getAdmin().getId().equals(currentUser.getId())) {
             throw new AccessDeniedException("You are not an admin of a given group " + group.getName());
         }
 
-        if (!groupRequestRepository.existsByUserAndGroup(newMember, group)) {
-            throw new BusinessLogicException(ERROR_MANAGING_GROUP_REQUEST, "Request for given user " + newMember +
-                    " and group " + group + " does not exist");
-        }
+//        if (!groupRequestRepository.existsByUserAndGroup(newMember, group)) {
+//            throw new BusinessLogicException(ERROR_MANAGING_GROUP_REQUEST, "Request for given user " + newMember +
+//                    " and group " + group + " does not exist");
+//        }
 
         if (group.isPublic()) {
             throw new BusinessLogicException(ERROR_MANAGING_GROUP_REQUEST, "You can't accept or reject a request if group is public");

@@ -4,6 +4,8 @@ import com.socialnetwork.socialnetwork.IntegrationTestConfiguration;
 import com.socialnetwork.socialnetwork.dto.group.*;
 import com.socialnetwork.socialnetwork.dto.post.PostDTO;
 import com.socialnetwork.socialnetwork.entity.*;
+import com.socialnetwork.socialnetwork.exceptions.ErrorCode;
+import com.socialnetwork.socialnetwork.exceptions.ExceptionResponse;
 import com.socialnetwork.socialnetwork.exceptions.ResourceNotFoundException;
 import com.socialnetwork.socialnetwork.repository.*;
 import org.junit.jupiter.api.AfterEach;
@@ -65,27 +67,28 @@ class GroupControllerTestInt extends IntegrationTestConfiguration {
         assertThat(response.getStatusCode()).isEqualTo(HttpStatus.CREATED);
     }
 
-    //    @Order(2)
-//    @DisplayName("Creating group with duplicate name should return exception) //doradi
-//    @Test
-//    void creatingGroupWithDuplicateNameShouldReturnException() throws ResourceNotFoundException {
-//        User user = jwtService.getUser();
-//        userRepository.save(user);
-//
-//        Group testGroup = new Group();
-//        testGroup.setName("Test");
-//        testGroup.setPublic(false);
-//        testGroup.setAdmin(user);
-//        groupRepository.save(testGroup);
-//
-//        String urlWithParams = UriComponentsBuilder.fromUriString(groupsApiURL).toUriString();
-//
-//        ResponseEntity<ExceptionResponse> response = restTemplate.postForEntity(urlWithParams, new CreateGroupDTO("Test", false), ExceptionResponse.class);
-//        assertThat(response.getStatusCode()).isEqualTo(HttpStatus.BAD_REQUEST);
-//        assertThat(response.getBody()).isNotNull();
-//        assertThat(response.getBody().errorCode()).isEqualTo(ErrorCode.ERROR_CREATING_GROUP);
-//        assertThat(response.getBody().message()).isEqualTo("Group with that name already exists.");
-//    }
+    @Order(2)
+    @DisplayName("Creating group with duplicate name should return exception")
+    @Test
+    void creatingGroupWithDuplicateNameShouldReturnException() throws ResourceNotFoundException {
+        User user = jwtService.getUser();
+        userRepository.save(user);
+
+        Group testGroup = new Group();
+        testGroup.setName("Test");
+        testGroup.setPublic(false);
+        testGroup.setAdmin(user);
+        groupRepository.save(testGroup);
+
+        String urlWithParams = UriComponentsBuilder.fromUriString(groupsApiURL).toUriString();
+
+        ResponseEntity<ExceptionResponse> response = restTemplate.postForEntity(urlWithParams, new CreateGroupDTO("Test", false), ExceptionResponse.class);
+        assertThat(response.getStatusCode()).isEqualTo(HttpStatus.BAD_REQUEST);
+        assertThat(response.getBody()).isNotNull();
+        assertThat(response.getBody().errorCode()).isEqualTo(ErrorCode.ERROR_CREATING_GROUP);
+        assertThat(response.getBody().message()).isEqualTo("Group with that name already exists.");
+    }
+
     @Order(3)
     @DisplayName("Successfully deleting group")
     @Test
@@ -128,43 +131,42 @@ class GroupControllerTestInt extends IntegrationTestConfiguration {
         boolean groupRequestsExist = groupRequestRepository.existsByGroupId(testGroup.getId());
         assertThat(groupRequestsExist).isFalse();
     }
-//    @Order(4)
-//    @DisplayName("Deleting group by non-admin user should return exception")
-//    @Test
-//    void deletingGroupByNonAdminUserShouldReturnException() throws ResourceNotFoundException {
-//        User user = jwtService.getUser();
-//        userRepository.save(user);
-//
-//        User testUser = new User();
-//        testUser.setUserSub("f3841812-e0f1-7025-b7bc-ce67d7fb933e");
-//        testUser.setEmail("xanitev711@mcatag.com");
-//        testUser = userRepository.save(testUser);
-//
-//        Group testGroup = new Group();
-//        testGroup.setName("Test");
-//        testGroup.setPublic(false);
-//        testGroup.setAdmin(testUser);
-//        testGroup = groupRepository.save(testGroup);
-//
-//        GroupMember groupMember = new GroupMember();
-//        groupMember.setMember(testUser);
-//        groupMember.setGroup(testGroup);
-//        groupMemberRepository.save(groupMember);
-//
-//        GroupRequest testGroupRequest = new GroupRequest();
-//        testGroupRequest.setUser(user);
-//        testGroupRequest.setGroup(testGroup);
-//        groupRequestRepository.save(testGroupRequest);
-//
-//        String urlWithParams = UriComponentsBuilder.fromUriString(groupsApiURL).path("/{id}").buildAndExpand(testGroup.getId()).toUriString();
-//
-//        ResponseEntity<ExceptionResponse> response = restTemplate.exchange(urlWithParams, HttpMethod.DELETE,null, ExceptionResponse.class);
-//        assertThat(response.getStatusCode()).isEqualTo(HttpStatus.NOT_FOUND);
-//        assertThat(response.getBody()).isNotNull();
-//        assertThat(response.getBody().errorCode()).isEqualTo(ErrorCode.ERROR_FINDING_USER);
-//        assertThat(response.getBody().message()).isEqualTo("You can't delete a group that you are not an admin of.");
-//
-//    }
+    @Order(4)
+    @DisplayName("Deleting group by non-admin user should return exception")
+    @Test
+    void deletingGroupByNonAdminUserShouldReturnException() throws ResourceNotFoundException {
+        User user = jwtService.getUser();
+        userRepository.save(user);
+
+        User testUser = new User();
+        testUser.setUserSub("f3841812-e0f1-7025-b7bc-ce67d7fb933e");
+        testUser.setEmail("xanitev711@mcatag.com");
+        testUser = userRepository.save(testUser);
+
+        Group testGroup = new Group();
+        testGroup.setName("Test");
+        testGroup.setPublic(false);
+        testGroup.setAdmin(testUser);
+        testGroup = groupRepository.save(testGroup);
+
+        GroupMember groupMember = new GroupMember();
+        groupMember.setMember(testUser);
+        groupMember.setGroup(testGroup);
+        groupMemberRepository.save(groupMember);
+
+        GroupRequest testGroupRequest = new GroupRequest();
+        testGroupRequest.setUser(user);
+        testGroupRequest.setGroup(testGroup);
+        groupRequestRepository.save(testGroupRequest);
+
+        String urlWithParams = UriComponentsBuilder.fromUriString(groupsApiURL).path("/{id}").buildAndExpand(testGroup.getId()).toUriString();
+
+        ResponseEntity<ExceptionResponse> response = restTemplate.exchange(urlWithParams, HttpMethod.DELETE,null, ExceptionResponse.class);
+        assertThat(response.getStatusCode()).isEqualTo(HttpStatus.FORBIDDEN);
+        assertThat(response.getBody()).isNotNull();
+        assertThat(response.getBody().message()).isEqualTo("You can't delete a group that you are not an admin of.");
+
+    }
 
     @Order(5)
     @DisplayName("Successfully returning groups by name")
@@ -234,44 +236,43 @@ class GroupControllerTestInt extends IntegrationTestConfiguration {
         assertThat(returnedRequest.userDTO()).isNotNull();
     }
 
-//    @Order(7)
-//    @DisplayName("Returning all requests for non-existent group should return exception")
-//    @Test
-//    void returningAllRequestsForNonExistentGroupShouldReturnException() {
-//        String urlWithParams = UriComponentsBuilder.fromUriString(groupsApiURL).path("/{id}/requests").buildAndExpand(5).toUriString();
-//
-//        ResponseEntity<ExceptionResponse> response = restTemplate.getForEntity(urlWithParams, HttpMethod.GET, ExceptionResponse.class);
-//
-//        assertThat(response.getStatusCode()).isEqualTo(HttpStatus.NOT_FOUND);
-//        assertThat(response.getBody()).isNotNull();
-//        assertThat(response.getBody().errorCode()).isEqualTo(ErrorCode.ERROR_FINDING_USER);
-//        assertThat(response.getBody().message()).isEqualTo("Group with id " + 5 + "does not exist");
-//    }
+    @Order(7)
+    @DisplayName("Returning all requests for non-existent group should return exception")
+    @Test
+    void returningAllRequestsForNonExistentGroupShouldReturnException() {
+        String urlWithParams = UriComponentsBuilder.fromUriString(groupsApiURL).path("/{id}/requests").buildAndExpand(5).toUriString();
 
-//    @Order(8)
-//    @DisplayName("Returning all requests for group when not admin should return exception")
-//    @Test
-//    void returningAllRequestsForGroupWhenNotAdminShouldReturnException() {
-//        User testUser = new User();
-//        testUser.setUserSub("f3841812-e0f1-7025-b7bc-ce67d7fb933e");
-//        testUser.setEmail("xanitev711@mcatag.com");
-//        testUser = userRepository.save(testUser);
-//
-//        Group testGroup = new Group();
-//        testGroup.setName("Test");
-//        testGroup.setPublic(false);
-//        testGroup.setAdmin(testUser);
-//        testGroup = groupRepository.save(testGroup);
-//
-//        String urlWithParams = UriComponentsBuilder.fromUriString(groupsApiURL).path("/{id}/requests").buildAndExpand(testGroup.getId()).toUriString();
-//
-//        ResponseEntity<ExceptionResponse> response = restTemplate.getForEntity(urlWithParams, HttpMethod.GET, ExceptionResponse.class);
-//
-//        assertThat(response.getStatusCode()).isEqualTo(HttpStatus.NOT_FOUND);
-//        assertThat(response.getBody()).isNotNull();
-//        assertThat(response.getBody().errorCode()).isEqualTo(ErrorCode.ERROR_FINDING_USER);
-//        assertThat(response.getBody().message()).isEqualTo("You are not an admin of a given group " + testGroup.getName());
-//    }
+        ResponseEntity<ExceptionResponse> response = restTemplate.getForEntity(urlWithParams, ExceptionResponse.class);
+
+        assertThat(response.getStatusCode()).isEqualTo(HttpStatus.BAD_REQUEST);
+        assertThat(response.getBody()).isNotNull();
+        assertThat(response.getBody().errorCode()).isEqualTo(ErrorCode.ERROR_GETTING_GROUP_REQUESTS);
+        assertThat(response.getBody().message()).isEqualTo("Group with id " + 5 + "does not exist");
+    }
+
+    @Order(8)
+    @DisplayName("Returning all requests for group when not admin should return exception")
+    @Test
+    void returningAllRequestsForGroupWhenNotAdminShouldReturnException() {
+        User testUser = new User();
+        testUser.setUserSub("f3841812-e0f1-7025-b7bc-ce67d7fb933e");
+        testUser.setEmail("xanitev711@mcatag.com");
+        testUser = userRepository.save(testUser);
+
+        Group testGroup = new Group();
+        testGroup.setName("Test");
+        testGroup.setPublic(false);
+        testGroup.setAdmin(testUser);
+        testGroup = groupRepository.save(testGroup);
+
+        String urlWithParams = UriComponentsBuilder.fromUriString(groupsApiURL).path("/{id}/requests").buildAndExpand(testGroup.getId()).toUriString();
+
+        ResponseEntity<ExceptionResponse> response = restTemplate.getForEntity(urlWithParams, ExceptionResponse.class);
+
+        assertThat(response.getStatusCode()).isEqualTo(HttpStatus.FORBIDDEN);
+        assertThat(response.getBody()).isNotNull();
+        assertThat(response.getBody().message()).isEqualTo("You are not an admin of a given group " + testGroup.getName());
+    }
 
     @Order(9)
     @DisplayName("Successfully accept request")
@@ -315,51 +316,51 @@ class GroupControllerTestInt extends IntegrationTestConfiguration {
         assertThat(userIsMember).isTrue();
     }
 
-//    @Order(10)
-//    @DisplayName("Accepting request for non-existent group should return exception")
-//    @Test
-//    void acceptingRequestForNonExistentGroupShouldReturnException() {
-//        String urlWithParams = UriComponentsBuilder.fromUriString(groupsApiURL).path("/{idGroup}/requests/{idRequest}/accept").buildAndExpand(5,5).toUriString();
-//
-//        ResponseEntity<ExceptionResponse> response = restTemplate.postForEntity(urlWithParams,null, ExceptionResponse.class);
-//
-//        assertThat(response.getStatusCode()).isEqualTo(HttpStatus.NOT_FOUND);
-//        assertThat(response.getBody()).isNotNull();
-//        assertThat(response.getBody().errorCode()).isEqualTo(ErrorCode.ERROR_FINDING_USER);
-//        assertThat(response.getBody().message()).isEqualTo("Group with id " + 5 + "does not exist");
-//    }
+    @Order(10)
+    @DisplayName("Accepting request for non-existent group should return exception")
+    @Test
+    void acceptingRequestForNonExistentGroupShouldReturnException() {
+        String urlWithParams = UriComponentsBuilder.fromUriString(groupsApiURL).path("/{idGroup}/requests/{idRequest}/accept").buildAndExpand(5,5).toUriString();
 
-//    @Order(11)
-//    @DisplayName("Accepting request for non-existent group request should return exception")
-//    @Test
-//    void acceptingRequestForNonExistentGroupRequestShouldReturnException() throws ResourceNotFoundException {
-//        User user = jwtService.getUser();
-//
-//        User testUser = new User();
-//        testUser.setUserSub("f3841812-e0f1-7025-b7bc-ce67d7fb933e");
-//        testUser.setEmail("xanitev711@mcatag.com");
-//        testUser = userRepository.save(testUser);
-//
-//        Group testGroup = new Group();
-//        testGroup.setName("Test");
-//        testGroup.setPublic(false);
-//        testGroup.setAdmin(user);
-//        testGroup = groupRepository.save(testGroup);
-//
-//        GroupMember groupMember = new GroupMember();
-//        groupMember.setMember(user);
-//        groupMember.setGroup(testGroup);
-//        groupMemberRepository.save(groupMember);
-//
-//        String urlWithParams = UriComponentsBuilder.fromUriString(groupsApiURL).path("/{idGroup}/requests/{idRequest}/accept").buildAndExpand(testGroup.getId(),5).toUriString();
-//
-//        ResponseEntity<ExceptionResponse> response = restTemplate.postForEntity(urlWithParams,null, ExceptionResponse.class);
-//
-//        assertThat(response.getStatusCode()).isEqualTo(HttpStatus.NOT_FOUND);
-//        assertThat(response.getBody()).isNotNull();
-//        assertThat(response.getBody().errorCode()).isEqualTo(ErrorCode.ERROR_FINDING_USER);
-//        assertThat(response.getBody().message()).isEqualTo("Group request with id " + 5 + "does not exist");
-//    }
+        ResponseEntity<ExceptionResponse> response = restTemplate.postForEntity(urlWithParams,null, ExceptionResponse.class);
+
+        assertThat(response.getStatusCode()).isEqualTo(HttpStatus.BAD_REQUEST);
+        assertThat(response.getBody()).isNotNull();
+        assertThat(response.getBody().errorCode()).isEqualTo(ErrorCode.ERROR_MANAGING_GROUP_REQUEST);
+        assertThat(response.getBody().message()).isEqualTo("Group with id " + 5 + "does not exist");
+    }
+
+    @Order(11)
+    @DisplayName("Accepting request for non-existent group request should return exception")
+    @Test
+    void acceptingRequestForNonExistentGroupRequestShouldReturnException() throws ResourceNotFoundException {
+        User user = jwtService.getUser();
+
+        User testUser = new User();
+        testUser.setUserSub("f3841812-e0f1-7025-b7bc-ce67d7fb933e");
+        testUser.setEmail("xanitev711@mcatag.com");
+        testUser = userRepository.save(testUser);
+
+        Group testGroup = new Group();
+        testGroup.setName("Test");
+        testGroup.setPublic(false);
+        testGroup.setAdmin(user);
+        testGroup = groupRepository.save(testGroup);
+
+        GroupMember groupMember = new GroupMember();
+        groupMember.setMember(user);
+        groupMember.setGroup(testGroup);
+        groupMemberRepository.save(groupMember);
+
+        String urlWithParams = UriComponentsBuilder.fromUriString(groupsApiURL).path("/{idGroup}/requests/{idRequest}/accept").buildAndExpand(testGroup.getId(),5).toUriString();
+
+        ResponseEntity<ExceptionResponse> response = restTemplate.postForEntity(urlWithParams,null, ExceptionResponse.class);
+
+        assertThat(response.getStatusCode()).isEqualTo(HttpStatus.BAD_REQUEST);
+        assertThat(response.getBody()).isNotNull();
+        assertThat(response.getBody().errorCode()).isEqualTo(ErrorCode.ERROR_MANAGING_GROUP_REQUEST);
+        assertThat(response.getBody().message()).isEqualTo("Group request with id " + 5 + "does not exist");
+    }
 
 //    @Order(12)
 //    @DisplayName("Accepting request for non-existent user should return exception")
@@ -392,52 +393,51 @@ class GroupControllerTestInt extends IntegrationTestConfiguration {
 //
 //        ResponseEntity<ExceptionResponse> response = restTemplate.postForEntity(urlWithParams,null, ExceptionResponse.class);
 //
-//        assertThat(response.getStatusCode()).isEqualTo(HttpStatus.NOT_FOUND);
+//        assertThat(response.getStatusCode()).isEqualTo(HttpStatus.BAD_REQUEST);
 //        assertThat(response.getBody()).isNotNull();
-//        assertThat(response.getBody().errorCode()).isEqualTo(ErrorCode.ERROR_FINDING_USER);
+//        assertThat(response.getBody().errorCode()).isEqualTo(ErrorCode.ERROR_MANAGING_GROUP_REQUEST);
 //        assertThat(response.getBody().message()).isEqualTo("User with id " + testUser.getId() + "does not exist");
 //    }
 
 
-//    @Order(13)
-//    @DisplayName("Accepting request by non-admin user should return exception")
-//    @Test
-//    void acceptingRequestByNonAdminUserShouldReturnException() {
-//        User testUser = new User();
-//        testUser.setUserSub("f3841812-e0f1-7025-b7bc-ce67d7fb933e");
-//        testUser.setEmail("xanitev711@mcatag.com");
-//        testUser = userRepository.save(testUser);
-//
-//        User testUser2 = new User();
-//        testUser2.setUserSub("73140822-2011-705f-ce8c-675fa425e435");
-//        testUser2.setEmail("mapsesisto@gufum.com");
-//        testUser2 = userRepository.save(testUser2);
-//
-//        Group testGroup = new Group();
-//        testGroup.setName("Test");
-//        testGroup.setPublic(false);
-//        testGroup.setAdmin(testUser);
-//        testGroup = groupRepository.save(testGroup);
-//
-//        GroupMember groupMember = new GroupMember();
-//        groupMember.setMember(testUser);
-//        groupMember.setGroup(testGroup);
-//        groupMemberRepository.save(groupMember);
-//
-//        GroupRequest groupRequest = new GroupRequest();
-//        groupRequest.setUser(testUser2);
-//        groupRequest.setGroup(testGroup);
-//        groupRequest = groupRequestRepository.save(groupRequest);
-//
-//        String urlWithParams = UriComponentsBuilder.fromUriString(groupsApiURL).path("/{idGroup}/requests/{idRequest}/accept").buildAndExpand(testGroup.getId(),groupRequest.getId()).toUriString();
-//
-//        ResponseEntity<ExceptionResponse> response = restTemplate.postForEntity(urlWithParams,null, ExceptionResponse.class);
-//
-//        assertThat(response.getStatusCode()).isEqualTo(HttpStatus.NOT_FOUND);
-//        assertThat(response.getBody()).isNotNull();
-//        assertThat(response.getBody().errorCode()).isEqualTo(ErrorCode.ERROR_FINDING_USER);
-//        assertThat(response.getBody().message()).isEqualTo("You are not an admin of a given group " + testGroup.getName());
-//    }
+    @Order(12)
+    @DisplayName("Accepting request by non-admin user should return exception")
+    @Test
+    void acceptingRequestByNonAdminUserShouldReturnException() {
+        User testUser = new User();
+        testUser.setUserSub("f3841812-e0f1-7025-b7bc-ce67d7fb933e");
+        testUser.setEmail("xanitev711@mcatag.com");
+        testUser = userRepository.save(testUser);
+
+        User testUser2 = new User();
+        testUser2.setUserSub("73140822-2011-705f-ce8c-675fa425e435");
+        testUser2.setEmail("mapsesisto@gufum.com");
+        testUser2 = userRepository.save(testUser2);
+
+        Group testGroup = new Group();
+        testGroup.setName("Test");
+        testGroup.setPublic(false);
+        testGroup.setAdmin(testUser);
+        testGroup = groupRepository.save(testGroup);
+
+        GroupMember groupMember = new GroupMember();
+        groupMember.setMember(testUser);
+        groupMember.setGroup(testGroup);
+        groupMemberRepository.save(groupMember);
+
+        GroupRequest groupRequest = new GroupRequest();
+        groupRequest.setUser(testUser2);
+        groupRequest.setGroup(testGroup);
+        groupRequest = groupRequestRepository.save(groupRequest);
+
+        String urlWithParams = UriComponentsBuilder.fromUriString(groupsApiURL).path("/{idGroup}/requests/{idRequest}/accept").buildAndExpand(testGroup.getId(),groupRequest.getId()).toUriString();
+
+        ResponseEntity<ExceptionResponse> response = restTemplate.postForEntity(urlWithParams,null, ExceptionResponse.class);
+
+        assertThat(response.getStatusCode()).isEqualTo(HttpStatus.FORBIDDEN);
+        assertThat(response.getBody()).isNotNull();
+        assertThat(response.getBody().message()).isEqualTo("You are not an admin of a given group " + testGroup.getName());
+    }
 
 
 //    @Order(14) OVO NE VALJA SREDI TO
@@ -478,51 +478,51 @@ class GroupControllerTestInt extends IntegrationTestConfiguration {
 //
 //        ResponseEntity<ExceptionResponse> response = restTemplate.postForEntity(urlWithParams,null, ExceptionResponse.class);
 //
-//        assertThat(response.getStatusCode()).isEqualTo(HttpStatus.NOT_FOUND);
+//        assertThat(response.getStatusCode()).isEqualTo(HttpStatus.BAD_REQUEST);
 //        assertThat(response.getBody()).isNotNull();
-//        assertThat(response.getBody().errorCode()).isEqualTo(ErrorCode.ERROR_FINDING_USER);
+//        assertThat(response.getBody().errorCode()).isEqualTo(ErrorCode.ERROR_MANAGING_GROUP_REQUEST);
 //        assertThat(response.getBody().message()).isEqualTo("You are not an admin of a given group " + testGroup.getName());
 //    }
 
-//    @Order(15)
-//    @DisplayName("Attempting to accept request for public group returns exception")
-//    @Test
-//    void acceptingRequestForPublicGroupShouldReturnException() throws ResourceNotFoundException {
-//        User user = jwtService.getUser();
-//
-//        User testUser = new User();
-//        testUser.setUserSub("f3841812-e0f1-7025-b7bc-ce67d7fb933e");
-//        testUser.setEmail("xanitev711@mcatag.com");
-//        testUser =  userRepository.save(testUser);
-//
-//        Group testGroup = new Group();
-//        testGroup.setName("Test");
-//        testGroup.setPublic(true);
-//        testGroup.setAdmin(user);
-//        testGroup = groupRepository.save(testGroup);
-//
-//        GroupMember groupMember = new GroupMember();
-//        groupMember.setMember(user);
-//        groupMember.setGroup(testGroup);
-//        groupMemberRepository.save(groupMember);
-//
-//        GroupRequest groupRequest = new GroupRequest();
-//        groupRequest.setUser(testUser);
-//        groupRequest.setGroup(testGroup);
-//        groupRequest = groupRequestRepository.save(groupRequest);
-//
-//
-//        String urlWithParams = UriComponentsBuilder.fromUriString(groupsApiURL).path("/{idGroup}/requests/{idRequest}/accept").buildAndExpand(testGroup.getId(),groupRequest.getId()).toUriString();
-//
-//        ResponseEntity<ExceptionResponse> response = restTemplate.postForEntity(urlWithParams,null, ExceptionResponse.class);
-//
-//        assertThat(response.getStatusCode()).isEqualTo(HttpStatus.NOT_FOUND);
-//        assertThat(response.getBody()).isNotNull();
-//        assertThat(response.getBody().errorCode()).isEqualTo(ErrorCode.ERROR_FINDING_USER);
-//        assertThat(response.getBody().message()).isEqualTo("You can't accept or reject a request if group is public");
-//    }
+    @Order(13)
+    @DisplayName("Attempting to accept request for public group returns exception")
+    @Test
+    void acceptingRequestForPublicGroupShouldReturnException() throws ResourceNotFoundException {
+        User user = jwtService.getUser();
 
-    @Order(16)
+        User testUser = new User();
+        testUser.setUserSub("f3841812-e0f1-7025-b7bc-ce67d7fb933e");
+        testUser.setEmail("xanitev711@mcatag.com");
+        testUser =  userRepository.save(testUser);
+
+        Group testGroup = new Group();
+        testGroup.setName("Test");
+        testGroup.setPublic(true);
+        testGroup.setAdmin(user);
+        testGroup = groupRepository.save(testGroup);
+
+        GroupMember groupMember = new GroupMember();
+        groupMember.setMember(user);
+        groupMember.setGroup(testGroup);
+        groupMemberRepository.save(groupMember);
+
+        GroupRequest groupRequest = new GroupRequest();
+        groupRequest.setUser(testUser);
+        groupRequest.setGroup(testGroup);
+        groupRequest = groupRequestRepository.save(groupRequest);
+
+
+        String urlWithParams = UriComponentsBuilder.fromUriString(groupsApiURL).path("/{idGroup}/requests/{idRequest}/accept").buildAndExpand(testGroup.getId(),groupRequest.getId()).toUriString();
+
+        ResponseEntity<ExceptionResponse> response = restTemplate.postForEntity(urlWithParams,null, ExceptionResponse.class);
+
+        assertThat(response.getStatusCode()).isEqualTo(HttpStatus.BAD_REQUEST);
+        assertThat(response.getBody()).isNotNull();
+        assertThat(response.getBody().errorCode()).isEqualTo(ErrorCode.ERROR_MANAGING_GROUP_REQUEST);
+        assertThat(response.getBody().message()).isEqualTo("You can't accept or reject a request if group is public");
+    }
+
+    @Order(14)
     @DisplayName("Successfully reject request")
     @Test
     void successfullyRejectRequest() throws ResourceNotFoundException {
@@ -563,7 +563,7 @@ class GroupControllerTestInt extends IntegrationTestConfiguration {
         assertThat(groupExists).isTrue();
     }
 
-    @Order(17)
+    @Order(15)
     @DisplayName("Successfully create request to join to private group")
     @Test
     void successfullyCreateRequestForPrivateGroup() throws ResourceNotFoundException {
@@ -597,77 +597,77 @@ class GroupControllerTestInt extends IntegrationTestConfiguration {
         assertThat(groupExists).isTrue();
     }
 
-//    @Order(18)
-//    @DisplayName("Attempting to create request to join non-existing private group returns exception")
-//    @Test
-//    void createRequestForNonExistingPrivateGroupShouldReturnException() {
-//        String urlWithParams = UriComponentsBuilder.fromUriString(groupsApiURL).path("/{id}/join").buildAndExpand(5).toUriString();
-//
-//        ResponseEntity<ExceptionResponse> response = restTemplate.postForEntity(urlWithParams,null, ExceptionResponse.class);
-//
-//        assertThat(response.getStatusCode()).isEqualTo(HttpStatus.NOT_FOUND);
-//        assertThat(response.getBody()).isNotNull();
-//        assertThat(response.getBody().errorCode()).isEqualTo(ErrorCode.ERROR_FINDING_USER);
-//        assertThat(response.getBody().message()).isEqualTo("Group with id " + 5 + "does not exist");
-//
-//    }
+    @Order(16)
+    @DisplayName("Attempting to create request to join non-existing private group returns exception")
+    @Test
+    void createRequestForNonExistingPrivateGroupShouldReturnException() {
+        String urlWithParams = UriComponentsBuilder.fromUriString(groupsApiURL).path("/{id}/join").buildAndExpand(5).toUriString();
 
-//    @Order(19)
-//    @DisplayName("Creating duplicate request to join private group returns exception")
-//    @Test
-//    void createDuplicateRequestForPrivateGroupShouldReturnException() throws ResourceNotFoundException {
-//        User user = jwtService.getUser();
-//
-//        Group testGroup = new Group();
-//        testGroup.setName("Test");
-//        testGroup.setPublic(false);
-//        testGroup.setAdmin(user);
-//        testGroup = groupRepository.save(testGroup);
-//
-//        GroupRequest request = new GroupRequest();
-//        request.setUser(user);
-//        request.setGroup(testGroup);
-//        groupRequestRepository.save(request);
-//
-//        String urlWithParams = UriComponentsBuilder.fromUriString(groupsApiURL).path("/{id}/join").buildAndExpand(testGroup.getId()).toUriString();
-//
-//        ResponseEntity<ExceptionResponse> response = restTemplate.postForEntity(urlWithParams,null, ExceptionResponse.class);
-//
-//        assertThat(response.getStatusCode()).isEqualTo(HttpStatus.NOT_FOUND);
-//        assertThat(response.getBody()).isNotNull();
-//        assertThat(response.getBody().errorCode()).isEqualTo(ErrorCode.ERROR_FINDING_USER);
-//        assertThat(response.getBody().message()).isEqualTo("The request has already been sent.");
-//
-//    }
+        ResponseEntity<ExceptionResponse> response = restTemplate.postForEntity(urlWithParams,null, ExceptionResponse.class);
 
-    //    @Order(20)
-//    @DisplayName("Create request to join private group when already a member returns exception")
-//    @Test
-//    void createRequestForPrivateGroupWhenAlreadyMemberShouldReturnException() throws ResourceNotFoundException {
-//        User user = jwtService.getUser();
-//
-//        Group testGroup = new Group();
-//        testGroup.setName("Test");
-//        testGroup.setPublic(false);
-//        testGroup.setAdmin(user);
-//        testGroup = groupRepository.save(testGroup);
-//
-//        GroupMember groupMember = new GroupMember();
-//        groupMember.setGroup(testGroup);
-//        groupMember.setMember(user);
-//        groupMemberRepository.save(groupMember);
-//
-//        String urlWithParams = UriComponentsBuilder.fromUriString(groupsApiURL).path("/{id}/join").buildAndExpand(testGroup.getId()).toUriString();
-//
-//        ResponseEntity<ExceptionResponse> response = restTemplate.postForEntity(urlWithParams,null, ExceptionResponse.class);
-//
-//        assertThat(response.getStatusCode()).isEqualTo(HttpStatus.NOT_FOUND);
-//        assertThat(response.getBody()).isNotNull();
-//        assertThat(response.getBody().errorCode()).isEqualTo(ErrorCode.ERROR_FINDING_USER);
-//        assertThat(response.getBody().message()).isEqualTo("You are already member of that group.");
-//
-//    }
-    @Order(21)
+        assertThat(response.getStatusCode()).isEqualTo(HttpStatus.BAD_REQUEST);
+        assertThat(response.getBody()).isNotNull();
+        assertThat(response.getBody().errorCode()).isEqualTo(ErrorCode.ERROR_CREATING_REQUEST_GROUP);
+        assertThat(response.getBody().message()).isEqualTo("Group with id " + 5 + "does not exist");
+
+    }
+
+    @Order(17)
+    @DisplayName("Creating duplicate request to join private group returns exception")
+    @Test
+    void createDuplicateRequestForPrivateGroupShouldReturnException() throws ResourceNotFoundException {
+        User user = jwtService.getUser();
+
+        Group testGroup = new Group();
+        testGroup.setName("Test");
+        testGroup.setPublic(false);
+        testGroup.setAdmin(user);
+        testGroup = groupRepository.save(testGroup);
+
+        GroupRequest request = new GroupRequest();
+        request.setUser(user);
+        request.setGroup(testGroup);
+        groupRequestRepository.save(request);
+
+        String urlWithParams = UriComponentsBuilder.fromUriString(groupsApiURL).path("/{id}/join").buildAndExpand(testGroup.getId()).toUriString();
+
+        ResponseEntity<ExceptionResponse> response = restTemplate.postForEntity(urlWithParams,null, ExceptionResponse.class);
+
+        assertThat(response.getStatusCode()).isEqualTo(HttpStatus.BAD_REQUEST);
+        assertThat(response.getBody()).isNotNull();
+        assertThat(response.getBody().errorCode()).isEqualTo(ErrorCode.ERROR_CREATING_REQUEST_GROUP);
+        assertThat(response.getBody().message()).isEqualTo("The request has already been sent.");
+
+    }
+
+    @Order(18)
+    @DisplayName("Create request to join private group when already a member returns exception")
+    @Test
+    void createRequestForPrivateGroupWhenAlreadyMemberShouldReturnException() throws ResourceNotFoundException {
+        User user = jwtService.getUser();
+
+        Group testGroup = new Group();
+        testGroup.setName("Test");
+        testGroup.setPublic(false);
+        testGroup.setAdmin(user);
+        testGroup = groupRepository.save(testGroup);
+
+        GroupMember groupMember = new GroupMember();
+        groupMember.setGroup(testGroup);
+        groupMember.setMember(user);
+        groupMemberRepository.save(groupMember);
+
+        String urlWithParams = UriComponentsBuilder.fromUriString(groupsApiURL).path("/{id}/join").buildAndExpand(testGroup.getId()).toUriString();
+
+        ResponseEntity<ExceptionResponse> response = restTemplate.postForEntity(urlWithParams,null, ExceptionResponse.class);
+
+        assertThat(response.getStatusCode()).isEqualTo(HttpStatus.BAD_REQUEST);
+        assertThat(response.getBody()).isNotNull();
+        assertThat(response.getBody().errorCode()).isEqualTo(ErrorCode.ERROR_CREATING_REQUEST_GROUP);
+        assertThat(response.getBody().message()).isEqualTo("You are already member of that group.");
+
+    }
+    @Order(19)
     @DisplayName("Successfully create request to join to public group and automatically accept")
     @Test
     void successfullyCreateRequestForPublicGroup() throws ResourceNotFoundException {
@@ -704,7 +704,7 @@ class GroupControllerTestInt extends IntegrationTestConfiguration {
         assertThat(groupMember).isTrue();
     }
 
-    @Order(22)
+    @Order(20)
     @DisplayName("Successfully return all posts for private group ")
     @Test
     void successfullyReturnPostsForPrivateGroup() throws ResourceNotFoundException {
@@ -745,7 +745,7 @@ class GroupControllerTestInt extends IntegrationTestConfiguration {
     }
 
 
-    @Order(23)
+    @Order(21)
     @DisplayName("Successfully return all posts for public group ")
     @Test
     void successfullyReturnPostsForPublicGroup() throws ResourceNotFoundException {
@@ -784,7 +784,8 @@ class GroupControllerTestInt extends IntegrationTestConfiguration {
         assertThat(returnedPost.userEmail()).isEqualTo(user.getEmail());
         assertThat(returnedPost.groupName()).isEqualTo(testGroup.getName());
     }
-    @Order(24)
+
+    @Order(22)
     @DisplayName("Successfully return all posts for public group in which user is not a member")
     @Test
     void successfullyReturnPostsForPublicGroupAndUserIsNotAMemberOfThatGroup() throws ResourceNotFoundException {
@@ -819,60 +820,59 @@ class GroupControllerTestInt extends IntegrationTestConfiguration {
         assertThat(returnedPost.groupName()).isEqualTo(testGroup.getName());
     }
 
-//    @Order(25)
-//    @DisplayName("Return all posts for which group which does not exist return exception ")
-//    @Test
-//    void returnAllPostsForGroupThatDoesNotExistReturnException() {
-//        String urlWithParams = UriComponentsBuilder.fromUriString(groupsApiURL).path("/{id}/posts").buildAndExpand(5).toUriString();
-//
-//        ResponseEntity<ExceptionResponse> response = restTemplate.getForEntity(urlWithParams, ExceptionResponse.class);
-//
-//        assertThat(response.getStatusCode()).isEqualTo(HttpStatus.NOT_FOUND);
-//        assertThat(response.getBody()).isNotNull();
-//        assertThat(response.getBody().errorCode()).isEqualTo(ErrorCode.ERROR_FINDING_USER);
-//        assertThat(response.getBody().message()).isEqualTo("Group request with id " + 5 + "does not exist");
-//    }
+    @Order(23)
+    @DisplayName("Return all posts for which group which does not exist return exception ")
+    @Test
+    void returnAllPostsForGroupThatDoesNotExistReturnException() {
+        String urlWithParams = UriComponentsBuilder.fromUriString(groupsApiURL).path("/{id}/posts").buildAndExpand(5).toUriString();
 
-//    @Order(26)
-//    @DisplayName("Return all posts for group if user is not a member of that group return exception")
-//    @Test
-//    void returnAllPostsForGroupInWhichUserIsNotAMemberOfReturnException() throws ResourceNotFoundException {
-//        User user = jwtService.getUser();
-//
-//        User testUser = new User();
-//        testUser.setUserSub("f3841812-e0f1-7025-b7bc-ce67d7fb933e");
-//        testUser.setEmail("xanitev711@mcatag.com");
-//        testUser = userRepository.save(testUser);
-//
-//        Group testGroup = new Group();
-//        testGroup.setName("Test");
-//        testGroup.setPublic(false);
-//        testGroup.setAdmin(testUser);
-//        testGroup = groupRepository.save(testGroup);
-//
-//        Post post = new Post();
-//        post.setGroup(testGroup);
-//        post.setPublic(true);
-//        post.setText("TEST");
-//        post.setOwner(testUser);
-//        post.setImgS3Key(null);
-//        post.setComments(null);
-//        postRepository.save(post);
-//
-//        GroupMember groupMember = new GroupMember();
-//        groupMember.setMember(testUser);
-//        groupMember.setGroup(testGroup);
-//        groupMemberRepository.save(groupMember);
-//
-//        String urlWithParams = UriComponentsBuilder.fromUriString(groupsApiURL).path("/{id}/posts").buildAndExpand(testGroup.getId()).toUriString();
-//
-//        ResponseEntity<ExceptionResponse> response = restTemplate.getForEntity(urlWithParams, ExceptionResponse.class);
-//
-//        assertThat(response.getStatusCode()).isEqualTo(HttpStatus.NOT_FOUND);
-//        assertThat(response.getBody()).isNotNull();
-//        assertThat(response.getBody().errorCode()).isEqualTo(ErrorCode.ERROR_FINDING_USER);
-//        assertThat(response.getBody().message()).isEqualTo("User " + user.getEmail() + "is not a member of the group with id: " + testGroup.getId());
-//    }
+        ResponseEntity<ExceptionResponse> response = restTemplate.getForEntity(urlWithParams, ExceptionResponse.class);
+
+        assertThat(response.getStatusCode()).isEqualTo(HttpStatus.BAD_REQUEST);
+        assertThat(response.getBody()).isNotNull();
+        assertThat(response.getBody().errorCode()).isEqualTo(ErrorCode.ERROR_GETTING_GROUP_POSTS);
+        assertThat(response.getBody().message()).isEqualTo("Group with id " + 5 + "does not exist");
+    }
+
+    @Order(24)
+    @DisplayName("Return all posts for group if user is not a member of that group return exception")
+    @Test
+    void returnAllPostsForGroupInWhichUserIsNotAMemberOfReturnException() throws ResourceNotFoundException {
+        User user = jwtService.getUser();
+
+        User testUser = new User();
+        testUser.setUserSub("f3841812-e0f1-7025-b7bc-ce67d7fb933e");
+        testUser.setEmail("xanitev711@mcatag.com");
+        testUser = userRepository.save(testUser);
+
+        Group testGroup = new Group();
+        testGroup.setName("Test");
+        testGroup.setPublic(false);
+        testGroup.setAdmin(testUser);
+        testGroup = groupRepository.save(testGroup);
+
+        Post post = new Post();
+        post.setGroup(testGroup);
+        post.setPublic(true);
+        post.setText("TEST");
+        post.setOwner(testUser);
+        post.setImgS3Key(null);
+        post.setComments(null);
+        postRepository.save(post);
+
+        GroupMember groupMember = new GroupMember();
+        groupMember.setMember(testUser);
+        groupMember.setGroup(testGroup);
+        groupMemberRepository.save(groupMember);
+
+        String urlWithParams = UriComponentsBuilder.fromUriString(groupsApiURL).path("/{id}/posts").buildAndExpand(testGroup.getId()).toUriString();
+
+        ResponseEntity<ExceptionResponse> response = restTemplate.getForEntity(urlWithParams, ExceptionResponse.class);
+
+        assertThat(response.getStatusCode()).isEqualTo(HttpStatus.FORBIDDEN);
+        assertThat(response.getBody()).isNotNull();
+        assertThat(response.getBody().message()).isEqualTo("User " + user.getEmail() + " is not a member of the group with id: " + testGroup.getId());
+    }
 
 
 }
