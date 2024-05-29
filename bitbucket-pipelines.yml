@@ -73,7 +73,8 @@ definitions:
         oidc: true
         script:
           - *createOIDC
-          - aws ecs register-task-definition --cli-input-json file://taskDefinitionCleaned.json
+          - cat taskDefinitionCleaned.json
+          - aws ecs register-task-definition --cli-input-json taskDefinitionCleaned.json
           - pipe: atlassian/aws-ecs-deploy:1.12.1
             variables:
               AWS_DEFAULT_REGION: 'eu-central-1'
