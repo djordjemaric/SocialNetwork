@@ -1,14 +1,8 @@
 package com.socialnetwork.socialnetwork.exceptions;
 
-public class IAMProviderException extends Exception{
-    private final ErrorCode errorCode;
+public class IAMProviderException extends SocialNetworkException{
 
-    public IAMProviderException(ErrorCode errorCode, String message){
-        super(message);
-        this.errorCode = errorCode;
-    }
-
-    public ErrorCode getErrorCode(){
-        return errorCode;
+    public IAMProviderException(ErrorCode errorCode, String message) {
+        super(errorCode, message);
     }
 }
