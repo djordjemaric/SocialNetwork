@@ -55,7 +55,7 @@ definitions:
         name: Deploy image to ECS
         oidc: true
         script:
-          - export AWS_REGION=eu-central-1
+          - *createOIDC
           - aws ecs describe-task-definition --task-definition social-network-task > taskDefinition.json
           - pipe: atlassian/aws-ecs-deploy:1.12.1
             variables:
