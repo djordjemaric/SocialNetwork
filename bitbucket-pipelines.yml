@@ -58,20 +58,22 @@ definitions:
           - *createOIDC
           - aws ecs describe-task-definition --task-definition social-network-task > taskDefinition.json
         artifacts:
-          - target/aws/*
+          - taskDefinition.json
+
     - step: &cleaningJSON
         image: stedolan/jq
+        name: Cleaning inital json file
         script:
-          - jq 'del(.taskDefinitionArn, .requiresAttributes, .compatibilities, .registeredAt, .registeredBy, .revision, .status)' target/aws/taskDefinition.json > taskDefinitionCleaned.json
+          - jq 'del(.taskDefinitionArn, .requiresAttributes, .compatibilities, .registeredAt, .registeredBy, .revision, .status)' taskDefinition.json > taskDefinitionCleaned.json
         artifacts:
-          - target/aws/*
+          - taskDefinitionCleaned.json
     - step: &deployToECS
         image: amazon/aws-cli
         name: Deploy image to ECS
         oidc: true
         script:
           - *createOIDC
-          - aws ecs register-task-definition --cli-input-json file://target/aws/taskDefinitionCleaned.json
+          - aws ecs register-task-definition --cli-input-json file://taskDefinitionCleaned.json
           - pipe: atlassian/aws-ecs-deploy:1.12.1
             variables:
               AWS_DEFAULT_REGION: 'eu-central-1'
