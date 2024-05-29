@@ -42,7 +42,7 @@ public class PostControllerTests extends IntegrationTestConfiguration {
     //getById
     @Test
     @DisplayName("Testing if user gets the post he asked for")
-    public void does_getById_return_the_correct_post() throws ResourceNotFoundException {
+    public void doesGetByIdReturnTheCorrectPost() throws ResourceNotFoundException {
         User currentUser = jwtService.getUser();
 
         Post post = new Post();
@@ -57,7 +57,7 @@ public class PostControllerTests extends IntegrationTestConfiguration {
 
 //    @Test
 //    @DisplayName("Error while getting post that doesn't exist")
-//    void getting_post_that_is_not_present() throws ResourceNotFoundException {
+//    void gettingPostThatIsNotPresent() throws ResourceNotFoundException {
 //        User currentUser = jwtService.getUser();
 //
 //        ResponseEntity<ExceptionResponse> response = restTemplate.exchange(postApiURL + "/5", HttpMethod.GET, null, ExceptionResponse.class);
@@ -69,7 +69,7 @@ public class PostControllerTests extends IntegrationTestConfiguration {
 
 //    @Test
 //    @DisplayName("Error while user who is not the friend of the owner or the owner is getting the post")
-//    void getting_post_without_access() throws ResourceNotFoundException {
+//    void gettingPostWithoutAccess() throws ResourceNotFoundException {
 //        User currentUser = jwtService.getUser();
 //        User testUser1 = new User();
 //        testUser1.setUserSub("f3841812-e0f1-7025-b7bc-ce67d7fb933e");
@@ -89,7 +89,7 @@ public class PostControllerTests extends IntegrationTestConfiguration {
 
 //    @Test
 //    @DisplayName("Error while user who is not a member of a group is getting a post from a private group")
-//    void getting_post_from_private_group() throws ResourceNotFoundException {
+//    void gettingPostFromPrivateGroup() throws ResourceNotFoundException {
 //        User currentUser = jwtService.getUser();
 //        User testUser1 = new User();
 //        testUser1.setUserSub("f3841812-e0f1-7025-b7bc-ce67d7fb933e");
@@ -118,7 +118,7 @@ public class PostControllerTests extends IntegrationTestConfiguration {
     //save
     @Test
     @DisplayName("Testing if user-generated post can be created successfully")
-    public void is_post_saved() throws ResourceNotFoundException {
+    public void isPostSaved() throws ResourceNotFoundException {
         User currentUser = jwtService.getUser();
 
         MultiValueMap<String, Object> formData = new LinkedMultiValueMap<>();
@@ -144,7 +144,7 @@ public class PostControllerTests extends IntegrationTestConfiguration {
 
 //    @Test
 //    @DisplayName("Error while user tries to create a post in a group that doesn't exist")
-//    void creating_post_in_group_that_is_not_present() throws ResourceNotFoundException {
+//    void creatingPostInGroupThatIsNotPresent() throws ResourceNotFoundException {
 //
 //        MultiValueMap<String, Object> formData = new LinkedMultiValueMap<>();
 //        formData.add("isPublic", "false");
@@ -166,7 +166,7 @@ public class PostControllerTests extends IntegrationTestConfiguration {
 
 //    @Test
 //    @DisplayName("Error while user tries to create a post in a group that they are not a member of")
-//    void creating_post_in_group_without_access() throws ResourceNotFoundException {
+//    void creatingPostInGroupWithoutAccess() throws ResourceNotFoundException {
 //        User currentUser = jwtService.getUser();
 //        User testUser1 = new User();
 //        testUser1.setUserSub("f3841812-e0f1-7025-b7bc-ce67d7fb933e");
@@ -199,7 +199,7 @@ public class PostControllerTests extends IntegrationTestConfiguration {
     //update
     @Test
     @DisplayName("Testing if the post can be updated successfully")
-    public void is_post_updated() throws ResourceNotFoundException {
+    public void isPostUpdated() throws ResourceNotFoundException {
         User currentUser = jwtService.getUser();
 
         Post post = new Post();
@@ -228,7 +228,7 @@ public class PostControllerTests extends IntegrationTestConfiguration {
 
 //    @Test
 //    @DisplayName("Error while updating post that doesn't exist")
-//    public void updating_post_that_is_not_present() throws ResourceNotFoundException {
+//    public void updatingPostThatIsNotPresent() throws ResourceNotFoundException {
 //        User currentUser = jwtService.getUser();
 //        userRepository.save(currentUser);
 //
@@ -252,7 +252,7 @@ public class PostControllerTests extends IntegrationTestConfiguration {
 
 //    @Test
 //    @DisplayName("Error while user who is not the owner is trying to update a post")
-//    public void updating_post_without_access() throws ResourceNotFoundException {
+//    public void updatingPostWithoutAccess() throws ResourceNotFoundException {
 //        User currentUser = jwtService.getUser();
 //        userRepository.save(currentUser);
 //        User testUser1 = new User();
@@ -286,7 +286,7 @@ public class PostControllerTests extends IntegrationTestConfiguration {
     //delete
     @Test
     @DisplayName("Testing if post can be deleted")
-    public void is_post_deleted() throws ResourceNotFoundException {
+    public void isPostDeleted() throws ResourceNotFoundException {
         User currentUser = jwtService.getUser();
 
         Post post = new Post();
@@ -301,7 +301,7 @@ public class PostControllerTests extends IntegrationTestConfiguration {
 
 //    @Test
 //    @DisplayName("Error while deleting post that doesn't exist")
-//    public void deleting_post_that_is_not_present() throws ResourceNotFoundException {
+//    public void deletingPostThatIsNotPresent() throws ResourceNotFoundException {
 //
 //        ResponseEntity<ExceptionResponse> response = restTemplate.exchange(postApiURL + "/5", HttpMethod.DELETE, null, ExceptionResponse.class);
 //
@@ -313,7 +313,7 @@ public class PostControllerTests extends IntegrationTestConfiguration {
 
 //    @Test
 //    @DisplayName("Error while user who is not the owner is trying to delete a post")
-//    public void updating_post_without_access() throws ResourceNotFoundException {
+//    public void updatingPostWithoutAccess() throws ResourceNotFoundException {
 //        User currentUser = jwtService.getUser();
 //        userRepository.save(currentUser);
 //        User testUser1 = new User();
