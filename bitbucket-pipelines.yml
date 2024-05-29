@@ -51,6 +51,7 @@ definitions:
               IMAGE_NAME: social-network
               TAGS: 'latest ${BITBUCKET_COMMIT}'
     - step: &deployToECS
+        image: amazon/aws-cli
         name: Deploy image to ECS
         oidc: true
         script:
