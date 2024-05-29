@@ -64,7 +64,8 @@ definitions:
         image: stedolan/jq
         name: Cleaning inital json file
         script:
-          - jq '.taskDefinition' taskDefinitionTainted.json > taskDefinition.json
+          - jq '.taskDefinition | del(.taskDefinitionArn, .requiresAttributes, .compatibilities, .registeredAt, \
+           .registeredBy, .revision, .status)' taskDefinitionTainted.json > taskDefinition.json
         artifacts:
           - taskDefinition.json
     - step: &deployToECS
