@@ -53,6 +53,7 @@ definitions:
     - step: &gettingTaskDefinition
         image: amazon/aws-cli
         name: Getting task definition file from AWS
+        oidc: true
         script:
           - *createOIDC
           - aws ecs describe-task-definition --task-definition social-network-task > taskDefinition.json
