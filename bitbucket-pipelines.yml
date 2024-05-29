@@ -74,7 +74,7 @@ definitions:
         script:
           - *createOIDC
           - cat taskDefinitionCleaned.json
-          - aws ecs register-task-definition --cli-input-json file://taskDefinitionCleaned.json
+          - aws ecs register-task-definition --family 'social-network-task' --cli-input-json file://taskDefinitionCleaned.json
           - pipe: atlassian/aws-ecs-deploy:1.12.1
             variables:
               AWS_DEFAULT_REGION: 'eu-central-1'
