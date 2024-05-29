@@ -14,6 +14,7 @@ import com.socialnetwork.socialnetwork.repository.UserRepository;
 import org.junit.jupiter.api.*;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.*;
+import org.springframework.transaction.annotation.Transactional;
 import org.springframework.util.LinkedMultiValueMap;
 import org.springframework.util.MultiValueMap;
 
@@ -31,18 +32,18 @@ public class PostControllerTests extends IntegrationTestConfiguration {
     private GroupRepository groupRepository;
 
     @AfterEach
-    void emptyDatabase() {
+    void cleanDatabase() {
         postRepository.deleteAll();
         userRepository.deleteAll();
         groupRepository.deleteAll();
     }
+
 
     //getById
     @Test
     @DisplayName("Testing if user gets the post he asked for")
     public void does_getById_return_the_correct_post() throws ResourceNotFoundException {
         User currentUser = jwtService.getUser();
-        userRepository.save(currentUser);
 
         Post post = new Post();
         post.setOwner(currentUser);
@@ -116,10 +117,9 @@ public class PostControllerTests extends IntegrationTestConfiguration {
 
     //save
     @Test
-    @DisplayName("Testing if user generated post can be created successfully")
+    @DisplayName("Testing if user-generated post can be created successfully")
     public void is_post_saved() throws ResourceNotFoundException {
         User currentUser = jwtService.getUser();
-        userRepository.save(currentUser);
 
         MultiValueMap<String, Object> formData = new LinkedMultiValueMap<>();
         formData.add("isPublic", "false");
@@ -201,7 +201,6 @@ public class PostControllerTests extends IntegrationTestConfiguration {
     @DisplayName("Testing if the post can be updated successfully")
     public void is_post_updated() throws ResourceNotFoundException {
         User currentUser = jwtService.getUser();
-        userRepository.save(currentUser);
 
         Post post = new Post();
         post.setOwner(currentUser);
@@ -209,22 +208,79 @@ public class PostControllerTests extends IntegrationTestConfiguration {
         post = postRepository.save(post);
 
         HttpHeaders headers = new HttpHeaders();
-        headers.setContentType(MediaType.APPLICATION_JSON);
+        headers.setContentType(MediaType.MULTIPART_FORM_DATA);
 
-        UpdatePostDTO updatePostDTO = new UpdatePostDTO(false, "Lorem ipsum", null);
+        MultiValueMap<String, Object> formData = new LinkedMultiValueMap<>();
+        formData.add("isPublic", "true");
+        formData.add("text", "Lorem");
+        formData.add("img", null);
 
-        HttpEntity<UpdatePostDTO> requestEntity = new HttpEntity<>(updatePostDTO, headers);
+        HttpEntity<MultiValueMap<String, Object>> requestEntity = new HttpEntity<>(formData, headers);
 
         ResponseEntity<PostDTO> postDTO = restTemplate.exchange(postApiURL + "/" + post.getId(), HttpMethod.PUT, requestEntity, PostDTO.class);
 
+        assertThat(postDTO.getStatusCode()).isEqualTo(HttpStatus.OK);
         assertThat(postDTO.getBody().id()).isEqualTo(post.getId());
         assertThat(postDTO.getBody().userEmail()).isEqualTo(currentUser.getEmail());
-        assertThat(postDTO.getBody().text()).isEqualTo(updatePostDTO.text());
+        assertThat(postDTO.getBody().text()).isEqualTo("Lorem");
         assertThat(postDTO.getBody().imgUrl()).isEqualTo("");
     }
 
+//    @Test
+//    @DisplayName("Error while updating post that doesn't exist")
+//    public void updating_post_that_is_not_present() throws ResourceNotFoundException {
+//        User currentUser = jwtService.getUser();
+//        userRepository.save(currentUser);
+//
+//        HttpHeaders headers = new HttpHeaders();
+//        headers.setContentType(MediaType.MULTIPART_FORM_DATA);
+//
+//        MultiValueMap<String, Object> formData = new LinkedMultiValueMap<>();
+//        formData.add("isPublic","true");
+//        formData.add("text", "Lorem");
+//        formData.add("img", null);
+//
+//        HttpEntity<MultiValueMap<String, Object>> requestEntity = new HttpEntity<>(formData, headers);
+//
+//        ResponseEntity<ExceptionResponse> response = restTemplate.exchange(postApiURL + "/5", HttpMethod.PUT, requestEntity, ExceptionResponse.class);
+//
+//        assertThat(response.getStatusCode()).isEqualTo(HttpStatus.BAD_REQUEST);
+//        assertThat(response.getBody()).isNotNull();
+//        assertThat(response.getBody().errorCode()).isEqualTo(ErrorCode.ERROR_UPDATING_POST);
+//        assertThat(response.getBody().message()).isEqualTo("The post which you are trying to update doesn't exist.");
+//    }
 
-
+//    @Test
+//    @DisplayName("Error while user who is not the owner is trying to update a post")
+//    public void updating_post_without_access() throws ResourceNotFoundException {
+//        User currentUser = jwtService.getUser();
+//        userRepository.save(currentUser);
+//        User testUser1 = new User();
+//        testUser1.setUserSub("f3841812-e0f1-7025-b7bc-ce67d7fb933e");
+//        testUser1.setEmail("xanitev711@mcatag.com");
+//        userRepository.save(testUser1);
+//
+//        Post post = new Post();
+//        post.setOwner(testUser1);
+//        post.setPublic(false);
+//        postRepository.save(post);
+//
+//        HttpHeaders headers = new HttpHeaders();
+//        headers.setContentType(MediaType.MULTIPART_FORM_DATA);
+//
+//        MultiValueMap<String, Object> formData = new LinkedMultiValueMap<>();
+//        formData.add("isPublic", "true");
+//        formData.add("text", "Lorem");
+//        formData.add("img", null);
+//
+//        HttpEntity<MultiValueMap<String, Object>> requestEntity = new HttpEntity<>(formData, headers);
+//
+//        ResponseEntity<ExceptionResponse> response = restTemplate.exchange(postApiURL + "/"+post.getId(), HttpMethod.PUT, requestEntity, ExceptionResponse.class);
+//
+//        assertThat(response.getStatusCode()).isEqualTo(HttpStatus.FORBIDDEN);
+//        assertThat(response.getBody()).isNotNull();
+//        assertThat(response.getBody().message()).isEqualTo("Only the owner can update this post!");
+//    }
 
 
     //delete
@@ -232,7 +288,6 @@ public class PostControllerTests extends IntegrationTestConfiguration {
     @DisplayName("Testing if post can be deleted")
     public void is_post_deleted() throws ResourceNotFoundException {
         User currentUser = jwtService.getUser();
-        userRepository.save(currentUser);
 
         Post post = new Post();
         post.setOwner(currentUser);
@@ -243,5 +298,40 @@ public class PostControllerTests extends IntegrationTestConfiguration {
 
         assertThat(response.getStatusCode()).isEqualTo(HttpStatus.OK);
     }
+
+//    @Test
+//    @DisplayName("Error while deleting post that doesn't exist")
+//    public void deleting_post_that_is_not_present() throws ResourceNotFoundException {
+//
+//        ResponseEntity<ExceptionResponse> response = restTemplate.exchange(postApiURL + "/5", HttpMethod.DELETE, null, ExceptionResponse.class);
+//
+//        assertThat(response.getStatusCode()).isEqualTo(HttpStatus.BAD_REQUEST);
+//        assertThat(response.getBody()).isNotNull();
+//        assertThat(response.getBody().errorCode()).isEqualTo(ErrorCode.ERROR_DELETING_POST);
+//        assertThat(response.getBody().message()).isEqualTo("The post which you are trying to delete doesn't exist.");
+//    }
+
+//    @Test
+//    @DisplayName("Error while user who is not the owner is trying to delete a post")
+//    public void updating_post_without_access() throws ResourceNotFoundException {
+//        User currentUser = jwtService.getUser();
+//        userRepository.save(currentUser);
+//        User testUser1 = new User();
+//        testUser1.setUserSub("f3841812-e0f1-7025-b7bc-ce67d7fb933e");
+//        testUser1.setEmail("xanitev711@mcatag.com");
+//        userRepository.save(testUser1);
+//
+//        Post post = new Post();
+//        post.setOwner(testUser1);
+//        post.setPublic(false);
+//        postRepository.save(post);
+//
+//        ResponseEntity<ExceptionResponse> response = restTemplate.exchange(postApiURL + "/" + post.getId(), HttpMethod.DELETE, null, ExceptionResponse.class);
+//
+//        assertThat(response.getStatusCode()).isEqualTo(HttpStatus.FORBIDDEN);
+//        assertThat(response.getBody()).isNotNull();
+//        assertThat(response.getBody().message()).isEqualTo("You don't have the permission to delete this post.");
+//    }
+
 
 }

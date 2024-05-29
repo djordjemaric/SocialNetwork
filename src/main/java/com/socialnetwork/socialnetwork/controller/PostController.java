@@ -55,7 +55,7 @@ public class PostController {
 
     @ResponseStatus(HttpStatus.OK)
     @PutMapping("/{id}")
-    public PostDTO update(@PathVariable Integer id, @RequestBody UpdatePostDTO postDTO) throws ResourceNotFoundException, AccessDeniedException, BusinessLogicException {
+    public PostDTO update(@PathVariable Integer id, @ModelAttribute UpdatePostDTO postDTO) throws ResourceNotFoundException, AccessDeniedException, BusinessLogicException {
         return postService.updatePost(id, postDTO);
     }
 
