@@ -56,15 +56,15 @@ definitions:
         oidc: true
         script:
           - *createOIDC
-          - aws ecs describe-task-definition --task-definition social-network-task > taskDefinition.json
+          - aws ecs describe-task-definition --task-definition social-network-task > taskDefinitionTainted.json
         artifacts:
-          - taskDefinition.json
+          - taskDefinitionTainted.json
 
     - step: &cleaningJSON
         image: stedolan/jq
         name: Cleaning inital json file
         script:
-          - jq '.taskDefinition' taskDefinition.json > taskDefinition.json
+          - jq '.taskDefinition' taskDefinitionTainted.json > taskDefinition.json
         artifacts:
           - taskDefinition.json
     - step: &deployToECS
