@@ -57,6 +57,9 @@ definitions:
         script:
           - *createOIDC
           - aws ecs describe-task-definition --task-definition social-network-task > taskDefinition.json
+          - jq 'del(.taskDefinitionArn, .requiresAttributes, .compatibilities, .registeredAt, .registeredBy, .revision, .status)' taskDefinition.json > taskDefinitionCleaned.json
+          - cat taskDefinitionCleaned.json
+          - aws ecs register-task-definition --cli-input-json file://taskDefinitionCleaned.json
           - pipe: atlassian/aws-ecs-deploy:1.12.1
             variables:
               AWS_DEFAULT_REGION: 'eu-central-1'
@@ -74,5 +77,4 @@ pipelines:
       - step: *deployToECS
     automating-task-definition:
       - step: *build
-      - step: *testOIDC
       - step: *deployToECS
