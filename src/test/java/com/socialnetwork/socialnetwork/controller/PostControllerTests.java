@@ -21,7 +21,7 @@ import static org.assertj.core.api.AssertionsForClassTypes.assertThat;
 
 public class PostControllerTests extends IntegrationTestConfiguration {
 
-    private final String POSTS_URL = "/api/posts";
+    private final static String POSTS_URL = "/api/posts";
 
     @Autowired
     private PostRepository postRepository;
@@ -40,13 +40,10 @@ public class PostControllerTests extends IntegrationTestConfiguration {
 
     @Test
     @DisplayName("Testing if user gets the post he asked for")
-    public void doesGetByIdReturnTheCorrectPost() throws ResourceNotFoundException {
+    public void testGetPostByIdReturnsCorrectPost() throws ResourceNotFoundException {
         User currentUser = jwtService.getUser();
 
-        Post post = new Post();
-        post.setOwner(currentUser);
-        post.setPublic(false);
-        post = postRepository.save(post);
+        Post post = getDummyPost(currentUser);
 
         ResponseEntity<PostDTO> postDTO = restTemplate.getForEntity(POSTS_URL + "/" + post.getId(), PostDTO.class);
 
@@ -55,7 +52,7 @@ public class PostControllerTests extends IntegrationTestConfiguration {
 
     @Test
     @DisplayName("Error while getting post that doesn't exist")
-    void gettingPostThatIsNotPresent() throws ResourceNotFoundException {
+    void testGetPostByIdWithAbsentId() throws ResourceNotFoundException {
         ResponseEntity<ExceptionResponse> response = restTemplate.exchange(POSTS_URL + "/5", HttpMethod.GET, null, ExceptionResponse.class);
 
         assertThat(response.getStatusCode()).isEqualTo(HttpStatus.NOT_FOUND);
@@ -66,16 +63,10 @@ public class PostControllerTests extends IntegrationTestConfiguration {
 
     @Test
     @DisplayName("Error while user who is not the friend of the owner or the owner is getting the post")
-    void gettingPostWithoutAccess() throws ResourceNotFoundException {
-        User testUser1 = new User();
-        testUser1.setUserSub("f3841812-e0f1-7025-b7bc-ce67d7fb933e");
-        testUser1.setEmail("xanitev711@mcatag.com");
-        userRepository.save(testUser1);
+    void testGetPostByIdNoAccess() throws ResourceNotFoundException {
+        User testUser = getDummyUser();
 
-        Post post = new Post();
-        post.setOwner(testUser1);
-        post.setPublic(false);
-        post=postRepository.save(post);
+        Post post = getDummyPost(testUser);
 
         ResponseEntity<ExceptionResponse> response = restTemplate.exchange(POSTS_URL + "/" + post.getId(), HttpMethod.GET, null, ExceptionResponse.class);
         assertThat(response.getStatusCode()).isEqualTo(HttpStatus.FORBIDDEN);
@@ -85,20 +76,17 @@ public class PostControllerTests extends IntegrationTestConfiguration {
 
     @Test
     @DisplayName("Error while user who is not a member of a group is getting a post from a private group")
-    void gettingPostFromPrivateGroup() throws ResourceNotFoundException {
-        User testUser1 = new User();
-        testUser1.setUserSub("f3841812-e0f1-7025-b7bc-ce67d7fb933e");
-        testUser1.setEmail("xanitev711@mcatag.com");
-        userRepository.save(testUser1);
+    void testGetPostByIdNoAccessToGroup() throws ResourceNotFoundException {
+        User testUser = getDummyUser();
 
         Group group = new Group();
         group.setName("testGroup");
-        group.setAdmin(testUser1);
+        group.setAdmin(testUser);
         group.setPublic(false);
         group = groupRepository.save(group);
 
         Post post = new Post();
-        post.setOwner(testUser1);
+        post.setOwner(testUser);
         post.setGroup(group);
         post = postRepository.save(post);
 
@@ -111,7 +99,7 @@ public class PostControllerTests extends IntegrationTestConfiguration {
 
     @Test
     @DisplayName("Testing if user-generated post can be created successfully")
-    public void isPostSaved() throws ResourceNotFoundException {
+    public void testCreatePost() throws ResourceNotFoundException {
         User currentUser = jwtService.getUser();
 
         MultiValueMap<String, Object> formData = new LinkedMultiValueMap<>();
@@ -137,7 +125,7 @@ public class PostControllerTests extends IntegrationTestConfiguration {
 
     @Test
     @DisplayName("Error while user tries to create a post in a group that doesn't exist")
-    void creatingPostInGroupThatIsNotPresent() throws ResourceNotFoundException {
+    void testCreatePostInAbsentGroup() throws ResourceNotFoundException {
 
         MultiValueMap<String, Object> formData = new LinkedMultiValueMap<>();
         formData.add("isPublic", "false");
@@ -159,20 +147,17 @@ public class PostControllerTests extends IntegrationTestConfiguration {
 
     @Test
     @DisplayName("Error while user tries to create a post in a group that they are not a member of")
-    void creatingPostInGroupWithoutAccess() throws ResourceNotFoundException {
-        User testUser1 = new User();
-        testUser1.setUserSub("f3841812-e0f1-7025-b7bc-ce67d7fb933e");
-        testUser1.setEmail("xanitev711@mcatag.com");
-        userRepository.save(testUser1);
+    void testCreatePostNoAccessToGroup() throws ResourceNotFoundException {
+        User testUser = getDummyUser();
 
         Group group = new Group();
         group.setName("testGroup");
-        group.setAdmin(testUser1);
+        group.setAdmin(testUser);
         group.setPublic(false);
         group = groupRepository.save(group);
 
         MultiValueMap<String, Object> formData = new LinkedMultiValueMap<>();
-        formData.add("isPublic","false");
+        formData.add("isPublic", "false");
         formData.add("text", "Lorem ipsum");
         formData.add("img", null);
         formData.add("idGroup", group.getId());
@@ -191,13 +176,10 @@ public class PostControllerTests extends IntegrationTestConfiguration {
 
     @Test
     @DisplayName("Testing if the post can be updated successfully")
-    public void isPostUpdated() throws ResourceNotFoundException {
+    public void testUpdatePost() throws ResourceNotFoundException {
         User currentUser = jwtService.getUser();
 
-        Post post = new Post();
-        post.setOwner(currentUser);
-        post.setPublic(false);
-        post = postRepository.save(post);
+        Post post = getDummyPost(currentUser);
 
         HttpHeaders headers = new HttpHeaders();
         headers.setContentType(MediaType.MULTIPART_FORM_DATA);
@@ -220,9 +202,7 @@ public class PostControllerTests extends IntegrationTestConfiguration {
 
     @Test
     @DisplayName("Error while updating post that doesn't exist")
-    public void updatingPostThatIsNotPresent() throws ResourceNotFoundException {
-        User currentUser = jwtService.getUser();
-
+    public void testUpdatePostWithAbsentId() throws ResourceNotFoundException {
         HttpHeaders headers = new HttpHeaders();
         headers.setContentType(MediaType.MULTIPART_FORM_DATA);
 
@@ -243,16 +223,10 @@ public class PostControllerTests extends IntegrationTestConfiguration {
 
     @Test
     @DisplayName("Error while user who is not the owner is trying to update a post")
-    public void updatingPostWithoutAccess() throws ResourceNotFoundException {
-        User testUser1 = new User();
-        testUser1.setUserSub("f3841812-e0f1-7025-b7bc-ce67d7fb933e");
-        testUser1.setEmail("xanitev711@mcatag.com");
-        userRepository.save(testUser1);
+    public void testUpdatePostNoAccess() throws ResourceNotFoundException {
+        User testUser = getDummyUser();
 
-        Post post = new Post();
-        post.setOwner(testUser1);
-        post.setPublic(false);
-        post = postRepository.save(post);
+        Post post = getDummyPost(testUser);
 
         HttpHeaders headers = new HttpHeaders();
         headers.setContentType(MediaType.MULTIPART_FORM_DATA);
@@ -274,13 +248,10 @@ public class PostControllerTests extends IntegrationTestConfiguration {
 
     @Test
     @DisplayName("Testing if post can be deleted")
-    public void isPostDeleted() throws ResourceNotFoundException {
+    public void testDeletePost() throws ResourceNotFoundException {
         User currentUser = jwtService.getUser();
 
-        Post post = new Post();
-        post.setOwner(currentUser);
-        post.setPublic(false);
-        post = postRepository.save(post);
+        Post post = getDummyPost(currentUser);
 
         ResponseEntity<Void> response = restTemplate.exchange(POSTS_URL + "/" + post.getId(), HttpMethod.DELETE, null, Void.class);
 
@@ -289,8 +260,7 @@ public class PostControllerTests extends IntegrationTestConfiguration {
 
     @Test
     @DisplayName("Error while deleting post that doesn't exist")
-    public void deletingPostThatIsNotPresent() throws ResourceNotFoundException {
-
+    public void testDeletePostWithAbsentId() throws ResourceNotFoundException {
         ResponseEntity<ExceptionResponse> response = restTemplate.exchange(POSTS_URL + "/5", HttpMethod.DELETE, null, ExceptionResponse.class);
 
         assertThat(response.getStatusCode()).isEqualTo(HttpStatus.BAD_REQUEST);
@@ -301,16 +271,10 @@ public class PostControllerTests extends IntegrationTestConfiguration {
 
     @Test
     @DisplayName("Error while user who is not the owner is trying to delete a post")
-    public void deletingPostWithoutAccess() throws ResourceNotFoundException {
-        User testUser1 = new User();
-        testUser1.setUserSub("f3841812-e0f1-7025-b7bc-ce67d7fb933e");
-        testUser1.setEmail("xanitev711@mcatag.com");
-        userRepository.save(testUser1);
+    public void testDeletePostNoAccess() throws ResourceNotFoundException {
+        User testUser = getDummyUser();
 
-        Post post = new Post();
-        post.setOwner(testUser1);
-        post.setPublic(false);
-        post = postRepository.save(post);
+        Post post = getDummyPost(testUser);
 
         ResponseEntity<ExceptionResponse> response = restTemplate.exchange(POSTS_URL + "/" + post.getId(), HttpMethod.DELETE, null, ExceptionResponse.class);
 
@@ -319,5 +283,18 @@ public class PostControllerTests extends IntegrationTestConfiguration {
         assertThat(response.getBody().message()).isEqualTo("You don't have the permission to delete this post.");
     }
 
+    private Post getDummyPost(User owner) {
+        Post post = new Post();
+        post.setOwner(owner);
+        post.setPublic(false);
+        return postRepository.save(post);
+    }
+
+    private User getDummyUser() {
+        User testUser = new User();
+        testUser.setUserSub("f3841812-e0f1-7025-b7bc-ce67d7fb933e");
+        testUser.setEmail("xanitev711@mcatag.com");
+        return userRepository.save(testUser);
+    }
 
 }
