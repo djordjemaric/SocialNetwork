@@ -2,12 +2,14 @@ package com.socialnetwork.socialnetwork.service;
 
 
 
-import com.socialnetwork.socialnetwork.dto.LoginResponse;
+import com.socialnetwork.socialnetwork.dto.user.LoginResponse;
+import com.socialnetwork.socialnetwork.dto.user.PreviewUserDTO;
 import com.socialnetwork.socialnetwork.entity.User;
 import com.socialnetwork.socialnetwork.exceptions.BusinessLogicException;
 import com.socialnetwork.socialnetwork.exceptions.ErrorCode;
 import com.socialnetwork.socialnetwork.exceptions.ResourceNotFoundException;
 import com.socialnetwork.socialnetwork.exceptions.IAMProviderException;
+import com.socialnetwork.socialnetwork.mapper.UserMapper;
 import com.socialnetwork.socialnetwork.repository.UserRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -19,11 +21,13 @@ public class UserService {
     private final UserRepository userRepository;
 
     private final CognitoService cognitoService;
+    private final UserMapper userMapper;
 
     @Autowired
-    public UserService(UserRepository userRepository, CognitoService cognitoService) {
+    public UserService(UserRepository userRepository, CognitoService cognitoService, UserMapper userMapper) {
         this.userRepository = userRepository;
         this.cognitoService = cognitoService;
+        this.userMapper = userMapper;
     }
 
     public List<User> getAllUsers() {
@@ -36,18 +40,18 @@ public class UserService {
     }
 
 
-    public User createUser(String email, String password) throws IAMProviderException, BusinessLogicException {
+    public PreviewUserDTO createUser(String email, String password) throws IAMProviderException, BusinessLogicException {
 
         if (userRepository.existsByEmail(email)) {
             throw new BusinessLogicException(ErrorCode.ERROR_REGISTERING_USER, "User already exists in database with email: " + email);
         }
-        String userSub = cognitoService.registerUser(email, email, password);
+        String userSub = cognitoService.registerUser(email, password);
 
         User user = new User();
         user.setEmail(email);
         user.setUserSub(userSub);
         userRepository.save(user);
-        return user;
+        return userMapper.userToPreviewUserDTO(user);
     }
 
     public LoginResponse loginUser(String email, String password) throws IAMProviderException {

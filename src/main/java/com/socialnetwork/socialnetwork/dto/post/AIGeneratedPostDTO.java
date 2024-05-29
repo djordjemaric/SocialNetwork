@@ -4,7 +4,7 @@ import jakarta.validation.constraints.NotBlank;
 
 public record AIGeneratedPostDTO(
         boolean isPublic,
-        @NotBlank
+        @NotBlank(message = "text prompt should not be blank")
         String txtPrompt,
         String imgPrompt,
         Integer idGroup) {

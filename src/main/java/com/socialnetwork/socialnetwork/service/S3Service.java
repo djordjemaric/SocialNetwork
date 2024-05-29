@@ -29,6 +29,7 @@ public class S3Service {
         return fileKey;
     }
 
+
     public void deleteFromBucket(String key) {
         s3Template.deleteObject(bucketName, key);
     }

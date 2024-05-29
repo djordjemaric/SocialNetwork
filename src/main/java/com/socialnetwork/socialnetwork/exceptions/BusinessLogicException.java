@@ -1,14 +1,8 @@
 package com.socialnetwork.socialnetwork.exceptions;
 
-public class BusinessLogicException extends Exception{
-    private final ErrorCode errorCode;
+public class BusinessLogicException extends SocialNetworkException{
 
-    public BusinessLogicException(ErrorCode errorCode, String message){
-        super(message);
-        this.errorCode = errorCode;
-    }
-
-    public ErrorCode getErrorCode(){
-        return errorCode;
+    public BusinessLogicException(ErrorCode errorCode, String message) {
+        super(errorCode, message);
     }
 }

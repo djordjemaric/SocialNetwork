@@ -45,6 +45,7 @@ public class PostService {
         this.s3Service = s3Service;
         this.aiService = aiService;
     }
+
     private String uploadImageAndGetKey(MultipartFile image) {
         if (image == null) {
             return null;
@@ -110,16 +111,20 @@ public class PostService {
 
     public PostDTO createAIPostOnTimeline(AIGeneratedPostDTO postDTO) throws ResourceNotFoundException {
         String generatedText = aiService.generateText(postDTO.txtPrompt());
-        //null prosledjujemo umesto MultipartFile dok se ne napravi metoda u AIServisu
-        CreatePostDTO createPostDTO = postMapper.AIGeneratedPostDTOtoCreatePostDTO(postDTO, generatedText, null);
-        return createPostOnTimeline(createPostDTO);
+        MultipartFile file = null;
+        if (postDTO.imgPrompt() != null) {
+            file = aiService.generateImg(postDTO.imgPrompt());
+        }
+        return createPostOnTimeline(postMapper.AIGeneratedPostToCreatePostDTO(postDTO,generatedText,file));
     }
 
     public PostDTO createAIPostInGroup(AIGeneratedPostDTO postDTO) throws ResourceNotFoundException, BusinessLogicException {
         String generatedText = aiService.generateText(postDTO.txtPrompt());
-        //null prosledjujemo umesto MultipartFile dok se ne napravi metoda u AIServisu
-        CreatePostDTO createPostDTO = postMapper.AIGeneratedPostDTOtoCreatePostDTO(postDTO, generatedText, null);
-        return createPostInGroup(createPostDTO);
+        MultipartFile file=null;
+        if (postDTO.imgPrompt() != null) {
+            file = aiService.generateImg(postDTO.imgPrompt());
+        }
+        return createPostInGroup(postMapper.AIGeneratedPostToCreatePostDTO(postDTO,generatedText,file));
     }
 
     public PostDTO updatePost(Integer idPost, UpdatePostDTO updatePostDTO) throws ResourceNotFoundException, AccessDeniedException, BusinessLogicException {
