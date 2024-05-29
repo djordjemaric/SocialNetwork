@@ -21,7 +21,7 @@ import static org.assertj.core.api.AssertionsForClassTypes.assertThat;
 
 public class PostControllerTests extends IntegrationTestConfiguration {
 
-    private final String postApiURL = "/api/posts";
+    private final String POSTS_URL = "/api/posts";
 
     @Autowired
     private PostRepository postRepository;
@@ -48,7 +48,7 @@ public class PostControllerTests extends IntegrationTestConfiguration {
         post.setPublic(false);
         post = postRepository.save(post);
 
-        ResponseEntity<PostDTO> postDTO = restTemplate.getForEntity(postApiURL + "/" + post.getId(), PostDTO.class);
+        ResponseEntity<PostDTO> postDTO = restTemplate.getForEntity(POSTS_URL + "/" + post.getId(), PostDTO.class);
 
         assertThat(postDTO.getBody().id()).isEqualTo(post.getId());
     }
@@ -56,7 +56,7 @@ public class PostControllerTests extends IntegrationTestConfiguration {
     @Test
     @DisplayName("Error while getting post that doesn't exist")
     void gettingPostThatIsNotPresent() throws ResourceNotFoundException {
-        ResponseEntity<ExceptionResponse> response = restTemplate.exchange(postApiURL + "/5", HttpMethod.GET, null, ExceptionResponse.class);
+        ResponseEntity<ExceptionResponse> response = restTemplate.exchange(POSTS_URL + "/5", HttpMethod.GET, null, ExceptionResponse.class);
 
         assertThat(response.getStatusCode()).isEqualTo(HttpStatus.NOT_FOUND);
         assertThat(response.getBody()).isNotNull();
@@ -77,7 +77,7 @@ public class PostControllerTests extends IntegrationTestConfiguration {
         post.setPublic(false);
         post=postRepository.save(post);
 
-        ResponseEntity<ExceptionResponse> response = restTemplate.exchange(postApiURL + "/" + post.getId(), HttpMethod.GET, null, ExceptionResponse.class);
+        ResponseEntity<ExceptionResponse> response = restTemplate.exchange(POSTS_URL + "/" + post.getId(), HttpMethod.GET, null, ExceptionResponse.class);
         assertThat(response.getStatusCode()).isEqualTo(HttpStatus.FORBIDDEN);
         assertThat(response.getBody()).isNotNull();
         assertThat(response.getBody().message()).isEqualTo("You cannot see the post because you are not friends with the post owner.");
@@ -102,7 +102,7 @@ public class PostControllerTests extends IntegrationTestConfiguration {
         post.setGroup(group);
         post = postRepository.save(post);
 
-        ResponseEntity<ExceptionResponse> response = restTemplate.exchange(postApiURL + "/" + post.getId(), HttpMethod.GET, null, ExceptionResponse.class);
+        ResponseEntity<ExceptionResponse> response = restTemplate.exchange(POSTS_URL + "/" + post.getId(), HttpMethod.GET, null, ExceptionResponse.class);
         assertThat(response.getStatusCode()).isEqualTo(HttpStatus.FORBIDDEN);
         assertThat(response.getBody()).isNotNull();
         assertThat(response.getBody().message()).isEqualTo("You cannot see the post because you are not a member of the testGroup group.");
@@ -125,7 +125,7 @@ public class PostControllerTests extends IntegrationTestConfiguration {
 
         HttpEntity<MultiValueMap<String, Object>> requestEntity = new HttpEntity<>(formData, headers);
 
-        ResponseEntity<PostDTO> postDTO = restTemplate.postForEntity(postApiURL, requestEntity, PostDTO.class);
+        ResponseEntity<PostDTO> postDTO = restTemplate.postForEntity(POSTS_URL, requestEntity, PostDTO.class);
 
         assertThat(postDTO.getStatusCode()).isEqualTo(HttpStatus.CREATED);
         assertThat(postDTO.getBody().text()).isEqualTo("Lorem ipsum");
@@ -150,7 +150,7 @@ public class PostControllerTests extends IntegrationTestConfiguration {
 
         HttpEntity<MultiValueMap<String, Object>> requestEntity = new HttpEntity<>(formData, headers);
 
-        ResponseEntity<ExceptionResponse> response = restTemplate.exchange(postApiURL, HttpMethod.POST, requestEntity, ExceptionResponse.class);
+        ResponseEntity<ExceptionResponse> response = restTemplate.exchange(POSTS_URL, HttpMethod.POST, requestEntity, ExceptionResponse.class);
         assertThat(response.getStatusCode()).isEqualTo(HttpStatus.BAD_REQUEST);
         assertThat(response.getBody()).isNotNull();
         assertThat(response.getBody().errorCode()).isEqualTo(ErrorCode.ERROR_CREATING_POST);
@@ -182,7 +182,7 @@ public class PostControllerTests extends IntegrationTestConfiguration {
 
         HttpEntity<MultiValueMap<String, Object>> requestEntity = new HttpEntity<>(formData, headers);
 
-        ResponseEntity<ExceptionResponse> response = restTemplate.exchange(postApiURL, HttpMethod.POST, requestEntity, ExceptionResponse.class);
+        ResponseEntity<ExceptionResponse> response = restTemplate.exchange(POSTS_URL, HttpMethod.POST, requestEntity, ExceptionResponse.class);
         assertThat(response.getStatusCode()).isEqualTo(HttpStatus.FORBIDDEN);
         assertThat(response.getBody()).isNotNull();
         assertThat(response.getBody().message()).isEqualTo("You cannot create post because you are not a member of this group.");
@@ -209,7 +209,7 @@ public class PostControllerTests extends IntegrationTestConfiguration {
 
         HttpEntity<MultiValueMap<String, Object>> requestEntity = new HttpEntity<>(formData, headers);
 
-        ResponseEntity<PostDTO> postDTO = restTemplate.exchange(postApiURL + "/" + post.getId(), HttpMethod.PUT, requestEntity, PostDTO.class);
+        ResponseEntity<PostDTO> postDTO = restTemplate.exchange(POSTS_URL + "/" + post.getId(), HttpMethod.PUT, requestEntity, PostDTO.class);
 
         assertThat(postDTO.getStatusCode()).isEqualTo(HttpStatus.OK);
         assertThat(postDTO.getBody().id()).isEqualTo(post.getId());
@@ -233,7 +233,7 @@ public class PostControllerTests extends IntegrationTestConfiguration {
 
         HttpEntity<MultiValueMap<String, Object>> requestEntity = new HttpEntity<>(formData, headers);
 
-        ResponseEntity<ExceptionResponse> response = restTemplate.exchange(postApiURL + "/5", HttpMethod.PUT, requestEntity, ExceptionResponse.class);
+        ResponseEntity<ExceptionResponse> response = restTemplate.exchange(POSTS_URL + "/5", HttpMethod.PUT, requestEntity, ExceptionResponse.class);
 
         assertThat(response.getStatusCode()).isEqualTo(HttpStatus.BAD_REQUEST);
         assertThat(response.getBody()).isNotNull();
@@ -264,7 +264,7 @@ public class PostControllerTests extends IntegrationTestConfiguration {
 
         HttpEntity<MultiValueMap<String, Object>> requestEntity = new HttpEntity<>(formData, headers);
 
-        ResponseEntity<ExceptionResponse> response = restTemplate.exchange(postApiURL + "/" + post.getId(), HttpMethod.PUT, requestEntity, ExceptionResponse.class);
+        ResponseEntity<ExceptionResponse> response = restTemplate.exchange(POSTS_URL + "/" + post.getId(), HttpMethod.PUT, requestEntity, ExceptionResponse.class);
 
         assertThat(response.getStatusCode()).isEqualTo(HttpStatus.FORBIDDEN);
         assertThat(response.getBody()).isNotNull();
@@ -282,7 +282,7 @@ public class PostControllerTests extends IntegrationTestConfiguration {
         post.setPublic(false);
         post = postRepository.save(post);
 
-        ResponseEntity<Void> response = restTemplate.exchange(postApiURL + "/" + post.getId(), HttpMethod.DELETE, null, Void.class);
+        ResponseEntity<Void> response = restTemplate.exchange(POSTS_URL + "/" + post.getId(), HttpMethod.DELETE, null, Void.class);
 
         assertThat(response.getStatusCode()).isEqualTo(HttpStatus.OK);
     }
@@ -291,7 +291,7 @@ public class PostControllerTests extends IntegrationTestConfiguration {
     @DisplayName("Error while deleting post that doesn't exist")
     public void deletingPostThatIsNotPresent() throws ResourceNotFoundException {
 
-        ResponseEntity<ExceptionResponse> response = restTemplate.exchange(postApiURL + "/5", HttpMethod.DELETE, null, ExceptionResponse.class);
+        ResponseEntity<ExceptionResponse> response = restTemplate.exchange(POSTS_URL + "/5", HttpMethod.DELETE, null, ExceptionResponse.class);
 
         assertThat(response.getStatusCode()).isEqualTo(HttpStatus.BAD_REQUEST);
         assertThat(response.getBody()).isNotNull();
@@ -312,7 +312,7 @@ public class PostControllerTests extends IntegrationTestConfiguration {
         post.setPublic(false);
         post = postRepository.save(post);
 
-        ResponseEntity<ExceptionResponse> response = restTemplate.exchange(postApiURL + "/" + post.getId(), HttpMethod.DELETE, null, ExceptionResponse.class);
+        ResponseEntity<ExceptionResponse> response = restTemplate.exchange(POSTS_URL + "/" + post.getId(), HttpMethod.DELETE, null, ExceptionResponse.class);
 
         assertThat(response.getStatusCode()).isEqualTo(HttpStatus.FORBIDDEN);
         assertThat(response.getBody()).isNotNull();
