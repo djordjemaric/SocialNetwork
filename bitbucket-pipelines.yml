@@ -20,7 +20,7 @@ definitions:
           - target/*.jar
     - step: &testOIDC
         image: amazon/aws-cli
-        name: Creating aws openID connection
+        name: Creating AWS OpenID connection
         oidc: true
         script:
           - *createOIDC
@@ -50,23 +50,34 @@ definitions:
               AWS_OIDC_ROLE_ARN: 'arn:aws:iam::211125711045:role/bitbucket_oidc_role'
               IMAGE_NAME: social-network
               TAGS: 'latest ${BITBUCKET_COMMIT}'
+    - step: &gettingTaskDefinition
+        image: amazon/aws-cli
+        name: Getting task definition file from AWS
+        script:
+          - *createOIDC
+          - aws ecs describe-task-definition --task-definition social-network-task > target/aws/taskDefinition.json
+        artifacts:
+          - target/aws/taskDefinition.json
+    - step: &cleaningJSON
+        image: stedolan/jq
+        script:
+          - jq 'del(.taskDefinitionArn, .requiresAttributes, .compatibilities, .registeredAt, .registeredBy, .revision, .status)' target/aws/taskDefinition.json > target/aws/taskDefinitionCleaned.json
+        artifacts:
+          - target/aws/taskDefinitionCleaned.json
     - step: &deployToECS
         image: amazon/aws-cli
         name: Deploy image to ECS
         oidc: true
         script:
           - *createOIDC
-          - aws ecs describe-task-definition --task-definition social-network-task > taskDefinition.json
-          - jq 'del(.taskDefinitionArn, .requiresAttributes, .compatibilities, .registeredAt, .registeredBy, .revision, .status)' taskDefinition.json > taskDefinitionCleaned.json
-          - cat taskDefinitionCleaned.json
-          - aws ecs register-task-definition --cli-input-json file://taskDefinitionCleaned.json
+          - aws ecs register-task-definition --cli-input-json file://target/aws/taskDefinitionCleaned.json
           - pipe: atlassian/aws-ecs-deploy:1.12.1
             variables:
               AWS_DEFAULT_REGION: 'eu-central-1'
               AWS_OIDC_ROLE_ARN: 'arn:aws:iam::211125711045:role/bitbucket_oidc_role'
               CLUSTER_NAME: 'SocialNetworkCluster'
               SERVICE_NAME: 'SocialNetworkService'
-              TASK_DEFINITION: 'taskDefinition.json'
+              TASK_DEFINITION: 'taskDefinitionCleaned.json'
 pipelines:
   branches:
     master:
@@ -77,4 +88,6 @@ pipelines:
       - step: *deployToECS
     automating-task-definition:
       - step: *build
+      - step: *gettingTaskDefinition
+      - step: *cleaningJSON
       - step: *deployToECS
