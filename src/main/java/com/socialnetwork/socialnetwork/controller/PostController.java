@@ -77,6 +77,12 @@ public class PostController {
     public void delete(@PathVariable Integer id) throws ResourceNotFoundException, AccessDeniedException, BusinessLogicException {
         postService.deletePost(id);
     }
+
+    @ResponseStatus(HttpStatus.OK)
+    @DeleteMapping("/{idPost}/comments/{idComment}")
+    public void deleteComment(@PathVariable Integer idComment) throws ResourceNotFoundException, AccessDeniedException, BusinessLogicException {
+        commentService.deletePost(idComment);
+    }
 }
 
 

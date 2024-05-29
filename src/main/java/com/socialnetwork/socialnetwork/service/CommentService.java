@@ -14,6 +14,7 @@ import org.springframework.security.access.AccessDeniedException;
 import org.springframework.stereotype.Service;
 
 import java.util.NoSuchElementException;
+import java.util.Objects;
 
 @Service
 public class CommentService {
@@ -54,6 +55,24 @@ public class CommentService {
         Comment savedComment = commentRepository.save(comment);
         return new CommentDTO(savedComment.getId(), savedComment.getText(), savedComment.getPost().getId(), savedComment.getCommOwner().getId());
 
+    }
+
+    public void deletePost(Integer commentId) throws BusinessLogicException, ResourceNotFoundException {
+        Comment comment = commentRepository.findById(commentId).orElseThrow(() ->
+                new BusinessLogicException(ErrorCode.ERROR_DELETING_COMMENT, "The comment which you are trying to delete doesn't exist."));
+        User user = jwtService.getUser();
+
+        if (comment.getPost().getGroup() != null) {
+            if (Objects.equals(comment.getPost().getGroup().getAdmin().getId(), user.getId())) {
+                commentRepository.deleteById(commentId);
+                return;
+            }
+        }
+        if (Objects.equals(user.getId(), comment.getPost().getOwner().getId())) {
+            commentRepository.deleteById(commentId);
+            return;
+        }
+        throw new AccessDeniedException("You don't have the permission to delete this post.");
     }
 
 }
