@@ -62,14 +62,14 @@ public class PostController {
 
     @ResponseStatus(HttpStatus.CREATED)
     @PostMapping("/{idPost}/comments")
-    public CommentDTO saveComment(@PathVariable Integer idPost, @RequestBody @Valid CreateCommentDTO commentDTO) throws ResourceNotFoundException {
+    public CommentDTO saveComment(@PathVariable Integer idPost, @RequestBody @Valid CreateCommentDTO commentDTO) throws ResourceNotFoundException, BusinessLogicException {
         return commentService.createComment(idPost, commentDTO);
 
     }
 
     @ResponseStatus(HttpStatus.CREATED)
     @PostMapping("/{idPost}/comments/{commentId}/replies")
-    public ReplyDTO saveReply(@PathVariable Integer idPost, @PathVariable Integer commentId, @RequestBody @Valid CreateReplyDTO replyDTO) throws ResourceNotFoundException {
+    public ReplyDTO saveReply(@PathVariable Integer idPost, @PathVariable Integer commentId, @RequestBody @Valid CreateReplyDTO replyDTO) throws ResourceNotFoundException, BusinessLogicException {
         return replyService.createReply(idPost, commentId, replyDTO);
     }
 
