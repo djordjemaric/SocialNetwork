@@ -16,6 +16,7 @@ public enum ErrorCode {
     ERROR_DELETING_POST,
     //Comment
     ERROR_CREATING_COMMENT,
+    ERROR_DELETING_COMMENT,
     //Reply
     ERROR_CREATING_REPLY,
     //Group
