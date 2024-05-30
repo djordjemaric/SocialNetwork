@@ -64,7 +64,7 @@ definitions:
         image: stedolan/jq
         name: Cleaning initial json file
         script:
-          - jq --arg COMMIT_HASH "$BITBUCKET_COMMIT" '.taskDefinition | .containerDefinitions[0].image = "211125711045.dkr.ecr.eu-central-1.amazonaws.com/social-network:\($COMMIT_HASH)"' taskDefinitionTainted.json > taskDefinition.json
+          - jq --arg COMMIT_HASH "$BITBUCKET_COMMIT" '.taskDefinition | .containerDefinitions[0].image = "211125711045.dkr.ecr.eu-central-1.amazonaws.com/social-network:\($COMMIT_HASH)" | del(.taskDefinitionArn, .requiresAttributes, .compatibilities, .registeredAt, .registeredBy, .revision, .status)' taskDefinitionTainted.json > taskDefinition.json
           - cat taskDefinition.json
         artifacts:
           - taskDefinition.json
@@ -87,10 +87,6 @@ pipelines:
       - step: *build
       - step: *test
       - step: *testOIDC
-      - step: *pushToECR
-      - step: *deployToECS
-    automating-task-definition:
-      - step: *build
       - step: *pushToECR
       - step: *gettingTaskDefinition
       - step: *cleaningJSON
