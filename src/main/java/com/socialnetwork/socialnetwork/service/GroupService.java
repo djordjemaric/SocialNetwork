@@ -142,21 +142,13 @@ public class GroupService {
                 new BusinessLogicException(ERROR_MANAGING_GROUP_REQUEST, "Group with id "
                         + idGroup + "does not exist"));
 
-        GroupRequest request = groupRequestRepository.findById(idRequest).orElseThrow(() ->
+        GroupRequest request = groupRequestRepository.findAllByIdAndGroupId(idRequest,idGroup).orElseThrow(() ->
                 new BusinessLogicException(ERROR_MANAGING_GROUP_REQUEST, "Group request with id "
-                        + idRequest + "does not exist"));
-//
-//        User newMember = userRepository.findById(request.getUser().getId()).orElseThrow(() ->
-//                new BusinessLogicException(ERROR_MANAGING_GROUP_REQUEST, "User with id " + request.getUser().getId() + "does not exist"));
+                        + idRequest + " and group id " + idGroup + " does not exist"));
 
         if (!group.getAdmin().getId().equals(currentUser.getId())) {
             throw new AccessDeniedException("You are not an admin of a given group " + group.getName());
         }
-
-//        if (!groupRequestRepository.existsByUserAndGroup(newMember, group)) {
-//            throw new BusinessLogicException(ERROR_MANAGING_GROUP_REQUEST, "Request for given user " + newMember +
-//                    " and group " + group + " does not exist");
-//        }
 
         if (group.isPublic()) {
             throw new BusinessLogicException(ERROR_MANAGING_GROUP_REQUEST, "You can't accept or reject a request if group is public");
