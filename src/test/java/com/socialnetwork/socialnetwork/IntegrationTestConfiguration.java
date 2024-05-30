@@ -2,6 +2,8 @@ package com.socialnetwork.socialnetwork;
 
 import com.socialnetwork.socialnetwork.entity.User;
 import com.socialnetwork.socialnetwork.exceptions.ResourceNotFoundException;
+import com.socialnetwork.socialnetwork.repository.GroupRepository;
+import com.socialnetwork.socialnetwork.repository.PostRepository;
 import com.socialnetwork.socialnetwork.repository.UserRepository;
 import com.socialnetwork.socialnetwork.service.JwtService;
 import org.junit.jupiter.api.*;
@@ -45,6 +47,12 @@ public abstract class IntegrationTestConfiguration {
     @Autowired
     protected UserRepository userRepository;
 
+    @Autowired
+    protected PostRepository postRepository;
+
+    @Autowired
+    protected GroupRepository groupRepository;
+
     @Container
     @ServiceConnection
     protected static PostgreSQLContainer<?> postgres = new PostgreSQLContainer<>("postgres:14.2-alpine");
@@ -61,9 +69,17 @@ public abstract class IntegrationTestConfiguration {
         when(jwtService.getUser()).thenReturn(testUser);
     }
 
+    @AfterEach
+    void cleanDatabase() {
+        postRepository.deleteAll();
+        groupRepository.deleteAll();
+        userRepository.deleteAll();
+    }
+
     @Test
     void connectionEstablished(){
         assertThat(postgres.isCreated()).isTrue();
         assertThat(postgres.isRunning()).isTrue();
     }
+
 }
