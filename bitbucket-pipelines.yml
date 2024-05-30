@@ -91,6 +91,7 @@ pipelines:
       - step: *deployToECS
     automating-task-definition:
       - step: *build
+      - step: *pushToECR
       - step: *gettingTaskDefinition
       - step: *cleaningJSON
       - step: *deployToECS
