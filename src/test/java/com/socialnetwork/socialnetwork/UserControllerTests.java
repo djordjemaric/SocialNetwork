@@ -41,7 +41,6 @@ public class UserControllerTests {
     private User user;
     private PreviewUserDTO expectedUserDTO;
     private LoginResponse expectedLoginResponse;
-//    private LoginResponse loginResponse;
 
     @BeforeEach
     public void setUp() {
@@ -53,7 +52,7 @@ public class UserControllerTests {
     }
 
     @Test
-    void createUser_success() throws Exception {
+    void testCreateUserSuccess() throws Exception {
 
         when(userService.createUser(userRequest.email(), userRequest.password())).thenReturn(expectedUserDTO);
 
@@ -74,7 +73,7 @@ public class UserControllerTests {
     }
 
     @Test
-    void loginUser_success() throws Exception {
+    void testLoginUserSuccess() throws Exception {
         when(userService.loginUser(userRequest.email(), userRequest.password())).thenReturn(expectedLoginResponse);
 
         String content = objectWriter.writeValueAsString(userRequest);

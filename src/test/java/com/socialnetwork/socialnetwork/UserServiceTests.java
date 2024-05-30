@@ -24,6 +24,7 @@ import java.util.Optional;
 import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
+import static org.mockito.Mockito.any;
 
 @ExtendWith(MockitoExtension.class)
 public class UserServiceTests {
@@ -59,74 +60,74 @@ public class UserServiceTests {
     }
 
     @Test
-    void getUserById_userDoesNotExist_throwsException() {
-        when(userRepository.findById(idArgumentCaptor.capture())).thenReturn(Optional.empty());
+    void testGetUserByIdThrowsResourceNotFoundException() {
+        when(userRepository.findById(any(Integer.class))).thenReturn(Optional.empty());
         assertThrows(ResourceNotFoundException.class, () -> userService.getUserById(2));
+        verify(userRepository).findById(idArgumentCaptor.capture());
         assertEquals(2, idArgumentCaptor.getValue());
     }
 
     @Test
-    void getUserById_userExists_success() {
-         when(userRepository.findById(idArgumentCaptor.capture())).thenReturn(Optional.of(user));
-         User returnedUser = userRepository.findById(user.getId()).get();
+    void testGetUserByIdSuccess() throws ResourceNotFoundException {
+         when(userRepository.findById(user.getId())).thenReturn(Optional.of(user));
+         User returnedUser = userService.getUserById(user.getId());
+
+         verify(userRepository).findById(idArgumentCaptor.capture());
          assertEquals(user, returnedUser);
          assertEquals(idArgumentCaptor.getValue(), user.getId());
     }
 
     @Test
-    void createUser_userExists_throwsException() {
-        when(userRepository.existsByEmail(stringArgumentCaptor.capture())).thenReturn(true);
+    void testCreateUserThrowsBusinessLogicException() {
+        when(userRepository.existsByEmail(user.getEmail())).thenReturn(true);
         assertThrows(BusinessLogicException.class,() -> userService.createUser(user.getEmail(),"test"));
-        assertEquals(stringArgumentCaptor.getValue(), user.getEmail());
 
         verify(userRepository).existsByEmail(stringArgumentCaptor.capture());
+        assertEquals(stringArgumentCaptor.getValue(), user.getEmail());
     }
 
     @Test
-    void createUser_success() throws IAMProviderException, BusinessLogicException {
+    void testCreateUserSuccess() throws IAMProviderException, BusinessLogicException {
         User newUser = new User(2, "user2@user.com", "sample-user-sub");
         PreviewUserDTO expectedDTO = new PreviewUserDTO(newUser.getId(), newUser.getEmail());
-        when(userMapper.userToPreviewUserDTO(userArgumentCaptor.capture())).thenReturn(expectedDTO);
-        when(userRepository.existsByEmail(stringArgumentCaptor.capture())).thenReturn(false);
-        when(cognitoService.registerUser(stringArgumentCaptor.capture(),
-                                         stringArgumentCaptor.capture()))
+        when(userMapper.userToPreviewUserDTO(any(User.class))).thenReturn(expectedDTO);
+        when(userRepository.existsByEmail(any(String.class))).thenReturn(false);
+        when(cognitoService.registerUser(any(String.class),
+                                         any(String.class)))
                                         .thenReturn("sample-user-sub");
 
         PreviewUserDTO resultDTO = userService.createUser(newUser.getEmail(), "test");
+        verify(userRepository).existsByEmail(stringArgumentCaptor.capture());
+        verify(cognitoService).registerUser(stringArgumentCaptor.capture(), stringArgumentCaptor.capture());
+        verify(userMapper).userToPreviewUserDTO(userArgumentCaptor.capture());
 
-        assertEquals(expectedDTO.email(), resultDTO.email());
-        verify(userRepository).existsByEmail(stringArgumentCaptor.getAllValues().get(0));
-        verify(cognitoService).registerUser(stringArgumentCaptor.getAllValues().get(0), "test");
-
-        assertEquals(stringArgumentCaptor.getAllValues().get(0), newUser.getEmail());
-        assertEquals(stringArgumentCaptor.getAllValues().get(2), "test");
+        assertEquals(expectedDTO, resultDTO);
     }
 
     @Test
-    void loginUser_userDoesNotExist_throwsException() throws IAMProviderException {
-        when(cognitoService.loginUser(stringArgumentCaptor.capture(), stringArgumentCaptor.capture())).thenThrow(IAMProviderException.class);
+    void testLoginUserThrowsIAMProviderException() throws IAMProviderException {
+        User user2  = new User(2, "not@exists.com", "sample-user-sub");
+        when(cognitoService.loginUser(user2.getEmail(), "test")).thenThrow(IAMProviderException.class);
+
         assertThrows(IAMProviderException.class, () -> userService.loginUser("not@exists.com","test"));
 
-        verify(cognitoService).loginUser(stringArgumentCaptor.getAllValues().get(0), stringArgumentCaptor.getAllValues().get(1));
-        assertEquals(stringArgumentCaptor.getAllValues().get(0), "not@exists.com");
-        assertEquals(stringArgumentCaptor.getAllValues().get(1), "test");
+        verify(cognitoService).loginUser(user2.getEmail(), "test");
+
     }
 
     @Test
-    void loginUser_userExists_success() throws IAMProviderException, BusinessLogicException {
-        LoginResponse loginResponseExpected = new LoginResponse("access", "refresh", 10);
-        when(cognitoService.loginUser(stringArgumentCaptor.capture(),
-                                      stringArgumentCaptor.capture()))
-                                      .thenReturn(loginResponseExpected);
+    void testLoginUserSuccess() throws IAMProviderException, BusinessLogicException {
+        LoginResponse loginResponseExpected = new LoginResponse("access",
+                                                                "refresh",
+                                                                    10);
+        when(cognitoService.loginUser(user.getEmail(),
+                            "test"))
+                                    .thenReturn(loginResponseExpected);
 
         LoginResponse loginResponseResult = userService.loginUser(user.getEmail(),"test");
 
-        verify(cognitoService).loginUser(stringArgumentCaptor.getAllValues().get(0), stringArgumentCaptor.getAllValues().get(1));
-        assertEquals(loginResponseExpected.accessToken(), loginResponseResult.accessToken());
-        assertEquals(loginResponseExpected.refreshToken(), loginResponseResult.refreshToken());
-        assertEquals(loginResponseExpected.expiresIn(), loginResponseResult.expiresIn());
-
-
+        verify(cognitoService).loginUser(user.getEmail(), "test");
+        assertEquals(loginResponseExpected, loginResponseResult);
     }
 
 
