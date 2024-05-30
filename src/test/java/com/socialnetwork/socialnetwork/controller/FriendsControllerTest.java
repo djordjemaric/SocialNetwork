@@ -44,18 +44,7 @@ class FriendsControllerTest extends IntegrationTestConfiguration {
     }
 
     @Test
-    @DisplayName("Testing if there are no pending requests")
-    @Order(2)
-    void userFriendsRequestsShouldNotShow() throws ResourceNotFoundException {
-
-        FriendRequestDTO[] frResponseArray = restTemplate.getForObject(friendsApiURL + "/requests", FriendRequestDTO[].class);
-
-        assertThat(frResponseArray.length).isEqualTo(0);
-    }
-
-    @Test
     @DisplayName("Testing if user can see his pending friend requests")
-    @Order(1)
     void userFriendsRequestsShouldShow() throws ResourceNotFoundException {
 
         User currentTestUser = jwtService.getUser();
@@ -88,8 +77,16 @@ class FriendsControllerTest extends IntegrationTestConfiguration {
     }
 
     @Test
+    @DisplayName("Testing if there are no pending requests")
+    void userFriendsRequestsShouldNotShow() throws ResourceNotFoundException {
+
+        FriendRequestDTO[] frResponseArray = restTemplate.getForObject(friendsApiURL + "/requests", FriendRequestDTO[].class);
+
+        assertThat(frResponseArray.length).isEqualTo(0);
+    }
+
+    @Test
     @DisplayName("Testing if user can send friend requests")
-    @Order(3)
     void userShouldSendRequests() throws ResourceNotFoundException {
         User currentTestUser = jwtService.getUser();
 
@@ -123,7 +120,6 @@ class FriendsControllerTest extends IntegrationTestConfiguration {
 
     @Test
     @DisplayName("Sending a request to a non existing user")
-    @Order(4)
     void userSendingToANonExistingFriend() throws ResourceNotFoundException {
 
         ResponseEntity<ExceptionResponse> response = restTemplate.postForEntity(friendsApiURL + "/requests", new SentFriendRequestDTO("anonymous@test.com"), ExceptionResponse.class);
@@ -135,7 +131,6 @@ class FriendsControllerTest extends IntegrationTestConfiguration {
 
     @Test
     @DisplayName("Sending a friend request to yourself")
-    @Order(5)
     void userSendingToHimself() throws ResourceNotFoundException {
 
         ResponseEntity<ExceptionResponse> response = restTemplate.postForEntity(friendsApiURL + "/requests", new SentFriendRequestDTO("vica.ristic@gmail.com"), ExceptionResponse.class);
@@ -147,7 +142,6 @@ class FriendsControllerTest extends IntegrationTestConfiguration {
 
     @Test
     @DisplayName("Checking users are already friends")
-    @Order(6)
     void usersAreAlreadyFriendsBothWays() throws ResourceNotFoundException {
 
         User currentUser = jwtService.getUser();
@@ -187,7 +181,6 @@ class FriendsControllerTest extends IntegrationTestConfiguration {
 
     @Test
     @DisplayName("There is already a pending exception")
-    @Order(7)
     void thereIsAlreadyPendingRequest() throws ResourceNotFoundException {
         User currentUser = jwtService.getUser();
 
@@ -226,7 +219,6 @@ class FriendsControllerTest extends IntegrationTestConfiguration {
 
     @Test
     @DisplayName("User searching his friends")
-    @Order(8)
     void userSearchingFriends() throws ResourceNotFoundException {
         User currentUser = jwtService.getUser();
 
@@ -274,7 +266,6 @@ class FriendsControllerTest extends IntegrationTestConfiguration {
 
     @Test
     @DisplayName("Successfully deleting friend")
-    @Order(9)
     void successfullyDeletingFriend() throws ResourceNotFoundException {
         User currentUser = jwtService.getUser();
 
@@ -295,7 +286,6 @@ class FriendsControllerTest extends IntegrationTestConfiguration {
 
     @Test
     @DisplayName("Error while deleting friend that does not exist")
-    @Order(10)
     void deletingFriendThatDoesNotExist() throws ResourceNotFoundException {
         User currentUser = jwtService.getUser();
 
@@ -308,7 +298,6 @@ class FriendsControllerTest extends IntegrationTestConfiguration {
 
     @Test
     @DisplayName("Error while deleting user that is not a friend")
-    @Order(11)
     void deletingUserThatIsNotFriend() throws ResourceNotFoundException {
         User currentUser = jwtService.getUser();
 
@@ -326,7 +315,6 @@ class FriendsControllerTest extends IntegrationTestConfiguration {
 
     @Test
     @DisplayName("Error while accepting friend request")
-    @Order(12)
     void errorAcceptingRequest() throws ResourceNotFoundException {
 
         User testUser1 = new User();
@@ -362,7 +350,6 @@ class FriendsControllerTest extends IntegrationTestConfiguration {
 
     @Test
     @DisplayName("Successfully accept friend request")
-    @Order(13)
     void successfullyAcceptingRequest() throws ResourceNotFoundException {
         User currentUser = jwtService.getUser();
 
@@ -385,7 +372,6 @@ class FriendsControllerTest extends IntegrationTestConfiguration {
 
     @Test
     @DisplayName("Error while declining friend request")
-    @Order(14)
     void errorDecliningRequest() throws ResourceNotFoundException {
 
         User testUser1 = new User();
@@ -421,7 +407,6 @@ class FriendsControllerTest extends IntegrationTestConfiguration {
 
     @Test
     @DisplayName("Successfully decline friend request")
-    @Order(15)
     void successfullyDeclineRequest() throws ResourceNotFoundException {
         User currentUser = jwtService.getUser();
 

@@ -25,7 +25,6 @@ import static org.mockito.Mockito.when;
 })
 @SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
 @ActiveProfiles("test")
-@TestMethodOrder(MethodOrderer.OrderAnnotation.class)
 public abstract class IntegrationTestConfiguration {
 
     @Autowired
