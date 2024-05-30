@@ -49,7 +49,7 @@ class GroupControllerTestInt extends IntegrationTestConfiguration {
 
     @DisplayName("Successfully creating group")
     @Test
-    void successfullyCreatingGroup()   {
+    void testCreateGroup()   {
         CreateGroupDTO createGroupDTO = new CreateGroupDTO("Test", false);
 
         String urlWithParams = UriComponentsBuilder.fromUriString(groupsApiURL).toUriString();
@@ -64,7 +64,7 @@ class GroupControllerTestInt extends IntegrationTestConfiguration {
 
     @DisplayName("Creating group with duplicate name should return exception")
     @Test
-    void creatingGroupWithDuplicateNameShouldReturnException() throws ResourceNotFoundException {
+    void testCreatingGroupAlreadyExist() throws ResourceNotFoundException {
         User user = jwtService.getUser();
 
         Group testGroup = new Group();
@@ -84,7 +84,7 @@ class GroupControllerTestInt extends IntegrationTestConfiguration {
 
     @DisplayName("Successfully deleting group")
     @Test
-    void successfullyDeletingGroup() throws ResourceNotFoundException {
+    void testDeleteGroup() throws ResourceNotFoundException {
         User user = jwtService.getUser();
 
         User testUser = new User();
@@ -125,7 +125,7 @@ class GroupControllerTestInt extends IntegrationTestConfiguration {
 
     @DisplayName("Deleting group by non-admin user should return exception")
     @Test
-    void deletingGroupByNonAdminUserShouldReturnException() throws ResourceNotFoundException {
+    void testDeleteGroupByNoAdminUser() throws ResourceNotFoundException {
         User user = jwtService.getUser();
 
         User testUser = new User();
@@ -160,7 +160,7 @@ class GroupControllerTestInt extends IntegrationTestConfiguration {
 
     @DisplayName("Successfully returning groups by name")
     @Test
-    void successfullyReturnGroupsByName() {
+    void testGetGroups() {
         User testUser = new User();
         testUser.setUserSub("f3841812-e0f1-7025-b7bc-ce67d7fb933e");
         testUser.setEmail("xanitev711@mcatag.com");
@@ -190,7 +190,7 @@ class GroupControllerTestInt extends IntegrationTestConfiguration {
 
     @DisplayName("Successfully returning all requests for group")
     @Test
-    void successfullyReturnAllGroupRequests() throws ResourceNotFoundException {
+    void testGetRequests() throws ResourceNotFoundException {
         User user = jwtService.getUser();
 
         User testUser = new User();
@@ -226,7 +226,7 @@ class GroupControllerTestInt extends IntegrationTestConfiguration {
 
     @DisplayName("Returning all requests for non-existent group should return exception")
     @Test
-    void returningAllRequestsForNonExistentGroupShouldReturnException() {
+    void testGetRequestsNoExistGroup() {
         String urlWithParams = UriComponentsBuilder.fromUriString(groupsApiURL).path("/{id}/requests").buildAndExpand(5).toUriString();
 
         ResponseEntity<ExceptionResponse> response = restTemplate.getForEntity(urlWithParams, ExceptionResponse.class);
@@ -239,7 +239,7 @@ class GroupControllerTestInt extends IntegrationTestConfiguration {
 
     @DisplayName("Returning all requests for group when not admin should return exception")
     @Test
-    void returningAllRequestsForGroupWhenNotAdminShouldReturnException() {
+    void testGetRequestsNoAdmin() {
         User testUser = new User();
         testUser.setUserSub("f3841812-e0f1-7025-b7bc-ce67d7fb933e");
         testUser.setEmail("xanitev711@mcatag.com");
@@ -262,7 +262,7 @@ class GroupControllerTestInt extends IntegrationTestConfiguration {
 
     @DisplayName("Successfully accept request")
     @Test
-    void successfullyAcceptRequest() throws ResourceNotFoundException {
+    void testAcceptRequest() throws ResourceNotFoundException {
         User user = jwtService.getUser();
 
         User testUser = new User();
@@ -303,7 +303,7 @@ class GroupControllerTestInt extends IntegrationTestConfiguration {
 
     @DisplayName("Accepting request for non-existent group should return exception")
     @Test
-    void acceptingRequestForNonExistentGroupShouldReturnException() {
+    void testAcceptRequestNoExistGroup() {
         String urlWithParams = UriComponentsBuilder.fromUriString(groupsApiURL).path("/{idGroup}/requests/{idRequest}/accept").buildAndExpand(5, 5).toUriString();
 
         ResponseEntity<ExceptionResponse> response = restTemplate.postForEntity(urlWithParams, null, ExceptionResponse.class);
@@ -316,7 +316,7 @@ class GroupControllerTestInt extends IntegrationTestConfiguration {
 
     @DisplayName("Accepting request for non-existent group request should return exception")
     @Test
-    void acceptingRequestForNonExistentGroupRequestShouldReturnException() throws ResourceNotFoundException {
+    void testAcceptRequestNoExistGroupRequest() throws ResourceNotFoundException {
         User user = jwtService.getUser();
 
         User testUser = new User();
@@ -348,7 +348,7 @@ class GroupControllerTestInt extends IntegrationTestConfiguration {
 
     @DisplayName("Accepting request for non-existent group request for given group id and given request id should return exception")
     @Test
-    void acceptingRequestForNonExistentGroupRequestBecauseOfGivenDifferentGroupId() throws ResourceNotFoundException {
+    void testAcceptRequestNoExistGroupAndRequest() throws ResourceNotFoundException {
         User user = jwtService.getUser();
 
         User testUser = new User();
@@ -392,7 +392,7 @@ class GroupControllerTestInt extends IntegrationTestConfiguration {
 
     @DisplayName("Accepting request by non-admin user should return exception")
     @Test
-    void acceptingRequestByNonAdminUserShouldReturnException() {
+    void testAcceptRequestNoExistAdmin() {
         User testUser = new User();
         testUser.setUserSub("f3841812-e0f1-7025-b7bc-ce67d7fb933e");
         testUser.setEmail("xanitev711@mcatag.com");
@@ -430,7 +430,7 @@ class GroupControllerTestInt extends IntegrationTestConfiguration {
 
     @DisplayName("Attempting to accept request for public group returns exception")
     @Test
-    void acceptingRequestForPublicGroupShouldReturnException() throws ResourceNotFoundException {
+    void testAcceptRequestPublicGroup() throws ResourceNotFoundException {
         User user = jwtService.getUser();
 
         User testUser = new User();
@@ -467,7 +467,7 @@ class GroupControllerTestInt extends IntegrationTestConfiguration {
 
     @DisplayName("Successfully reject request")
     @Test
-    void successfullyRejectRequest() throws ResourceNotFoundException {
+    void testRejectRequest() throws ResourceNotFoundException {
 
         User user = jwtService.getUser();
         userRepository.save(user);
@@ -507,7 +507,7 @@ class GroupControllerTestInt extends IntegrationTestConfiguration {
 
     @DisplayName("Successfully create request to join to private group")
     @Test
-    void successfullyCreateRequestForPrivateGroup() throws ResourceNotFoundException {
+    void testCreateRequestPublicGroup() throws ResourceNotFoundException {
         User user = jwtService.getUser();
 
         User testUser = new User();
@@ -540,7 +540,7 @@ class GroupControllerTestInt extends IntegrationTestConfiguration {
 
     @DisplayName("Attempting to create request to join non-existing private group returns exception")
     @Test
-    void createRequestForNonExistingPrivateGroupShouldReturnException() {
+    void testCreateRequestNoExistGroup() {
         String urlWithParams = UriComponentsBuilder.fromUriString(groupsApiURL).path("/{id}/join").buildAndExpand(5).toUriString();
 
         ResponseEntity<ExceptionResponse> response = restTemplate.postForEntity(urlWithParams, null, ExceptionResponse.class);
@@ -554,7 +554,7 @@ class GroupControllerTestInt extends IntegrationTestConfiguration {
 
     @DisplayName("Creating duplicate request to join private group returns exception")
     @Test
-    void createDuplicateRequestForPrivateGroupShouldReturnException() throws ResourceNotFoundException {
+    void testCreateRequestAlreadyExist() throws ResourceNotFoundException {
         User user = jwtService.getUser();
 
         Group testGroup = new Group();
@@ -581,7 +581,7 @@ class GroupControllerTestInt extends IntegrationTestConfiguration {
 
     @DisplayName("Create request to join private group when already a member returns exception")
     @Test
-    void createRequestForPrivateGroupWhenAlreadyMemberShouldReturnException() throws ResourceNotFoundException {
+    void testCreateRequestAlreadyMember() throws ResourceNotFoundException {
         User user = jwtService.getUser();
 
         Group testGroup = new Group();
@@ -608,7 +608,7 @@ class GroupControllerTestInt extends IntegrationTestConfiguration {
 
     @DisplayName("Successfully create request to join to public group and automatically accept")
     @Test
-    void successfullyCreateRequestForPublicGroup() throws ResourceNotFoundException {
+    void testCreateRequestPrivateGroup() throws ResourceNotFoundException {
         User user = jwtService.getUser();
 
         User testUser = new User();
@@ -644,7 +644,7 @@ class GroupControllerTestInt extends IntegrationTestConfiguration {
 
     @DisplayName("Successfully return all posts for private group ")
     @Test
-    void successfullyReturnPostsForPrivateGroup() throws ResourceNotFoundException {
+    void testGetPostsPrivateGroup() throws ResourceNotFoundException {
         User user = jwtService.getUser();
 
         Group testGroup = new Group();
@@ -684,7 +684,7 @@ class GroupControllerTestInt extends IntegrationTestConfiguration {
 
     @DisplayName("Successfully return all posts for public group ")
     @Test
-    void successfullyReturnPostsForPublicGroup() throws ResourceNotFoundException {
+    void testGetPostsPublicGroup() throws ResourceNotFoundException {
         User user = jwtService.getUser();
 
         Group testGroup = new Group();
@@ -723,7 +723,7 @@ class GroupControllerTestInt extends IntegrationTestConfiguration {
 
     @DisplayName("Successfully return all posts for public group in which user is not a member")
     @Test
-    void successfullyReturnPostsForPublicGroupAndUserIsNotAMemberOfThatGroup() throws ResourceNotFoundException {
+    void testGetPostsNotAPublicGroupMember() throws ResourceNotFoundException {
         User user = jwtService.getUser();
 
         Group testGroup = new Group();
@@ -757,7 +757,7 @@ class GroupControllerTestInt extends IntegrationTestConfiguration {
 
     @DisplayName("Return all posts for which group which does not exist return exception ")
     @Test
-    void returnAllPostsForGroupThatDoesNotExistReturnException() {
+    void testGetPostsNoExistGroup() {
         String urlWithParams = UriComponentsBuilder.fromUriString(groupsApiURL).path("/{id}/posts").buildAndExpand(5).toUriString();
 
         ResponseEntity<ExceptionResponse> response = restTemplate.getForEntity(urlWithParams, ExceptionResponse.class);
@@ -770,7 +770,7 @@ class GroupControllerTestInt extends IntegrationTestConfiguration {
 
     @DisplayName("Return all posts for group if user is not a member of that group return exception")
     @Test
-    void returnAllPostsForGroupInWhichUserIsNotAMemberOfReturnException() throws ResourceNotFoundException {
+    void testGetPostsNotAPrivateGroupMember() throws ResourceNotFoundException {
         User user = jwtService.getUser();
 
         User testUser = new User();
