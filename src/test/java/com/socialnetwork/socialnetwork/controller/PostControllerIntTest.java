@@ -33,9 +33,7 @@ public class PostControllerIntTest extends IntegrationTestConfiguration {
     @Test
     @DisplayName("Testing if user gets the post he asked for")
     public void testGetPostByIdReturnsCorrectPost() throws ResourceNotFoundException {
-        User currentUser = jwtService.getUser();
-
-        Post post = getDummyPost(currentUser,null);
+        Post post = getDummyPost(jwtService.getUser(),null);
         postRepository.save(post);
 
         ResponseEntity<PostDTO> postDTO = restTemplate.getForEntity(POSTS_URL + "/" + post.getId(), PostDTO.class);
@@ -91,8 +89,6 @@ public class PostControllerIntTest extends IntegrationTestConfiguration {
     @Test
     @DisplayName("Testing if user-generated post can be created successfully")
     public void testCreatePost() throws ResourceNotFoundException {
-        User currentUser = jwtService.getUser();
-
         MultiValueMap<String, Object> formData = new LinkedMultiValueMap<>();
         formData.add("isPublic", "false");
         formData.add("text", "Lorem ipsum");
@@ -109,7 +105,7 @@ public class PostControllerIntTest extends IntegrationTestConfiguration {
         assertThat(postDTO.getStatusCode()).isEqualTo(HttpStatus.CREATED);
         assertThat(postDTO.getBody().text()).isEqualTo("Lorem ipsum");
         assertThat(postDTO.getBody().imgUrl()).isEqualTo("");
-        assertThat(postDTO.getBody().userEmail()).isEqualTo(currentUser.getEmail());
+        assertThat(postDTO.getBody().userEmail()).isEqualTo(jwtService.getUser().getEmail());
         assertThat(postDTO.getBody().groupName()).isNull();
         assertThat(postDTO.getBody().comments()).isNull();
     }
@@ -166,9 +162,7 @@ public class PostControllerIntTest extends IntegrationTestConfiguration {
     @Test
     @DisplayName("Testing if the post can be updated successfully")
     public void testUpdatePost() throws ResourceNotFoundException {
-        User currentUser = jwtService.getUser();
-
-        Post post = getDummyPost(currentUser,null);
+        Post post = getDummyPost(jwtService.getUser(),null);
         postRepository.save(post);
 
         HttpHeaders headers = new HttpHeaders();
@@ -185,7 +179,7 @@ public class PostControllerIntTest extends IntegrationTestConfiguration {
 
         assertThat(postDTO.getStatusCode()).isEqualTo(HttpStatus.OK);
         assertThat(postDTO.getBody().id()).isEqualTo(post.getId());
-        assertThat(postDTO.getBody().userEmail()).isEqualTo(currentUser.getEmail());
+        assertThat(postDTO.getBody().userEmail()).isEqualTo(jwtService.getUser().getEmail());
         assertThat(postDTO.getBody().text()).isEqualTo("Lorem");
         assertThat(postDTO.getBody().imgUrl()).isEqualTo("");
     }
@@ -241,9 +235,7 @@ public class PostControllerIntTest extends IntegrationTestConfiguration {
     @Test
     @DisplayName("Testing if post can be deleted")
     public void testDeletePost() throws ResourceNotFoundException {
-        User currentUser = jwtService.getUser();
-
-        Post post = getDummyPost(currentUser,null);
+        Post post = getDummyPost(jwtService.getUser(),null);
         postRepository.save(post);
 
         ResponseEntity<Void> response = restTemplate.exchange(POSTS_URL + "/" + post.getId(), HttpMethod.DELETE, null, Void.class);
