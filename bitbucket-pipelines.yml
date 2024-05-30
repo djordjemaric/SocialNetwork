@@ -5,7 +5,7 @@ definitions:
     docker:
       memory: 2048
   script: &createOIDC
-    export AWS_REGION=eu-central-1 
+    export AWS_REGION=eu-central-1
             && export AWS_ROLE_ARN=arn:aws:iam::211125711045:role/bitbucket_oidc_role 
             && export AWS_WEB_IDENTITY_TOKEN_FILE=$(pwd)/web-identity-token 
             && echo $BITBUCKET_STEP_OIDC_TOKEN > $(pwd)/web-identity-token
@@ -20,7 +20,7 @@ definitions:
           - target/*.jar
     - step: &testOIDC
         image: amazon/aws-cli
-        name: Creating aws openID connection
+        name: Creating AWS OpenID connection
         oidc: true
         script:
           - *createOIDC
@@ -50,17 +50,37 @@ definitions:
               AWS_OIDC_ROLE_ARN: 'arn:aws:iam::211125711045:role/bitbucket_oidc_role'
               IMAGE_NAME: social-network
               TAGS: 'latest ${BITBUCKET_COMMIT}'
+    - step: &gettingTaskDefinition
+        image: amazon/aws-cli
+        name: Getting task definition file from AWS
+        oidc: true
+        script:
+          - *createOIDC
+          - aws ecs describe-task-definition --task-definition social-network-task > taskDefinitionTainted.json
+        artifacts:
+          - taskDefinitionTainted.json
+
+    - step: &cleaningJSON
+        image: stedolan/jq
+        name: Cleaning initial json file
+        script:
+          - jq --arg COMMIT_HASH "$BITBUCKET_COMMIT" '.taskDefinition | .containerDefinitions[0].image = "211125711045.dkr.ecr.eu-central-1.amazonaws.com/social-network:\($COMMIT_HASH)" | del(.taskDefinitionArn, .requiresAttributes, .compatibilities, .registeredAt, .registeredBy, .revision, .status)' taskDefinitionTainted.json > taskDefinition.json
+          - cat taskDefinition.json
+        artifacts:
+          - taskDefinition.json
     - step: &deployToECS
+        image: amazon/aws-cli
         name: Deploy image to ECS
         oidc: true
         script:
+          - *createOIDC
           - pipe: atlassian/aws-ecs-deploy:1.12.1
             variables:
               AWS_DEFAULT_REGION: 'eu-central-1'
               AWS_OIDC_ROLE_ARN: 'arn:aws:iam::211125711045:role/bitbucket_oidc_role'
               CLUSTER_NAME: 'SocialNetworkCluster'
               SERVICE_NAME: 'SocialNetworkService'
-              FORCE_NEW_DEPLOYMENT: 'true'
+              TASK_DEFINITION: 'taskDefinition.json'
 pipelines:
   branches:
     master:
@@ -68,4 +88,6 @@ pipelines:
       - step: *test
       - step: *testOIDC
       - step: *pushToECR
+      - step: *gettingTaskDefinition
+      - step: *cleaningJSON
       - step: *deployToECS
