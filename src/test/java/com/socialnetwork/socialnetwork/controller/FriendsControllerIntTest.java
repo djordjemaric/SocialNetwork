@@ -24,9 +24,7 @@ import java.util.List;
 
 import static org.assertj.core.api.AssertionsForClassTypes.assertThat;
 
-
-
-class FriendsControllerTest extends IntegrationTestConfiguration {
+class FriendsControllerIntTest extends IntegrationTestConfiguration {
 
     private String friendsApiURL = "/api/friends";
 
@@ -37,7 +35,7 @@ class FriendsControllerTest extends IntegrationTestConfiguration {
     private FriendsRepository friendsRepository;
 
     @AfterEach
-    void cleanDatabase() throws ResourceNotFoundException {
+    void cleanDatabase(){
         friendRequestRepository.deleteAll();
         friendsRepository.deleteAll();
         userRepository.deleteAll();
@@ -45,28 +43,20 @@ class FriendsControllerTest extends IntegrationTestConfiguration {
 
     @Test
     @DisplayName("Testing if user can see his pending friend requests")
-    void userFriendsRequestsShouldShow() throws ResourceNotFoundException {
+    void testUserFriendsRequestsShouldShow() throws ResourceNotFoundException {
 
         User currentTestUser = jwtService.getUser();
 
-        User testUser1 = new User();
-        testUser1.setUserSub("f3841812-e0f1-7025-b7bc-ce67d7fb933e");
-        testUser1.setEmail("xanitev711@mcatag.com");
-        userRepository.save(testUser1);
+        User testUser1 = createTestUser1();
+        testUser1 = userRepository.save(testUser1);
 
-        FriendRequest testFriendRequest1 = new FriendRequest();
-        testFriendRequest1.setFrom(testUser1);
-        testFriendRequest1.setTo(currentTestUser);
+        FriendRequest testFriendRequest1 = createFriendRequest(testUser1, currentTestUser);
         friendRequestRepository.save(testFriendRequest1);
 
-        User testUser2 = new User();
-        testUser2.setUserSub("73140822-2011-705f-ce8c-675fa425e435");
-        testUser2.setEmail("mapsesisto@gufum.com");
-        userRepository.save(testUser2);
+        User testUser2 = createTestUser2();
+        testUser2 = userRepository.save(testUser2);
 
-        FriendRequest testFriendRequest2 = new FriendRequest();
-        testFriendRequest2.setFrom(testUser2);
-        testFriendRequest2.setTo(currentTestUser);
+        FriendRequest testFriendRequest2 = createFriendRequest(testUser2, currentTestUser);
         friendRequestRepository.save(testFriendRequest2);
 
         FriendRequestDTO[] frResponseArray = restTemplate.getForObject(friendsApiURL + "/requests", FriendRequestDTO[].class);
@@ -78,7 +68,7 @@ class FriendsControllerTest extends IntegrationTestConfiguration {
 
     @Test
     @DisplayName("Testing if there are no pending requests")
-    void userFriendsRequestsShouldNotShow() throws ResourceNotFoundException {
+    void testUserFriendsRequestsShouldNotShow() {
 
         FriendRequestDTO[] frResponseArray = restTemplate.getForObject(friendsApiURL + "/requests", FriendRequestDTO[].class);
 
@@ -87,18 +77,14 @@ class FriendsControllerTest extends IntegrationTestConfiguration {
 
     @Test
     @DisplayName("Testing if user can send friend requests")
-    void userShouldSendRequests() throws ResourceNotFoundException {
+    void testUserShouldSendRequests() throws ResourceNotFoundException {
         User currentTestUser = jwtService.getUser();
 
-        User testUser1 = new User();
-        testUser1.setUserSub("f3841812-e0f1-7025-b7bc-ce67d7fb933e");
-        testUser1.setEmail("xanitev711@mcatag.com");
-        userRepository.save(testUser1);
+        User testUser1 = createTestUser1();
+        testUser1 = userRepository.save(testUser1);
 
-        User testUser2 = new User();
-        testUser2.setUserSub("73140822-2011-705f-ce8c-675fa425e435");
-        testUser2.setEmail("mapsesisto@gufum.com");
-        userRepository.save(testUser2);
+        User testUser2 = createTestUser2();
+        testUser2 = userRepository.save(testUser2);
 
         ResponseEntity<PreviewFriendRequestDTO> firstRequestResponse = restTemplate.postForEntity(friendsApiURL + "/requests", new SentFriendRequestDTO(testUser1.getEmail()), PreviewFriendRequestDTO.class);
         assertThat(firstRequestResponse.getStatusCode()).isEqualTo(HttpStatus.CREATED);
@@ -120,7 +106,7 @@ class FriendsControllerTest extends IntegrationTestConfiguration {
 
     @Test
     @DisplayName("Sending a request to a non existing user")
-    void userSendingToANonExistingFriend() throws ResourceNotFoundException {
+    void testUserSendingToANonExistingFriend(){
 
         ResponseEntity<ExceptionResponse> response = restTemplate.postForEntity(friendsApiURL + "/requests", new SentFriendRequestDTO("anonymous@test.com"), ExceptionResponse.class);
         assertThat(response.getStatusCode()).isEqualTo(HttpStatus.NOT_FOUND);
@@ -131,7 +117,7 @@ class FriendsControllerTest extends IntegrationTestConfiguration {
 
     @Test
     @DisplayName("Sending a friend request to yourself")
-    void userSendingToHimself() throws ResourceNotFoundException {
+    void testUserSendingToHimself() {
 
         ResponseEntity<ExceptionResponse> response = restTemplate.postForEntity(friendsApiURL + "/requests", new SentFriendRequestDTO("vica.ristic@gmail.com"), ExceptionResponse.class);
         assertThat(response.getStatusCode()).isEqualTo(HttpStatus.BAD_REQUEST);
@@ -142,28 +128,20 @@ class FriendsControllerTest extends IntegrationTestConfiguration {
 
     @Test
     @DisplayName("Checking users are already friends")
-    void usersAreAlreadyFriendsBothWays() throws ResourceNotFoundException {
+    void testUsersAreAlreadyFriendsBothWays() throws ResourceNotFoundException {
 
         User currentUser = jwtService.getUser();
 
-        User testUser1 = new User();
-        testUser1.setUserSub("f3841812-e0f1-7025-b7bc-ce67d7fb933e");
-        testUser1.setEmail("xanitev711@mcatag.com");
-        userRepository.save(testUser1);
+        User testUser1 = createTestUser1();
+        testUser1 = userRepository.save(testUser1);
 
-        User testUser2 = new User();
-        testUser2.setUserSub("73140822-2011-705f-ce8c-675fa425e435");
-        testUser2.setEmail("mapsesisto@gufum.com");
-        userRepository.save(testUser2);
+        User testUser2 = createTestUser2();
+        testUser2 = userRepository.save(testUser2);
 
-        Friends friends1 = new Friends();
-        friends1.setFriend(currentUser);
-        friends1.setFriendTo(testUser1);
+        Friends friends1 = createFriends(currentUser, testUser1);
         friendsRepository.save(friends1);
 
-        Friends friends2 = new Friends();
-        friends2.setFriend(testUser2);
-        friends2.setFriendTo(currentUser);
+        Friends friends2 = createFriends(testUser2, currentUser);
         friendsRepository.save(friends2);
 
         ResponseEntity<ExceptionResponse> response1 = restTemplate.postForEntity(friendsApiURL + "/requests", new SentFriendRequestDTO("xanitev711@mcatag.com"), ExceptionResponse.class);
@@ -181,27 +159,19 @@ class FriendsControllerTest extends IntegrationTestConfiguration {
 
     @Test
     @DisplayName("There is already a pending exception")
-    void thereIsAlreadyPendingRequest() throws ResourceNotFoundException {
+    void testThereIsAlreadyPendingRequest() throws ResourceNotFoundException {
         User currentUser = jwtService.getUser();
 
-        User testUser1 = new User();
-        testUser1.setUserSub("f3841812-e0f1-7025-b7bc-ce67d7fb933e");
-        testUser1.setEmail("xanitev711@mcatag.com");
-        userRepository.save(testUser1);
+        User testUser1 = createTestUser1();
+        testUser1 = userRepository.save(testUser1);
 
-        User testUser2 = new User();
-        testUser2.setUserSub("73140822-2011-705f-ce8c-675fa425e435");
-        testUser2.setEmail("mapsesisto@gufum.com");
-        userRepository.save(testUser2);
+        User testUser2 = createTestUser2();
+        testUser2 = userRepository.save(testUser2);
 
-        FriendRequest friendRequest1 = new FriendRequest();
-        friendRequest1.setTo(testUser1);
-        friendRequest1.setFrom(currentUser);
+        FriendRequest friendRequest1 = createFriendRequest(testUser1, currentUser);
         friendRequestRepository.save(friendRequest1);
 
-        FriendRequest friendRequest2 = new FriendRequest();
-        friendRequest2.setTo(currentUser);
-        friendRequest2.setFrom(testUser2);
+        FriendRequest friendRequest2 = createFriendRequest(currentUser, testUser2);
         friendRequestRepository.save(friendRequest2);
 
         ResponseEntity<ExceptionResponse> response1 = restTemplate.postForEntity(friendsApiURL + "/requests", new SentFriendRequestDTO("xanitev711@mcatag.com"), ExceptionResponse.class);
@@ -219,7 +189,7 @@ class FriendsControllerTest extends IntegrationTestConfiguration {
 
     @Test
     @DisplayName("User searching his friends")
-    void userSearchingFriends() throws ResourceNotFoundException {
+    void testUserSearchingFriends() throws ResourceNotFoundException {
         User currentUser = jwtService.getUser();
 
         String searchTerm = "";
@@ -229,27 +199,17 @@ class FriendsControllerTest extends IntegrationTestConfiguration {
         assertThat(response1.getStatusCode()).isEqualTo(HttpStatus.OK);
         assertThat(response1.getBody().length).isEqualTo(0);
 
-        User testUser1 = new User();
-        testUser1.setUserSub("f3841812-e0f1-7025-b7bc-ce67d7fb933e");
-        testUser1.setEmail("xanitev711@mcatag.com");
-        userRepository.save(testUser1);
+        User testUser1 = createTestUser1();
+        testUser1 = userRepository.save(testUser1);
 
-        User testUser2 = new User();
-        testUser2.setUserSub("73140822-2011-705f-ce8c-675fa425e435");
-        testUser2.setEmail("mapsesisto@gufum.com");
-        userRepository.save(testUser2);
+        User testUser2 = createTestUser2();
+        testUser2 = userRepository.save(testUser2);
 
-        Friends friends1 = new Friends();
-        friends1.setFriend(currentUser);
-        friends1.setFriendTo(testUser1);
+        Friends friends1 = createFriends(currentUser, testUser1);
         friendsRepository.save(friends1);
 
-        Friends friends2 = new Friends();
-        friends2.setFriend(testUser2);
-        friends2.setFriendTo(currentUser);
+        Friends friends2 = createFriends(testUser2, currentUser);
         friendsRepository.save(friends2);
-
-        friendsRepository.findAll();
 
         searchTerm = "@";
         ResponseEntity<PreviewUserDTO[]> response2 = restTemplate.getForEntity(friendsApiURL + "/search?searchTerm=" + searchTerm, PreviewUserDTO[].class);
@@ -266,17 +226,13 @@ class FriendsControllerTest extends IntegrationTestConfiguration {
 
     @Test
     @DisplayName("Successfully deleting friend")
-    void successfullyDeletingFriend() throws ResourceNotFoundException {
+    void testSuccessfullyDeletingFriend() throws ResourceNotFoundException {
         User currentUser = jwtService.getUser();
 
-        User testUser1 = new User();
-        testUser1.setUserSub("f3841812-e0f1-7025-b7bc-ce67d7fb933e");
-        testUser1.setEmail("xanitev711@mcatag.com");
+        User testUser1 = createTestUser1();
         testUser1 = userRepository.save(testUser1);
 
-        Friends friends1 = new Friends();
-        friends1.setFriend(currentUser);
-        friends1.setFriendTo(testUser1);
+        Friends friends1 = createFriends(currentUser, testUser1);
         friendsRepository.save(friends1);
 
         ResponseEntity<Void> response = restTemplate.exchange(friendsApiURL+ "/" + testUser1.getId(), HttpMethod.DELETE,null, Void.class);
@@ -286,8 +242,7 @@ class FriendsControllerTest extends IntegrationTestConfiguration {
 
     @Test
     @DisplayName("Error while deleting friend that does not exist")
-    void deletingFriendThatDoesNotExist() throws ResourceNotFoundException {
-        User currentUser = jwtService.getUser();
+    void testDeletingFriendThatDoesNotExist() {
 
         ResponseEntity<ExceptionResponse> response = restTemplate.exchange(friendsApiURL+ "/5", HttpMethod.DELETE,null, ExceptionResponse.class);
         assertThat(response.getStatusCode()).isEqualTo(HttpStatus.NOT_FOUND);
@@ -298,12 +253,9 @@ class FriendsControllerTest extends IntegrationTestConfiguration {
 
     @Test
     @DisplayName("Error while deleting user that is not a friend")
-    void deletingUserThatIsNotFriend() throws ResourceNotFoundException {
-        User currentUser = jwtService.getUser();
+    void testDeletingUserThatIsNotFriend() {
 
-        User testUser1 = new User();
-        testUser1.setUserSub("f3841812-e0f1-7025-b7bc-ce67d7fb933e");
-        testUser1.setEmail("xanitev711@mcatag.com");
+        User testUser1 = createTestUser1();
         testUser1 = userRepository.save(testUser1);
 
         ResponseEntity<ExceptionResponse> response = restTemplate.exchange(friendsApiURL+ "/" + testUser1.getId(), HttpMethod.DELETE,null, ExceptionResponse.class);
@@ -314,32 +266,38 @@ class FriendsControllerTest extends IntegrationTestConfiguration {
     }
 
     @Test
-    @DisplayName("Error while accepting friend request")
-    void errorAcceptingRequest() throws ResourceNotFoundException {
+    @DisplayName("Error while accepting friend request, wrong id")
+    void testErrorRequestAcceptWrongId() {
 
-        User testUser1 = new User();
-        testUser1.setUserSub("f3841812-e0f1-7025-b7bc-ce67d7fb933e");
-        testUser1.setEmail("xanitev711@mcatag.com");
+        User testUser1 = createTestUser1();
         userRepository.save(testUser1);
 
-        User testUser2 = new User();
-        testUser2.setUserSub("73140822-2011-705f-ce8c-675fa425e435");
-        testUser2.setEmail("mapsesisto@gufum.com");
+        User testUser2 = createTestUser2();
         userRepository.save(testUser2);
 
-        FriendRequest friendRequest = new FriendRequest();
-        friendRequest.setFrom(testUser1);
-        friendRequest.setTo(testUser2);
-        friendRequest = friendRequestRepository.save(friendRequest);
+        FriendRequest friendRequest = createFriendRequest(testUser1, testUser2);
+        friendRequestRepository.save(friendRequest);
 
-//        wrong id for friend request
         ResponseEntity<ExceptionResponse> response1 = restTemplate.postForEntity(friendsApiURL+ "/requests/5/accept", null,  ExceptionResponse.class);
         assertThat(response1.getStatusCode()).isEqualTo(HttpStatus.NOT_FOUND);
         assertThat(response1.getBody()).isNotNull();
         assertThat(response1.getBody().errorCode()).isEqualTo(ErrorCode.ERROR_FINDING_FRIEND_REQUEST);
         assertThat(response1.getBody().message()).isEqualTo("Friend request id and current user do not match");
+    }
 
-//        trying to accept some else's request
+    @Test
+    @DisplayName("Error while accepting friend request, someone else's request")
+    void testErrorRequestAcceptSomeoneElseRequest() {
+
+        User testUser1 = createTestUser1();
+        userRepository.save(testUser1);
+
+        User testUser2 = createTestUser2();
+        userRepository.save(testUser2);
+
+        FriendRequest friendRequest = createFriendRequest(testUser1, testUser2);
+        friendRequest = friendRequestRepository.save(friendRequest);
+
         ResponseEntity<ExceptionResponse> response2 = restTemplate.postForEntity(friendsApiURL+ "/requests/" + friendRequest.getId() + "/accept", null, ExceptionResponse.class);
         assertThat(response2.getStatusCode()).isEqualTo(HttpStatus.NOT_FOUND);
         assertThat(response2.getBody()).isNotNull();
@@ -350,17 +308,13 @@ class FriendsControllerTest extends IntegrationTestConfiguration {
 
     @Test
     @DisplayName("Successfully accept friend request")
-    void successfullyAcceptingRequest() throws ResourceNotFoundException {
+    void testSuccessfullyAcceptingRequest() throws ResourceNotFoundException {
         User currentUser = jwtService.getUser();
 
-        User testUser1 = new User();
-        testUser1.setUserSub("f3841812-e0f1-7025-b7bc-ce67d7fb933e");
-        testUser1.setEmail("xanitev711@mcatag.com");
-        userRepository.save(testUser1);
+        User testUser1 = createTestUser1();
+        testUser1 = userRepository.save(testUser1);
 
-        FriendRequest friendRequest = new FriendRequest();
-        friendRequest.setFrom(testUser1);
-        friendRequest.setTo(currentUser);
+        FriendRequest friendRequest = createFriendRequest(testUser1, currentUser);
         friendRequest = friendRequestRepository.save(friendRequest);
 
         ResponseEntity<ResolvedFriendRequestDTO> response1 = restTemplate.postForEntity(friendsApiURL+ "/requests/"  + friendRequest.getId() + "/accept", null, ResolvedFriendRequestDTO.class);
@@ -371,32 +325,36 @@ class FriendsControllerTest extends IntegrationTestConfiguration {
     }
 
     @Test
-    @DisplayName("Error while declining friend request")
-    void errorDecliningRequest() throws ResourceNotFoundException {
+    @DisplayName("Error while declining friend request, wrong id")
+    void testErrorDeclineRequestWrongId() {
 
-        User testUser1 = new User();
-        testUser1.setUserSub("f3841812-e0f1-7025-b7bc-ce67d7fb933e");
-        testUser1.setEmail("xanitev711@mcatag.com");
+        User testUser1 = createTestUser1();
         userRepository.save(testUser1);
-
-        User testUser2 = new User();
-        testUser2.setUserSub("73140822-2011-705f-ce8c-675fa425e435");
-        testUser2.setEmail("mapsesisto@gufum.com");
+        User testUser2 = createTestUser2();
         userRepository.save(testUser2);
 
-        FriendRequest friendRequest = new FriendRequest();
-        friendRequest.setFrom(testUser1);
-        friendRequest.setTo(testUser2);
+        FriendRequest friendRequest = createFriendRequest(testUser1, testUser2);
         friendRequestRepository.save(friendRequest);
 
-        //wrong id for friend request
         ResponseEntity<ExceptionResponse> response1 = restTemplate.postForEntity(friendsApiURL+ "/requests/5/decline", null,  ExceptionResponse.class);
         assertThat(response1.getStatusCode()).isEqualTo(HttpStatus.NOT_FOUND);
         assertThat(response1.getBody()).isNotNull();
         assertThat(response1.getBody().errorCode()).isEqualTo(ErrorCode.ERROR_FINDING_FRIEND_REQUEST);
         assertThat(response1.getBody().message()).isEqualTo("Friend request id and current user do not match");
+    }
 
-        //trying to decline some else's request
+    @Test
+    @DisplayName("Error while declining friend request, can't decline someone else's request")
+    void testErrorDeclineRequestSomeoneElseRequest() {
+
+        User testUser1 = createTestUser1();
+        userRepository.save(testUser1);
+        User testUser2 = createTestUser2();
+        userRepository.save(testUser2);
+
+        FriendRequest friendRequest = createFriendRequest(testUser1, testUser2);
+        friendRequest = friendRequestRepository.save(friendRequest);
+
         ResponseEntity<ExceptionResponse> response2 = restTemplate.postForEntity(friendsApiURL+ "/requests/" + friendRequest.getId() + "/decline", null, ExceptionResponse.class);
         assertThat(response2.getStatusCode()).isEqualTo(HttpStatus.NOT_FOUND);
         assertThat(response2.getBody()).isNotNull();
@@ -407,17 +365,13 @@ class FriendsControllerTest extends IntegrationTestConfiguration {
 
     @Test
     @DisplayName("Successfully decline friend request")
-    void successfullyDeclineRequest() throws ResourceNotFoundException {
+    void testSuccessfullyDeclineRequest() throws ResourceNotFoundException {
         User currentUser = jwtService.getUser();
 
-        User testUser1 = new User();
-        testUser1.setUserSub("f3841812-e0f1-7025-b7bc-ce67d7fb933e");
-        testUser1.setEmail("xanitev711@mcatag.com");
-        userRepository.save(testUser1);
+        User testUser1 = createTestUser1();
+        testUser1 = userRepository.save(testUser1);
 
-        FriendRequest friendRequest = new FriendRequest();
-        friendRequest.setFrom(testUser1);
-        friendRequest.setTo(currentUser);
+        FriendRequest friendRequest = createFriendRequest(testUser1, currentUser);
         friendRequest = friendRequestRepository.save(friendRequest);
 
         ResponseEntity<ResolvedFriendRequestDTO> response1 = restTemplate.postForEntity(friendsApiURL+ "/requests/"  + friendRequest.getId() + "/decline", null, ResolvedFriendRequestDTO.class);
@@ -425,5 +379,33 @@ class FriendsControllerTest extends IntegrationTestConfiguration {
         assertThat(response1.getBody().message()).isEqualTo("Successfully declined a request with: " + testUser1.getEmail());
         assertThat(friendsRepository.areTwoUsersFriends(currentUser.getId(), testUser1.getId()).isEmpty()).isTrue();
         assertThat(friendRequestRepository.doesRequestExistsBetweenUsers(currentUser.getId(), testUser1.getId()).isEmpty()).isTrue();
+    }
+
+    private User createTestUser1(){
+        User testUser = new User();
+        testUser.setUserSub("f3841812-e0f1-7025-b7bc-ce67d7fb933e");
+        testUser.setEmail("xanitev711@mcatag.com");
+        return testUser;
+    }
+
+    private User createTestUser2(){
+        User testUser = new User();
+        testUser.setUserSub("73140822-2011-705f-ce8c-675fa425e435");
+        testUser.setEmail("mapsesisto@gufum.com");
+        return testUser;
+    }
+
+    private Friends createFriends(User testUser1, User testUser2){
+        Friends friends = new Friends();
+        friends.setFriend(testUser1);
+        friends.setFriendTo(testUser2);
+        return friends;
+    }
+
+    private FriendRequest createFriendRequest(User testUser1, User testUser2){
+        FriendRequest friendRequest = new FriendRequest();
+        friendRequest.setFrom(testUser1);
+        friendRequest.setTo(testUser2);
+        return friendRequest;
     }
 }
