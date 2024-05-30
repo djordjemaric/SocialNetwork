@@ -62,17 +62,16 @@ public class CommentService {
                 new BusinessLogicException(ErrorCode.ERROR_DELETING_COMMENT, "The comment which you are trying to delete doesn't exist."));
         User user = jwtService.getUser();
 
-        if (comment.getPost().getGroup() != null) {
-            if (Objects.equals(comment.getPost().getGroup().getAdmin().getId(), user.getId())) {
-                commentRepository.deleteById(commentId);
-                return;
-            }
-        }
-        if (Objects.equals(user.getId(), comment.getPost().getOwner().getId())) {
-            commentRepository.deleteById(commentId);
-            return;
-        }
-        throw new AccessDeniedException("You don't have the permission to delete this post.");
-    }
+        User owner = comment.getPost().getOwner();
+        User admin = comment.getPost().getGroup() != null ? comment.getPost().getGroup().getAdmin() : null;
 
+        boolean isAdmin = admin != null && Objects.equals(admin.getId(), user.getId());
+        boolean isOwner = owner != null && Objects.equals(owner.getId(), user.getId());
+
+        if (isAdmin || isOwner) {
+            commentRepository.deleteById(commentId);
+        } else {
+            throw new AccessDeniedException("You don't have the permission to delete this post.");
+        }
+    }
 }
