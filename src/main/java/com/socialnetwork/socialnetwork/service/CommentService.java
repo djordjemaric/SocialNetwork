@@ -5,12 +5,16 @@ import com.socialnetwork.socialnetwork.dto.post.CreateCommentDTO;
 import com.socialnetwork.socialnetwork.entity.Comment;
 import com.socialnetwork.socialnetwork.entity.Post;
 import com.socialnetwork.socialnetwork.entity.User;
+import com.socialnetwork.socialnetwork.exceptions.BusinessLogicException;
+import com.socialnetwork.socialnetwork.exceptions.ErrorCode;
 import com.socialnetwork.socialnetwork.exceptions.ResourceNotFoundException;
 import com.socialnetwork.socialnetwork.mapper.CommentMapper;
 import com.socialnetwork.socialnetwork.repository.*;
+import org.springframework.security.access.AccessDeniedException;
 import org.springframework.stereotype.Service;
 
 import java.util.NoSuchElementException;
+import java.util.Objects;
 
 @Service
 public class CommentService {
@@ -31,19 +35,19 @@ public class CommentService {
         this.friendsRepository = friendshipRepository;
     }
 
-    public CommentDTO createComment(Integer postId, CreateCommentDTO commentDTO) throws ResourceNotFoundException {
+    public CommentDTO createComment(Integer postId, CreateCommentDTO commentDTO) throws ResourceNotFoundException, BusinessLogicException,AccessDeniedException {
         User currentUser = jwtService.getUser();
         Post post = postRepository.findById(postId)
-                .orElseThrow(() -> new NoSuchElementException("The post with the id of " +
+                .orElseThrow(() -> new BusinessLogicException(ErrorCode.ERROR_CREATING_COMMENT, "The post with the id of " +
                         postId + " is not present in the database."));
         if (!post.isPublic() && post.getGroup() == null) {
             if (friendsRepository.areTwoUsersFriends(post.getOwner().getId(), currentUser.getId()).isEmpty()) {
-                throw new RuntimeException("You cannot see the post because you are not friends with the post owner.");
+                throw new AccessDeniedException("You cannot see the post because you are not friends with the post owner.");
             }
         }
         if (post.getGroup() != null && !(post.getGroup().isPublic())) {
             if (!(groupMemberRepository.existsByUserIdAndGroupId(currentUser.getId(), post.getGroup().getId()))) {
-                throw new RuntimeException("You cannot see the post because you are not a member of the "
+                throw new AccessDeniedException("You cannot see the post because you are not a member of the "
                         + post.getGroup().getName() + " group.");
             }
         }
@@ -53,4 +57,21 @@ public class CommentService {
 
     }
 
+    public void deletePost(Integer commentId) throws BusinessLogicException, ResourceNotFoundException {
+        Comment comment = commentRepository.findById(commentId).orElseThrow(() ->
+                new BusinessLogicException(ErrorCode.ERROR_DELETING_COMMENT, "The comment which you are trying to delete doesn't exist."));
+        User user = jwtService.getUser();
+
+        User owner = comment.getPost().getOwner();
+        User admin = comment.getPost().getGroup() != null ? comment.getPost().getGroup().getAdmin() : null;
+
+        boolean isAdmin = admin != null && Objects.equals(admin.getId(), user.getId());
+        boolean isOwner = owner != null && Objects.equals(owner.getId(), user.getId());
+
+        if (isAdmin || isOwner) {
+            commentRepository.deleteById(commentId);
+        } else {
+            throw new AccessDeniedException("You don't have the permission to delete this post.");
+        }
+    }
 }

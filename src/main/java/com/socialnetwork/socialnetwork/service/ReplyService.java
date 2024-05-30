@@ -8,10 +8,13 @@ import com.socialnetwork.socialnetwork.entity.Post;
 import com.socialnetwork.socialnetwork.entity.Reply;
 import com.socialnetwork.socialnetwork.entity.User;
 
+import com.socialnetwork.socialnetwork.exceptions.BusinessLogicException;
+import com.socialnetwork.socialnetwork.exceptions.ErrorCode;
 import com.socialnetwork.socialnetwork.exceptions.ResourceNotFoundException;
 import com.socialnetwork.socialnetwork.mapper.CommentMapper;
 import com.socialnetwork.socialnetwork.mapper.ReplyMapper;
 import com.socialnetwork.socialnetwork.repository.*;
+import org.springframework.security.access.AccessDeniedException;
 import org.springframework.stereotype.Service;
 
 import javax.management.RuntimeErrorException;
@@ -40,24 +43,23 @@ public class ReplyService {
         this.commentMapper = commentMapper;
     }
 
-    public ReplyDTO createReply(Integer postId,Integer commentId, CreateReplyDTO replyDTO) throws ResourceNotFoundException {
+    public ReplyDTO createReply(Integer postId,Integer commentId, CreateReplyDTO replyDTO) throws ResourceNotFoundException, BusinessLogicException,AccessDeniedException {
         User currentUser = jwtService.getUser();
 
 
         Comment comment=commentRepository.findByIdAndPost_Id(commentId, postId)
-                .orElseThrow(() -> new RuntimeException("This comment is not associated with this post."));
-
+                .orElseThrow(() -> new BusinessLogicException(ErrorCode.ERROR_CREATING_REPLY,"This comment is not associated with this post."));
         Post post = comment.getPost();
 
         if (!post.isPublic() && post.getGroup() == null) {
             if (friendsRepository.areTwoUsersFriends(post.getOwner().getId(), currentUser.getId()).isEmpty()) {
-                throw new RuntimeException("You cannot see the post because you are not friends with the post owner.");
+                throw new AccessDeniedException("You cannot see the post because you are not friends with the post owner.");
             }
         }
 
         if (post.getGroup() != null && !(post.getGroup().isPublic())) {
             if (!(groupMemberRepository.existsByUserIdAndGroupId(currentUser.getId(), post.getGroup().getId()))) {
-                throw new RuntimeException("You cannot see the post because you are not a member of the "
+                throw new AccessDeniedException("You cannot see the post because you are not a member of the "
                         + post.getGroup().getName() + " group.");
             }
         }

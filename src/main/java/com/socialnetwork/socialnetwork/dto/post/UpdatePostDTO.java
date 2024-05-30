@@ -6,7 +6,7 @@ import org.springframework.web.multipart.MultipartFile;
 
 public record UpdatePostDTO(
         boolean isPublic,
-        @NotBlank
+        @NotBlank(message = "text prompt should not be blank")
         String text,
         MultipartFile img) {
 }
