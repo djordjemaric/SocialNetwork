@@ -91,3 +91,6 @@ pipelines:
       - step: *gettingTaskDefinition
       - step: *cleaningJSON
       - step: *deployToECS
+    post-controller-integration-tests:
+      - step: *build
+      - step: *test
