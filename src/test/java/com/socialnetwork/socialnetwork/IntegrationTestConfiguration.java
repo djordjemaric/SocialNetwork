@@ -15,7 +15,6 @@ import org.springframework.boot.testcontainers.service.connection.ServiceConnect
 import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.context.TestPropertySource;
 import org.testcontainers.containers.PostgreSQLContainer;
-import org.testcontainers.containers.localstack.LocalStackContainer;
 import org.testcontainers.junit.jupiter.Container;
 import org.testcontainers.junit.jupiter.Testcontainers;
 
@@ -56,6 +55,8 @@ public abstract class IntegrationTestConfiguration {
         testUser.setUserSub("93246812-3021-704e-9c37-bf46100f22dc");
         testUser=userRepository.save(testUser);
         when(jwtService.getUser()).thenReturn(testUser);
+        assertThat(postgres.isCreated()).isTrue();
+        assertThat(postgres.isRunning()).isTrue();
     }
 
     @AfterEach
@@ -65,10 +66,11 @@ public abstract class IntegrationTestConfiguration {
         userRepository.deleteAll();
     }
 
-    @Test
-    void connectionEstablished(){
-        assertThat(postgres.isCreated()).isTrue();
-        assertThat(postgres.isRunning()).isTrue();
+    @AfterAll
+    public static void tearDown() {
+        if (postgres.isRunning()) {
+            postgres.stop();
+        }
     }
 
 }
