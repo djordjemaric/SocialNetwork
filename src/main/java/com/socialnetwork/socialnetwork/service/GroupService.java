@@ -23,17 +23,15 @@ public class GroupService {
     private final GroupRequestRepository groupRequestRepository;
     private final GroupMemberRepository groupMemberRepository;
     private final PostRepository postRepository;
-    private final UserRepository userRepository;
     private final GroupMapper groupMapper;
     private final PostMapper postMapper;
     private final GroupRequestMapper groupRequestMapper;
     private final JwtService jwtService;
 
-    public GroupService(GroupRepository groupRepository, GroupRequestRepository groupRequestRepository, PostRepository postRepository, UserRepository userRepository, GroupMapper groupMapper, GroupMemberRepository groupMemberRepository, PostMapper postMapper, GroupRequestMapper groupRequestMapper, JwtService jwtService) {
+    public GroupService(GroupRepository groupRepository, GroupRequestRepository groupRequestRepository, PostRepository postRepository, GroupMapper groupMapper, GroupMemberRepository groupMemberRepository, PostMapper postMapper, GroupRequestMapper groupRequestMapper, JwtService jwtService) {
         this.groupRepository = groupRepository;
         this.groupRequestRepository = groupRequestRepository;
         this.postRepository = postRepository;
-        this.userRepository = userRepository;
         this.groupMemberRepository = groupMemberRepository;
         this.groupMapper = groupMapper;
         this.jwtService = jwtService;
