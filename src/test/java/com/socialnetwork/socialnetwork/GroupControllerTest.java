@@ -59,7 +59,7 @@ class GroupControllerTest {
     }
 
     @Test
-    void createGroup_success() throws Exception {
+    void test_createGroup_success() throws Exception {
         when(groupService.createGroup(createGroupDTO)).thenReturn(expectedGroupDTO);
 
         String content = objectWriter.writeValueAsString(createGroupDTO);
@@ -75,7 +75,7 @@ class GroupControllerTest {
     }
 
     @Test
-    void leaveGroup_success() throws Exception {
+    void test_leaveGroup_success() throws Exception {
 
         Integer idGroup = 1;
 
@@ -88,7 +88,7 @@ class GroupControllerTest {
     }
 
     @Test
-    void removeFromGroup_success() throws Exception {
+    void test_removeFromGroup_success() throws Exception {
 
         Integer idGroup = 1;
         Integer idUser = 3;
@@ -102,7 +102,7 @@ class GroupControllerTest {
     }
 
     @Test
-    void findGroupsByName_success() throws Exception {
+    void test_findGroupsByName_success() throws Exception {
         String groupName = "Group";
 
         when(groupService.findByName(groupName)).thenReturn(expectedGroupDTOS);
@@ -118,7 +118,7 @@ class GroupControllerTest {
     }
 
     @Test
-    void deleteGroup_success() throws Exception {
+    void test_deleteGroup_success() throws Exception {
         Integer idGroup = 1;
 
         doNothing().when(groupService).deleteGroup(idGroup);
@@ -131,7 +131,7 @@ class GroupControllerTest {
     }
 
     @Test
-    void createRequestToJoinGroup_success() throws Exception {
+    void test_createRequestToJoinGroup_success() throws Exception {
         Integer id = 1;
         when(groupService.createRequestToJoinGroup(id)).thenReturn(resolvedGroupRequestDTO);
 
