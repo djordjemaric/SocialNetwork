@@ -49,7 +49,7 @@ services:
     ports:
       - "4318:4318"
     volumes:
-      - ./otel-config.yml:/etc/otelcol/config.yaml
+      - ./monitoring/otel-config.yml:/etc/otelcol/config.yaml
     depends_on:
       - zipkin
   prometheus:
