@@ -1,5 +1,23 @@
 version: '3.8'
 services:
+  social-network:
+    build:
+      context: .
+      args:
+        - JAR_FILE=target/*.jar
+    container_name: social-network
+    depends_on:
+      - sn-postgres
+      - zipkin
+    environment:
+      - DB_URL=jdbc:postgresql://postgres:5432/social-network?currentSchema=social-network
+      - JWT_SET_URI=${JWT_SET_URI}
+      - COGNITO_CLIENT_ID=${COGNITO_CLIENT_ID}
+      - AWS_PROFILE_NAME=${AWS_PROFILE_NAME}
+      - SPRING_PROFILES_ACTIVE=local
+      - ZIPKIN_ENDPOINT=http://zipkin:9411/api/v2/spans
+    ports:
+      - '8080:8080'
   sn-postgres:
     image: postgres:14.2-alpine
     container_name: postgres
@@ -19,3 +37,8 @@ services:
       - '3400:80'
     depends_on:
       - sn-postgres
+  zipkin:
+    image: openzipkin/zipkin
+    container_name: zipkin
+    ports:
+      - '9411:9411'
