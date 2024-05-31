@@ -234,7 +234,7 @@ class GroupControllerTestInt extends IntegrationTestConfiguration {
         assertThat(response.getStatusCode()).isEqualTo(HttpStatus.BAD_REQUEST);
         assertThat(response.getBody()).isNotNull();
         assertThat(response.getBody().errorCode()).isEqualTo(ErrorCode.ERROR_GETTING_GROUP_REQUESTS);
-        assertThat(response.getBody().message()).isEqualTo("Group with id " + 5 + "does not exist");
+        assertThat(response.getBody().message()).isEqualTo("Group with id " + 5 + " does not exist.");
     }
 
     @DisplayName("Returning all requests for group when not admin should return exception")
@@ -311,7 +311,7 @@ class GroupControllerTestInt extends IntegrationTestConfiguration {
         assertThat(response.getStatusCode()).isEqualTo(HttpStatus.BAD_REQUEST);
         assertThat(response.getBody()).isNotNull();
         assertThat(response.getBody().errorCode()).isEqualTo(ErrorCode.ERROR_MANAGING_GROUP_REQUEST);
-        assertThat(response.getBody().message()).isEqualTo("Group with id " + 5 + "does not exist");
+        assertThat(response.getBody().message()).isEqualTo("Group with id " + 5 + " does not exist.");
     }
 
     @DisplayName("Accepting request for non-existent group request should return exception")
@@ -343,7 +343,7 @@ class GroupControllerTestInt extends IntegrationTestConfiguration {
         assertThat(response.getBody()).isNotNull();
         assertThat(response.getBody().errorCode()).isEqualTo(ErrorCode.ERROR_MANAGING_GROUP_REQUEST);
         assertThat(response.getBody().message()).isEqualTo("Group request with id " +
-                + 5 + " and group id " + testGroup.getId() + " does not exist" );
+                + 5 + " and group id " + testGroup.getId() + " does not exist." );
     }
 
     @DisplayName("Accepting request for non-existent group request for given group id and given request id should return exception")
@@ -386,7 +386,7 @@ class GroupControllerTestInt extends IntegrationTestConfiguration {
         assertThat(response.getBody()).isNotNull();
         assertThat(response.getBody().errorCode()).isEqualTo(ErrorCode.ERROR_MANAGING_GROUP_REQUEST);
         assertThat(response.getBody().message()).isEqualTo("Group request with id " +
-                + groupRequest.getId() + " and group id " + testGroup.getId() + " does not exist" );
+                + groupRequest.getId() + " and group id " + testGroup.getId() + " does not exist." );
     }
 
 
@@ -548,7 +548,7 @@ class GroupControllerTestInt extends IntegrationTestConfiguration {
         assertThat(response.getStatusCode()).isEqualTo(HttpStatus.BAD_REQUEST);
         assertThat(response.getBody()).isNotNull();
         assertThat(response.getBody().errorCode()).isEqualTo(ErrorCode.ERROR_CREATING_REQUEST_GROUP);
-        assertThat(response.getBody().message()).isEqualTo("Group with id " + 5 + "does not exist");
+        assertThat(response.getBody().message()).isEqualTo("Group with id " + 5 + " does not exist.");
 
     }
 
@@ -765,7 +765,7 @@ class GroupControllerTestInt extends IntegrationTestConfiguration {
         assertThat(response.getStatusCode()).isEqualTo(HttpStatus.BAD_REQUEST);
         assertThat(response.getBody()).isNotNull();
         assertThat(response.getBody().errorCode()).isEqualTo(ErrorCode.ERROR_GETTING_GROUP_POSTS);
-        assertThat(response.getBody().message()).isEqualTo("Group with id " + 5 + "does not exist");
+        assertThat(response.getBody().message()).isEqualTo("Group with id " + 5 + " does not exist.");
     }
 
     @DisplayName("Return all posts for group if user is not a member of that group return exception")
