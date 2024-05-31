@@ -25,37 +25,37 @@ public class GroupController {
         this.groupService = groupService;
     }
 
-    @ResponseStatus(HttpStatus.CREATED)//da
+    @ResponseStatus(HttpStatus.CREATED)
     @PostMapping
     public GroupDTO createGroup(@RequestBody @Valid CreateGroupDTO createGroupDto) throws BusinessLogicException, ResourceNotFoundException {
         return groupService.createGroup(createGroupDto);
     }
 
-    @ResponseStatus(HttpStatus.OK)//da
+    @ResponseStatus(HttpStatus.OK)
     @DeleteMapping("/{id}")
     public void deleteGroup(@PathVariable Integer id) throws ResourceNotFoundException {
         groupService.deleteGroup(id);
     }
 
-    @ResponseStatus(HttpStatus.OK)//da
+    @ResponseStatus(HttpStatus.OK)
     @GetMapping
     public List<GroupDTO> getGroupsByName(@RequestParam String name) {
         return groupService.findByName(name);
     }
 
-    @ResponseStatus(HttpStatus.OK)//da
+    @ResponseStatus(HttpStatus.OK)
     @GetMapping("/{id}/requests")
     public List<GroupRequestDTO> getAllRequestForGroup(@PathVariable Integer id) throws ResourceNotFoundException, BusinessLogicException {
         return groupService.getAllRequestsForGroup(id);
     }
 
-    @ResponseStatus(HttpStatus.OK)//da
+    @ResponseStatus(HttpStatus.OK)
     @PostMapping("/{idGroup}/requests/{idRequest}/accept")
     public void acceptRequest(@PathVariable Integer idGroup, @PathVariable Integer idRequest) throws ResourceNotFoundException, BusinessLogicException {
         groupService.acceptRequest(idGroup, idRequest);
     }
 
-    @ResponseStatus(HttpStatus.OK)//da
+    @ResponseStatus(HttpStatus.OK)
     @PostMapping("/{idGroup}/requests/{idRequest}/reject")
     public void rejectRequest(@PathVariable Integer idGroup, @PathVariable Integer idRequest) throws ResourceNotFoundException, BusinessLogicException {
         groupService.rejectRequest(idGroup, idRequest);
@@ -73,13 +73,13 @@ public class GroupController {
         groupService.removeMember(idGroup, idUser);
     }
 
-    @ResponseStatus(HttpStatus.CREATED)//da
+    @ResponseStatus(HttpStatus.CREATED)
     @PostMapping("/{id}/join")
     public ResolvedGroupRequestDTO createRequestToJoinGroup(@PathVariable Integer id) throws BusinessLogicException, ResourceNotFoundException {
         return groupService.createRequestToJoinGroup(id);
     }
 
-    @ResponseStatus(HttpStatus.OK)//da
+    @ResponseStatus(HttpStatus.OK)
     @GetMapping("/{id}/posts")
     public List<PostDTO> getAllPostsByGroupId(@PathVariable Integer id) throws ResourceNotFoundException, BusinessLogicException {
         return groupService.getAllPostsByGroupId(id);

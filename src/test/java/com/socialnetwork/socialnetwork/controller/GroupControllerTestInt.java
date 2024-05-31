@@ -9,6 +9,7 @@ import com.socialnetwork.socialnetwork.exceptions.ExceptionResponse;
 import com.socialnetwork.socialnetwork.exceptions.ResourceNotFoundException;
 import com.socialnetwork.socialnetwork.repository.*;
 import org.junit.jupiter.api.AfterEach;
+import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -49,7 +50,7 @@ class GroupControllerTestInt extends IntegrationTestConfiguration {
 
     @DisplayName("Successfully creating group")
     @Test
-    void testCreateGroup()   {
+    void testCreateGroup() {
         CreateGroupDTO createGroupDTO = new CreateGroupDTO("Test", false);
 
         String urlWithParams = UriComponentsBuilder.fromUriString(groupsApiURL).toUriString();
@@ -113,8 +114,7 @@ class GroupControllerTestInt extends IntegrationTestConfiguration {
         ResponseEntity<Void> response = restTemplate.exchange(urlWithParams, HttpMethod.DELETE, null, Void.class);
         assertThat(response.getStatusCode()).isEqualTo(HttpStatus.OK);
 
-        boolean groupExists = groupRepository.existsById(testGroup.getId());
-        assertThat(groupExists).isFalse();
+        Assertions.assertFalse(groupRepository.existsById(testGroup.getId()));
 
         boolean groupMemberExists = groupMemberRepository.existsByUserIdAndGroupId(user.getId(), testGroup.getId());
         assertThat(groupMemberExists).isFalse();
@@ -343,7 +343,7 @@ class GroupControllerTestInt extends IntegrationTestConfiguration {
         assertThat(response.getBody()).isNotNull();
         assertThat(response.getBody().errorCode()).isEqualTo(ErrorCode.ERROR_MANAGING_GROUP_REQUEST);
         assertThat(response.getBody().message()).isEqualTo("Group request with id " +
-                + 5 + " and group id " + testGroup.getId() + " does not exist." );
+                +5 + " and group id " + testGroup.getId() + " does not exist.");
     }
 
     @DisplayName("Accepting request for non-existent group request for given group id and given request id should return exception")
@@ -378,7 +378,7 @@ class GroupControllerTestInt extends IntegrationTestConfiguration {
         groupRequest.setGroup(testGroup2);
         groupRequest = groupRequestRepository.save(groupRequest);
 
-        String urlWithParams = UriComponentsBuilder.fromUriString(groupsApiURL).path("/{idGroup}/requests/{idRequest}/accept").buildAndExpand(testGroup.getId(),groupRequest.getId() ).toUriString();
+        String urlWithParams = UriComponentsBuilder.fromUriString(groupsApiURL).path("/{idGroup}/requests/{idRequest}/accept").buildAndExpand(testGroup.getId(), groupRequest.getId()).toUriString();
 
         ResponseEntity<ExceptionResponse> response = restTemplate.postForEntity(urlWithParams, null, ExceptionResponse.class);
 
@@ -386,7 +386,7 @@ class GroupControllerTestInt extends IntegrationTestConfiguration {
         assertThat(response.getBody()).isNotNull();
         assertThat(response.getBody().errorCode()).isEqualTo(ErrorCode.ERROR_MANAGING_GROUP_REQUEST);
         assertThat(response.getBody().message()).isEqualTo("Group request with id " +
-                + groupRequest.getId() + " and group id " + testGroup.getId() + " does not exist." );
+                +groupRequest.getId() + " and group id " + testGroup.getId() + " does not exist.");
     }
 
 

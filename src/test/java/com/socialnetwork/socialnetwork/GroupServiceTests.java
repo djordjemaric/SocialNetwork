@@ -65,7 +65,6 @@ class GroupServiceTests {
     void setUp() {
         admin = new User(1, "admin@admin.com", "");
         user = new User(2, "user@user.com", "");
-//        group = new Group(1, "Group1", admin, true, null);
         group = new Group(1, "Group1", admin, true);
         groupMember = new GroupMember(1, user, group);
         createGroupDTO = new CreateGroupDTO("Group1", true);
