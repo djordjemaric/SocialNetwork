@@ -8,14 +8,15 @@ services:
     container_name: social-network
     depends_on:
       - sn-postgres
-      - zipkin
+      - otel-collector
     environment:
       - DB_URL=jdbc:postgresql://postgres:5432/social-network?currentSchema=social-network
       - JWT_SET_URI=${JWT_SET_URI}
       - COGNITO_CLIENT_ID=${COGNITO_CLIENT_ID}
       - AWS_PROFILE_NAME=${AWS_PROFILE_NAME}
       - SPRING_PROFILES_ACTIVE=local
-      - ZIPKIN_ENDPOINT=http://zipkin:9411/api/v2/spans
+      - OTEL_EXPORTER_OTLP_ENDPOINT=http://otel-collector:4318
+      - OTEL_SERVICE_NAME=social-network
     ports:
       - '8080:8080'
   sn-postgres:
@@ -42,3 +43,12 @@ services:
     container_name: zipkin
     ports:
       - '9411:9411'
+  otel-collector:
+    image: otel/opentelemetry-collector:latest
+    container_name: otel-collector
+    ports:
+      - "4318:4318"
+    volumes:
+      - ./otel-collector-config.yml:/etc/otel/config.yaml
+    depends_on:
+      - zipkin
