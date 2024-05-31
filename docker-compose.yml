@@ -49,6 +49,6 @@ services:
     ports:
       - "4318:4318"
     volumes:
-      - ./otel-collector-config.yml:/etc/otel/config.yaml
+      - ./otel-config.yml:/etc/otelcol/config.yaml
     depends_on:
       - zipkin
