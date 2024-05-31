@@ -37,17 +37,17 @@ import static org.assertj.core.api.AssertionsForClassTypes.assertThat;
 
 
 class FriendsControllerTest extends IntegrationTestConfiguration {
-
-    private String friendsApiURL = "/api/friends";
-
-    @Autowired
-    private UserRepository userRepository;
-
-    @Autowired
-    private FriendRequestRepository friendRequestRepository;
-
-    @Test
-    void testFriendsConnection() throws ResourceNotFoundException {
+//
+//    private String friendsApiURL = "/api/friends";
+//
+//    @Autowired
+//    private UserRepository userRepository;
+//
+//    @Autowired
+//    private FriendRequestRepository friendRequestRepository;
+//
+//    @Test
+//    void testFriendsConnection() throws ResourceNotFoundException {
 //        User testUser1 = new User();
 //        testUser1.setUserSub("f3841812-e0f1-7025-b7bc-ce67d7fb933e");
 //        testUser1.setEmail("xanitev711@mcatag.com");
@@ -63,7 +63,7 @@ class FriendsControllerTest extends IntegrationTestConfiguration {
 //
 //        assertThat(frResponseArray.length).isEqualTo(1);
 //        assertThat(frResponseArray[0].requestSender()).isEqualTo(testUser1.getEmail());
-    }
+//    }
 
 
 }
