@@ -8,14 +8,12 @@ import com.socialnetwork.socialnetwork.dto.group.CreateGroupDTO;
 import com.socialnetwork.socialnetwork.dto.group.GroupDTO;
 import com.socialnetwork.socialnetwork.dto.group.ResolvedGroupRequestDTO;
 import com.socialnetwork.socialnetwork.dto.group.ResolvedGroupRequestStatus;
-import com.socialnetwork.socialnetwork.dto.post.PostDTO;
 import com.socialnetwork.socialnetwork.dto.user.PreviewUserDTO;
 import com.socialnetwork.socialnetwork.entity.Comment;
 import com.socialnetwork.socialnetwork.entity.Group;
 import com.socialnetwork.socialnetwork.entity.Post;
 import com.socialnetwork.socialnetwork.entity.User;
 import com.socialnetwork.socialnetwork.service.GroupService;
-import org.hibernate.query.sqm.produce.function.FunctionArgumentException;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -33,7 +31,6 @@ import java.util.*;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.mockito.Mockito.*;
-import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
 @ExtendWith(MockitoExtension.class)
