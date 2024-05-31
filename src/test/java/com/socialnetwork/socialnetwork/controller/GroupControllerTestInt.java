@@ -68,10 +68,7 @@ class GroupControllerTestInt extends IntegrationTestConfiguration {
     void testCreatingGroupAlreadyExist() throws ResourceNotFoundException {
         User user = jwtService.getUser();
 
-        Group testGroup = new Group();
-        testGroup.setName("Test");
-        testGroup.setPublic(false);
-        testGroup.setAdmin(user);
+        Group testGroup = getTestGroup(user, false);
         groupRepository.save(testGroup);
 
         String urlWithParams = UriComponentsBuilder.fromUriString(groupsApiURL).toUriString();
@@ -88,16 +85,11 @@ class GroupControllerTestInt extends IntegrationTestConfiguration {
     void testDeleteGroup() throws ResourceNotFoundException {
         User user = jwtService.getUser();
 
-        User testUser = new User();
-        testUser.setUserSub("f3841812-e0f1-7025-b7bc-ce67d7fb933e");
-        testUser.setEmail("xanitev711@mcatag.com");
-        testUser = userRepository.save(testUser);
+        User testUser = getTestUser();
+        userRepository.save(testUser);
 
-        Group testGroup = new Group();
-        testGroup.setName("Test");
-        testGroup.setPublic(false);
-        testGroup.setAdmin(user);
-        testGroup = groupRepository.save(testGroup);
+        Group testGroup = getTestGroup(user, false);
+        groupRepository.save(testGroup);
 
         GroupMember groupMember = new GroupMember();
         groupMember.setMember(user);
@@ -128,16 +120,11 @@ class GroupControllerTestInt extends IntegrationTestConfiguration {
     void testDeleteGroupByNoAdminUser() throws ResourceNotFoundException {
         User user = jwtService.getUser();
 
-        User testUser = new User();
-        testUser.setUserSub("f3841812-e0f1-7025-b7bc-ce67d7fb933e");
-        testUser.setEmail("xanitev711@mcatag.com");
-        testUser = userRepository.save(testUser);
+        User testUser = getTestUser();
+        userRepository.save(testUser);
 
-        Group testGroup = new Group();
-        testGroup.setName("Test");
-        testGroup.setPublic(false);
-        testGroup.setAdmin(testUser);
-        testGroup = groupRepository.save(testGroup);
+        Group testGroup = getTestGroup(testUser, false);
+        groupRepository.save(testGroup);
 
         GroupMember groupMember = new GroupMember();
         groupMember.setMember(testUser);
@@ -161,15 +148,10 @@ class GroupControllerTestInt extends IntegrationTestConfiguration {
     @DisplayName("Successfully returning groups by name")
     @Test
     void testGetGroups() {
-        User testUser = new User();
-        testUser.setUserSub("f3841812-e0f1-7025-b7bc-ce67d7fb933e");
-        testUser.setEmail("xanitev711@mcatag.com");
-        testUser = userRepository.save(testUser);
+        User testUser = getTestUser();
+        userRepository.save(testUser);
 
-        Group testGroup = new Group();
-        testGroup.setName("Test");
-        testGroup.setPublic(false);
-        testGroup.setAdmin(testUser);
+        Group testGroup = getTestGroup(testUser, false);
         groupRepository.save(testGroup);
 
         String name = "Test";
@@ -193,16 +175,11 @@ class GroupControllerTestInt extends IntegrationTestConfiguration {
     void testGetRequests() throws ResourceNotFoundException {
         User user = jwtService.getUser();
 
-        User testUser = new User();
-        testUser.setUserSub("f3841812-e0f1-7025-b7bc-ce67d7fb933e");
-        testUser.setEmail("xanitev711@mcatag.com");
-        testUser = userRepository.save(testUser);
+        User testUser = getTestUser();
+        userRepository.save(testUser);
 
-        Group testGroup = new Group();
-        testGroup.setName("Test");
-        testGroup.setPublic(false);
-        testGroup.setAdmin(user);
-        testGroup = groupRepository.save(testGroup);
+        Group testGroup = getTestGroup(user, false);
+        groupRepository.save(testGroup);
 
         GroupRequest testGroupRequest = new GroupRequest();
         testGroupRequest.setUser(testUser);
@@ -240,16 +217,11 @@ class GroupControllerTestInt extends IntegrationTestConfiguration {
     @DisplayName("Returning all requests for group when not admin should return exception")
     @Test
     void testGetRequestsNoAdmin() {
-        User testUser = new User();
-        testUser.setUserSub("f3841812-e0f1-7025-b7bc-ce67d7fb933e");
-        testUser.setEmail("xanitev711@mcatag.com");
-        testUser = userRepository.save(testUser);
+        User testUser = getTestUser();
+        userRepository.save(testUser);
 
-        Group testGroup = new Group();
-        testGroup.setName("Test");
-        testGroup.setPublic(false);
-        testGroup.setAdmin(testUser);
-        testGroup = groupRepository.save(testGroup);
+        Group testGroup = getTestGroup(testUser, false);
+        groupRepository.save(testGroup);
 
         String urlWithParams = UriComponentsBuilder.fromUriString(groupsApiURL).path("/{id}/requests").buildAndExpand(testGroup.getId()).toUriString();
 
@@ -265,16 +237,11 @@ class GroupControllerTestInt extends IntegrationTestConfiguration {
     void testAcceptRequest() throws ResourceNotFoundException {
         User user = jwtService.getUser();
 
-        User testUser = new User();
-        testUser.setUserSub("f3841812-e0f1-7025-b7bc-ce67d7fb933e");
-        testUser.setEmail("xanitev711@mcatag.com");
-        testUser = userRepository.save(testUser);
+        User testUser = getTestUser();
+        userRepository.save(testUser);
 
-        Group testGroup = new Group();
-        testGroup.setName("Test");
-        testGroup.setPublic(false);
-        testGroup.setAdmin(user);
-        testGroup = groupRepository.save(testGroup);
+        Group testGroup = getTestGroup(user, false);
+        groupRepository.save(testGroup);
 
         GroupMember groupMember = new GroupMember();
         groupMember.setMember(user);
@@ -319,16 +286,11 @@ class GroupControllerTestInt extends IntegrationTestConfiguration {
     void testAcceptRequestNoExistGroupRequest() throws ResourceNotFoundException {
         User user = jwtService.getUser();
 
-        User testUser = new User();
-        testUser.setUserSub("f3841812-e0f1-7025-b7bc-ce67d7fb933e");
-        testUser.setEmail("xanitev711@mcatag.com");
+        User testUser = getTestUser();
         userRepository.save(testUser);
 
-        Group testGroup = new Group();
-        testGroup.setName("Test");
-        testGroup.setPublic(false);
-        testGroup.setAdmin(user);
-        testGroup = groupRepository.save(testGroup);
+        Group testGroup = getTestGroup(user, false);
+        groupRepository.save(testGroup);
 
         GroupMember groupMember = new GroupMember();
         groupMember.setMember(user);
@@ -342,8 +304,7 @@ class GroupControllerTestInt extends IntegrationTestConfiguration {
         assertThat(response.getStatusCode()).isEqualTo(HttpStatus.BAD_REQUEST);
         assertThat(response.getBody()).isNotNull();
         assertThat(response.getBody().errorCode()).isEqualTo(ErrorCode.ERROR_MANAGING_GROUP_REQUEST);
-        assertThat(response.getBody().message()).isEqualTo("Group request with id " +
-                +5 + " and group id " + testGroup.getId() + " does not exist.");
+        assertThat(response.getBody().message()).isEqualTo("Group request with id " + +5 + " and group id " + testGroup.getId() + " does not exist.");
     }
 
     @DisplayName("Accepting request for non-existent group request for given group id and given request id should return exception")
@@ -351,22 +312,14 @@ class GroupControllerTestInt extends IntegrationTestConfiguration {
     void testAcceptRequestNoExistGroupAndRequest() throws ResourceNotFoundException {
         User user = jwtService.getUser();
 
-        User testUser = new User();
-        testUser.setUserSub("f3841812-e0f1-7025-b7bc-ce67d7fb933e");
-        testUser.setEmail("xanitev711@mcatag.com");
-        testUser = userRepository.save(testUser);
+        User testUser = getTestUser();
+        userRepository.save(testUser);
 
-        Group testGroup = new Group();
-        testGroup.setName("Test");
-        testGroup.setPublic(false);
-        testGroup.setAdmin(user);
-        testGroup = groupRepository.save(testGroup);
+        Group testGroup = getTestGroup(user, false);
+        groupRepository.save(testGroup);
 
-        Group testGroup2 = new Group();
-        testGroup2.setName("Test");
-        testGroup2.setPublic(false);
-        testGroup2.setAdmin(user);
-        testGroup2 = groupRepository.save(testGroup2);
+        Group testGroup2 = getTestGroup2(user);
+        groupRepository.save(testGroup2);
 
         GroupMember groupMember = new GroupMember();
         groupMember.setMember(user);
@@ -385,29 +338,21 @@ class GroupControllerTestInt extends IntegrationTestConfiguration {
         assertThat(response.getStatusCode()).isEqualTo(HttpStatus.BAD_REQUEST);
         assertThat(response.getBody()).isNotNull();
         assertThat(response.getBody().errorCode()).isEqualTo(ErrorCode.ERROR_MANAGING_GROUP_REQUEST);
-        assertThat(response.getBody().message()).isEqualTo("Group request with id " +
-                +groupRequest.getId() + " and group id " + testGroup.getId() + " does not exist.");
+        assertThat(response.getBody().message()).isEqualTo("Group request with id " + +groupRequest.getId() + " and group id " + testGroup.getId() + " does not exist.");
     }
 
 
     @DisplayName("Accepting request by non-admin user should return exception")
     @Test
     void testAcceptRequestNoExistAdmin() {
-        User testUser = new User();
-        testUser.setUserSub("f3841812-e0f1-7025-b7bc-ce67d7fb933e");
-        testUser.setEmail("xanitev711@mcatag.com");
-        testUser = userRepository.save(testUser);
+        User testUser = getTestUser();
+        userRepository.save(testUser);
 
-        User testUser2 = new User();
-        testUser2.setUserSub("73140822-2011-705f-ce8c-675fa425e435");
-        testUser2.setEmail("mapsesisto@gufum.com");
-        testUser2 = userRepository.save(testUser2);
+        User testUser2 = getTestUser2();
+        userRepository.save(testUser2);
 
-        Group testGroup = new Group();
-        testGroup.setName("Test");
-        testGroup.setPublic(false);
-        testGroup.setAdmin(testUser);
-        testGroup = groupRepository.save(testGroup);
+        Group testGroup = getTestGroup(testUser, false);
+        groupRepository.save(testGroup);
 
         GroupMember groupMember = new GroupMember();
         groupMember.setMember(testUser);
@@ -433,16 +378,11 @@ class GroupControllerTestInt extends IntegrationTestConfiguration {
     void testAcceptRequestPublicGroup() throws ResourceNotFoundException {
         User user = jwtService.getUser();
 
-        User testUser = new User();
-        testUser.setUserSub("f3841812-e0f1-7025-b7bc-ce67d7fb933e");
-        testUser.setEmail("xanitev711@mcatag.com");
-        testUser = userRepository.save(testUser);
+        User testUser = getTestUser();
+        userRepository.save(testUser);
 
-        Group testGroup = new Group();
-        testGroup.setName("Test");
-        testGroup.setPublic(true);
-        testGroup.setAdmin(user);
-        testGroup = groupRepository.save(testGroup);
+        Group testGroup = getTestGroup(user, true);
+        groupRepository.save(testGroup);
 
         GroupMember groupMember = new GroupMember();
         groupMember.setMember(user);
@@ -468,20 +408,13 @@ class GroupControllerTestInt extends IntegrationTestConfiguration {
     @DisplayName("Successfully reject request")
     @Test
     void testRejectRequest() throws ResourceNotFoundException {
-
         User user = jwtService.getUser();
-        userRepository.save(user);
 
-        User testUser = new User();
-        testUser.setUserSub("f3841812-e0f1-7025-b7bc-ce67d7fb933e");
-        testUser.setEmail("xanitev711@mcatag.com");
-        testUser = userRepository.save(testUser);
+        User testUser = getTestUser();
+        userRepository.save(testUser);
 
-        Group testGroup = new Group();
-        testGroup.setName("Test");
-        testGroup.setPublic(false);
-        testGroup.setAdmin(user);
-        testGroup = groupRepository.save(testGroup);
+        Group testGroup = getTestGroup(user, false);
+        groupRepository.save(testGroup);
 
         GroupMember groupMember = new GroupMember();
         groupMember.setMember(user);
@@ -510,16 +443,11 @@ class GroupControllerTestInt extends IntegrationTestConfiguration {
     void testCreateRequestPublicGroup() throws ResourceNotFoundException {
         User user = jwtService.getUser();
 
-        User testUser = new User();
-        testUser.setUserSub("f3841812-e0f1-7025-b7bc-ce67d7fb933e");
-        testUser.setEmail("xanitev711@mcatag.com");
-        testUser = userRepository.save(testUser);
+        User testUser = getTestUser();
+        userRepository.save(testUser);
 
-        Group testGroup = new Group();
-        testGroup.setName("Test");
-        testGroup.setPublic(false);
-        testGroup.setAdmin(testUser);
-        testGroup = groupRepository.save(testGroup);
+        Group testGroup = getTestGroup(testUser, false);
+        groupRepository.save(testGroup);
 
         String urlWithParams = UriComponentsBuilder.fromUriString(groupsApiURL).path("/{id}/join").buildAndExpand(testGroup.getId()).toUriString();
 
@@ -557,11 +485,8 @@ class GroupControllerTestInt extends IntegrationTestConfiguration {
     void testCreateRequestAlreadyExist() throws ResourceNotFoundException {
         User user = jwtService.getUser();
 
-        Group testGroup = new Group();
-        testGroup.setName("Test");
-        testGroup.setPublic(false);
-        testGroup.setAdmin(user);
-        testGroup = groupRepository.save(testGroup);
+        Group testGroup = getTestGroup(user, false);
+        groupRepository.save(testGroup);
 
         GroupRequest request = new GroupRequest();
         request.setUser(user);
@@ -584,11 +509,8 @@ class GroupControllerTestInt extends IntegrationTestConfiguration {
     void testCreateRequestAlreadyMember() throws ResourceNotFoundException {
         User user = jwtService.getUser();
 
-        Group testGroup = new Group();
-        testGroup.setName("Test");
-        testGroup.setPublic(false);
-        testGroup.setAdmin(user);
-        testGroup = groupRepository.save(testGroup);
+        Group testGroup = getTestGroup(user, false);
+        groupRepository.save(testGroup);
 
         GroupMember groupMember = new GroupMember();
         groupMember.setGroup(testGroup);
@@ -611,16 +533,11 @@ class GroupControllerTestInt extends IntegrationTestConfiguration {
     void testCreateRequestPrivateGroup() throws ResourceNotFoundException {
         User user = jwtService.getUser();
 
-        User testUser = new User();
-        testUser.setUserSub("f3841812-e0f1-7025-b7bc-ce67d7fb933e");
-        testUser.setEmail("xanitev711@mcatag.com");
-        testUser = userRepository.save(testUser);
+        User testUser = getTestUser();
+        userRepository.save(testUser);
 
-        Group testGroup = new Group();
-        testGroup.setName("Test");
-        testGroup.setPublic(true);
-        testGroup.setAdmin(testUser);
-        testGroup = groupRepository.save(testGroup);
+        Group testGroup = getTestGroup(testUser, true);
+        groupRepository.save(testGroup);
 
         String urlWithParams = UriComponentsBuilder.fromUriString(groupsApiURL).path("/{id}/join").buildAndExpand(testGroup.getId()).toUriString();
 
@@ -647,19 +564,10 @@ class GroupControllerTestInt extends IntegrationTestConfiguration {
     void testGetPostsPrivateGroup() throws ResourceNotFoundException {
         User user = jwtService.getUser();
 
-        Group testGroup = new Group();
-        testGroup.setName("Test");
-        testGroup.setPublic(false);
-        testGroup.setAdmin(user);
-        testGroup = groupRepository.save(testGroup);
+        Group testGroup = getTestGroup(user, false);
+        groupRepository.save(testGroup);
 
-        Post post = new Post();
-        post.setGroup(testGroup);
-        post.setPublic(true);
-        post.setText("TEST");
-        post.setOwner(user);
-        post.setImgS3Key(null);
-        post.setComments(null);
+        Post post = getTestPost(testGroup, user);
         postRepository.save(post);
 
         GroupMember groupMember = new GroupMember();
@@ -687,19 +595,10 @@ class GroupControllerTestInt extends IntegrationTestConfiguration {
     void testGetPostsPublicGroup() throws ResourceNotFoundException {
         User user = jwtService.getUser();
 
-        Group testGroup = new Group();
-        testGroup.setName("Test");
-        testGroup.setPublic(true);
-        testGroup.setAdmin(user);
-        testGroup = groupRepository.save(testGroup);
+        Group testGroup = getTestGroup(user, false);
+        groupRepository.save(testGroup);
 
-        Post post = new Post();
-        post.setGroup(testGroup);
-        post.setPublic(true);
-        post.setText("TEST");
-        post.setOwner(user);
-        post.setImgS3Key(null);
-        post.setComments(null);
+        Post post = getTestPost(testGroup, user);
         postRepository.save(post);
 
         GroupMember groupMember = new GroupMember();
@@ -726,19 +625,10 @@ class GroupControllerTestInt extends IntegrationTestConfiguration {
     void testGetPostsNotAPublicGroupMember() throws ResourceNotFoundException {
         User user = jwtService.getUser();
 
-        Group testGroup = new Group();
-        testGroup.setName("Test");
-        testGroup.setPublic(true);
-        testGroup.setAdmin(user);
-        testGroup = groupRepository.save(testGroup);
+        Group testGroup = getTestGroup(user, true);
+        groupRepository.save(testGroup);
 
-        Post post = new Post();
-        post.setGroup(testGroup);
-        post.setPublic(true);
-        post.setText("TEST");
-        post.setOwner(user);
-        post.setImgS3Key(null);
-        post.setComments(null);
+        Post post = getTestPost(testGroup, user);
         postRepository.save(post);
 
         String urlWithParams = UriComponentsBuilder.fromUriString(groupsApiURL).path("/{id}/posts").buildAndExpand(testGroup.getId()).toUriString();
@@ -773,24 +663,13 @@ class GroupControllerTestInt extends IntegrationTestConfiguration {
     void testGetPostsNotAPrivateGroupMember() throws ResourceNotFoundException {
         User user = jwtService.getUser();
 
-        User testUser = new User();
-        testUser.setUserSub("f3841812-e0f1-7025-b7bc-ce67d7fb933e");
-        testUser.setEmail("xanitev711@mcatag.com");
-        testUser = userRepository.save(testUser);
+        User testUser = getTestUser();
+        userRepository.save(testUser);
 
-        Group testGroup = new Group();
-        testGroup.setName("Test");
-        testGroup.setPublic(false);
-        testGroup.setAdmin(testUser);
-        testGroup = groupRepository.save(testGroup);
+        Group testGroup = getTestGroup(testUser, false);
+        groupRepository.save(testGroup);
 
-        Post post = new Post();
-        post.setGroup(testGroup);
-        post.setPublic(true);
-        post.setText("TEST");
-        post.setOwner(testUser);
-        post.setImgS3Key(null);
-        post.setComments(null);
+        Post post = getTestPost(testGroup, testUser);
         postRepository.save(post);
 
         GroupMember groupMember = new GroupMember();
@@ -807,5 +686,47 @@ class GroupControllerTestInt extends IntegrationTestConfiguration {
         assertThat(response.getBody().message()).isEqualTo("User " + user.getEmail() + " is not a member of the group with id: " + testGroup.getId());
     }
 
+    private Post getTestPost(Group group, User owner) {
+        Post post = new Post();
+        post.setGroup(group);
+        post.setPublic(true);
+        post.setText("TEST");
+        post.setOwner(owner);
+        post.setImgS3Key(null);
+        post.setComments(null);
+        return post;
+    }
+
+    private User getTestUser() {
+        User testUser = new User();
+        testUser.setUserSub("f3841812-e0f1-7025-b7bc-ce67d7fb933e");
+        testUser.setEmail("xanitev711@mcatag.com");
+        return testUser;
+    }
+
+    private User getTestUser2() {
+        User testUser = new User();
+        testUser.setUserSub("73140822-2011-705f-ce8c-675fa425e435");
+        testUser.setEmail("mapsesisto@gufum.com");
+        return testUser;
+    }
+
+    private Group getTestGroup(User admin, boolean isPublic) {
+        Group group = new Group();
+        group.setName("Test");
+        group.setPublic(isPublic);
+        group.setAdmin(admin);
+
+        return group;
+    }
+
+    private Group getTestGroup2(User admin) {
+        Group group = new Group();
+        group.setName("Test");
+        group.setPublic(false);
+        group.setAdmin(admin);
+
+        return group;
+    }
 
 }
