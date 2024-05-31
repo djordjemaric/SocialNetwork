@@ -54,6 +54,8 @@ public abstract class IntegrationTestConfiguration {
         testUser.setUserSub("93246812-3021-704e-9c37-bf46100f22dc");
         testUser=userRepository.save(testUser);
         when(jwtService.getUser()).thenReturn(testUser);
+        assertThat(postgres.isCreated()).isTrue();
+        assertThat(postgres.isRunning()).isTrue();
     }
 
     @AfterEach
@@ -63,9 +65,10 @@ public abstract class IntegrationTestConfiguration {
         userRepository.deleteAll();
     }
 
-    @Test
-    void connectionEstablished(){
-        assertThat(postgres.isCreated()).isTrue();
-        assertThat(postgres.isRunning()).isTrue();
+    @AfterAll
+    public static void tearDown() {
+        if (postgres.isRunning()) {
+            postgres.stop();
+        }
     }
 }
