@@ -56,7 +56,7 @@ public class PostController {
 
     @ResponseStatus(HttpStatus.OK)
     @PutMapping("/{id}")
-    public PostDTO update(@PathVariable Integer id, @RequestBody @Valid UpdatePostDTO postDTO) throws ResourceNotFoundException, AccessDeniedException, BusinessLogicException {
+    public PostDTO update(@PathVariable Integer id, @ModelAttribute @Valid UpdatePostDTO postDTO) throws ResourceNotFoundException, AccessDeniedException, BusinessLogicException {
         return postService.updatePost(id, postDTO);
     }
 
@@ -77,6 +77,12 @@ public class PostController {
     @DeleteMapping("/{id}")
     public void delete(@PathVariable Integer id) throws ResourceNotFoundException, AccessDeniedException, BusinessLogicException {
         postService.deletePost(id);
+    }
+
+    @ResponseStatus(HttpStatus.OK)
+    @DeleteMapping("/{idPost}/comments/{idComment}")
+    public void deleteComment(@PathVariable Integer idComment) throws ResourceNotFoundException, AccessDeniedException, BusinessLogicException {
+        commentService.deletePost(idComment);
     }
 }
 

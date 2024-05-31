@@ -2,6 +2,8 @@ package com.socialnetwork.socialnetwork;
 
 import com.socialnetwork.socialnetwork.entity.User;
 import com.socialnetwork.socialnetwork.exceptions.ResourceNotFoundException;
+import com.socialnetwork.socialnetwork.repository.GroupRepository;
+import com.socialnetwork.socialnetwork.repository.PostRepository;
 import com.socialnetwork.socialnetwork.repository.UserRepository;
 import com.socialnetwork.socialnetwork.service.JwtService;
 import org.junit.jupiter.api.*;
@@ -29,21 +31,36 @@ public abstract class IntegrationTestConfiguration {
 
     @Autowired
     protected TestRestTemplate restTemplate;
+
+    @Autowired
+    protected UserRepository userRepository;
+
+    @Autowired
+    protected PostRepository postRepository;
+
+    @Autowired
+    protected GroupRepository groupRepository;
+
     @Container
     @ServiceConnection
     protected static PostgreSQLContainer<?> postgres = new PostgreSQLContainer<>("postgres:14.2-alpine");
     @MockBean
     protected JwtService jwtService;
-    @Autowired
-    protected UserRepository userRepository;
 
     @BeforeEach
     void setUp() throws ResourceNotFoundException {
         User testUser = new User();
         testUser.setEmail("vica.ristic@gmail.com");
         testUser.setUserSub("93246812-3021-704e-9c37-bf46100f22dc");
-        User savedUser = userRepository.save(testUser);
-        when(jwtService.getUser()).thenReturn(savedUser);
+        testUser=userRepository.save(testUser);
+        when(jwtService.getUser()).thenReturn(testUser);
+    }
+
+    @AfterEach
+    void cleanDatabase() {
+        postRepository.deleteAll();
+        groupRepository.deleteAll();
+        userRepository.deleteAll();
     }
 
     @Test
