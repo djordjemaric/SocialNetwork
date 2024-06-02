@@ -15,7 +15,6 @@ import org.springframework.boot.testcontainers.service.connection.ServiceConnect
 import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.context.TestPropertySource;
 import org.testcontainers.containers.PostgreSQLContainer;
-import org.testcontainers.junit.jupiter.Container;
 import org.testcontainers.junit.jupiter.Testcontainers;
 
 import static org.assertj.core.api.AssertionsForClassTypes.assertThat;
@@ -41,9 +40,8 @@ public abstract class IntegrationTestConfiguration {
     @Autowired
     protected GroupRepository groupRepository;
 
-    @Container
     @ServiceConnection
-    protected static PostgreSQLContainer<?> postgres = new PostgreSQLContainer<>("postgres:14.2-alpine");
+    protected static PostgreSQLContainer<?> postgres = new PostgreSQLContainer<>("postgres:14.2-alpine").withReuse(true);
     @MockBean
     protected JwtService jwtService;
 
@@ -54,8 +52,6 @@ public abstract class IntegrationTestConfiguration {
         testUser.setUserSub("93246812-3021-704e-9c37-bf46100f22dc");
         testUser=userRepository.save(testUser);
         when(jwtService.getUser()).thenReturn(testUser);
-        assertThat(postgres.isCreated()).isTrue();
-        assertThat(postgres.isRunning()).isTrue();
     }
 
     @AfterEach
@@ -65,10 +61,8 @@ public abstract class IntegrationTestConfiguration {
         userRepository.deleteAll();
     }
 
-    @AfterAll
-    public static void tearDown() {
-        if (postgres.isRunning()) {
-            postgres.stop();
-        }
+    @BeforeAll
+    public static void beforeAll() {
+        postgres.start();
     }
 }
