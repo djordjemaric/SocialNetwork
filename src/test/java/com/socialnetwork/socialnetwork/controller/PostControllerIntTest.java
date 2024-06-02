@@ -23,13 +23,6 @@ public class PostControllerIntTest extends IntegrationTestConfiguration {
 
     private final static String POSTS_URL = "/api/posts";
 
-    @Autowired
-    private PostRepository postRepository;
-    @Autowired
-    private UserRepository userRepository;
-    @Autowired
-    private GroupRepository groupRepository;
-
     @Test
     @DisplayName("Testing if user gets the post he asked for")
     public void testGetPostByIdReturnsCorrectPost() throws ResourceNotFoundException {
