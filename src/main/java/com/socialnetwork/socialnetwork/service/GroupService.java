@@ -12,7 +12,6 @@ import com.socialnetwork.socialnetwork.repository.*;
 import org.springframework.security.access.AccessDeniedException;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
-
 import java.util.List;
 
 import static com.socialnetwork.socialnetwork.exceptions.ErrorCode.*;
@@ -24,17 +23,15 @@ public class GroupService {
     private final GroupRequestRepository groupRequestRepository;
     private final GroupMemberRepository groupMemberRepository;
     private final PostRepository postRepository;
-    private final UserRepository userRepository;
     private final GroupMapper groupMapper;
     private final PostMapper postMapper;
     private final GroupRequestMapper groupRequestMapper;
     private final JwtService jwtService;
 
-    public GroupService(GroupRepository groupRepository, GroupRequestRepository groupRequestRepository, PostRepository postRepository, UserRepository userRepository, GroupMapper groupMapper, GroupMemberRepository groupMemberRepository, PostMapper postMapper, GroupRequestMapper groupRequestMapper, JwtService jwtService) {
+    public GroupService(GroupRepository groupRepository, GroupRequestRepository groupRequestRepository, PostRepository postRepository, GroupMapper groupMapper, GroupMemberRepository groupMemberRepository, PostMapper postMapper, GroupRequestMapper groupRequestMapper, JwtService jwtService) {
         this.groupRepository = groupRepository;
         this.groupRequestRepository = groupRequestRepository;
         this.postRepository = postRepository;
-        this.userRepository = userRepository;
         this.groupMemberRepository = groupMemberRepository;
         this.groupMapper = groupMapper;
         this.jwtService = jwtService;
@@ -60,7 +57,7 @@ public class GroupService {
         User currentUser = jwtService.getUser();
         Group group = groupRepository.findById(idGroup).orElseThrow(() ->
                 new BusinessLogicException(ERROR_GETTING_GROUP_POSTS, "Group with id "
-                        + idGroup + "does not exist"));
+                        + idGroup + " does not exist."));
 
         if (!groupMemberRepository.existsByUserIdAndGroupId(currentUser.getId(), idGroup) && !group.isPublic() ) {
             throw new AccessDeniedException("User " + currentUser.getEmail()
@@ -96,7 +93,7 @@ public class GroupService {
 
         Group group = groupRepository.findById(idGroup).orElseThrow(() ->
                 new BusinessLogicException(ERROR_CREATING_REQUEST_GROUP, "Group with id "
-                        + idGroup + "does not exist"));
+                        + idGroup + " does not exist."));
 
         if (groupRequestRepository.existsByUserIdAndGroupId(currentUser.getId(), idGroup)) {
             throw new BusinessLogicException(ERROR_CREATING_REQUEST_GROUP, "The request has already been sent.");
@@ -124,9 +121,9 @@ public class GroupService {
         User currentUser = jwtService.getUser();
         Group group = groupRepository.findById(idGroup).orElseThrow(() ->
                 new BusinessLogicException(ERROR_GETTING_GROUP_REQUESTS, "Group with id "
-                        + idGroup + "does not exist"));
+                        + idGroup + " does not exist."));
 
-        if (!group.getAdmin().equals(currentUser)) {
+        if (!group.getAdmin().getId().equals(currentUser.getId())) {
             throw new AccessDeniedException("You are not an admin of a given group " + group.getName());
         }
         List<GroupRequest> groupRequests = groupRequestRepository.findAllByGroup(group);
@@ -141,22 +138,14 @@ public class GroupService {
 
         Group group = groupRepository.findById(idGroup).orElseThrow(() ->
                 new BusinessLogicException(ERROR_MANAGING_GROUP_REQUEST, "Group with id "
-                        + idGroup + "does not exist"));
+                        + idGroup + " does not exist."));
 
-        GroupRequest request = groupRequestRepository.findById(idRequest).orElseThrow(() ->
+        GroupRequest request = groupRequestRepository.findAllByIdAndGroupId(idRequest,idGroup).orElseThrow(() ->
                 new BusinessLogicException(ERROR_MANAGING_GROUP_REQUEST, "Group request with id "
-                        + idRequest + "does not exist"));
+                        + idRequest + " and group id " + idGroup + " does not exist."));
 
-        User newMember = userRepository.findById(request.getUser().getId()).orElseThrow(() ->
-                new BusinessLogicException(ERROR_MANAGING_GROUP_REQUEST, "User with id " + request.getUser().getId() + "does not exist"));
-
-        if (!group.getAdmin().equals(currentUser)) {
+        if (!group.getAdmin().getId().equals(currentUser.getId())) {
             throw new AccessDeniedException("You are not an admin of a given group " + group.getName());
-        }
-
-        if (!groupRequestRepository.existsByUserAndGroup(newMember, group)) {
-            throw new BusinessLogicException(ERROR_MANAGING_GROUP_REQUEST, "Request for given user " + newMember +
-                    " and group " + group + " does not exist");
         }
 
         if (group.isPublic()) {
@@ -188,7 +177,7 @@ public class GroupService {
     public void leaveGroup(Integer idGroup) throws BusinessLogicException, ResourceNotFoundException {
         Group group = groupRepository.findById(idGroup).orElseThrow(() ->
                 new BusinessLogicException(ERROR_LEAVING_GROUP, "Group with id "
-                        + idGroup + "does not exist"));
+                        + idGroup + " does not exist."));
         User user = jwtService.getUser();
         if (group.getAdmin().getId().equals(user.getId())) {
             throw new BusinessLogicException(ERROR_LEAVING_GROUP, "Admin can't leave a group.");

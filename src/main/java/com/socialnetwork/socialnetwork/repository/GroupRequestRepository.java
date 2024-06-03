@@ -6,6 +6,7 @@ import com.socialnetwork.socialnetwork.entity.User;
 import org.springframework.data.jpa.repository.JpaRepository;
 
 import java.util.List;
+import java.util.Optional;
 
 
 public interface GroupRequestRepository extends JpaRepository<GroupRequest, Integer> {
@@ -16,6 +17,8 @@ public interface GroupRequestRepository extends JpaRepository<GroupRequest, Inte
     boolean existsByUserAndGroup(User user, Group group);
 
     boolean existsByGroupId(Integer idGroup);
+
+   Optional<GroupRequest> findAllByIdAndGroupId(Integer idRequest, Integer idGroup);
 
 }
 
