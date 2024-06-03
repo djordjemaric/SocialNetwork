@@ -21,10 +21,9 @@ import org.mockito.junit.jupiter.MockitoExtension;
 
 import java.util.Optional;
 
-import static org.junit.jupiter.api.Assertions.*;
-import static org.mockito.Mockito.verify;
-import static org.mockito.Mockito.when;
-import static org.mockito.Mockito.any;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertThrows;
+import static org.mockito.Mockito.*;
 
 @ExtendWith(MockitoExtension.class)
 public class UserServiceTests {
@@ -45,15 +44,7 @@ public class UserServiceTests {
 
     @Captor
     private ArgumentCaptor<User> userArgumentCaptor;
-
-    @Captor
-    private ArgumentCaptor<Integer> idArgumentCaptor;
-
-    @Captor
-    private ArgumentCaptor<String> stringArgumentCaptor;
-
-
-
+    
     @BeforeEach
     void setUp() {
         user = new User(1, "user1@user.com", "");
@@ -63,8 +54,7 @@ public class UserServiceTests {
     void testGetUserByIdThrowsResourceNotFoundException() {
         when(userRepository.findById(any(Integer.class))).thenReturn(Optional.empty());
         assertThrows(ResourceNotFoundException.class, () -> userService.getUserById(2));
-        verify(userRepository).findById(idArgumentCaptor.capture());
-        assertEquals(2, idArgumentCaptor.getValue());
+        verify(userRepository).findById(2);
     }
 
     @Test
@@ -72,9 +62,8 @@ public class UserServiceTests {
          when(userRepository.findById(user.getId())).thenReturn(Optional.of(user));
          User returnedUser = userService.getUserById(user.getId());
 
-         verify(userRepository).findById(idArgumentCaptor.capture());
+         verify(userRepository).findById(user.getId());
          assertEquals(user, returnedUser);
-         assertEquals(idArgumentCaptor.getValue(), user.getId());
     }
 
     @Test
@@ -82,8 +71,7 @@ public class UserServiceTests {
         when(userRepository.existsByEmail(user.getEmail())).thenReturn(true);
         assertThrows(BusinessLogicException.class,() -> userService.createUser(user.getEmail(),"test"));
 
-        verify(userRepository).existsByEmail(stringArgumentCaptor.capture());
-        assertEquals(stringArgumentCaptor.getValue(), user.getEmail());
+        verify(userRepository).existsByEmail(user.getEmail());
     }
 
     @Test
@@ -97,10 +85,11 @@ public class UserServiceTests {
                                         .thenReturn("sample-user-sub");
 
         PreviewUserDTO resultDTO = userService.createUser(newUser.getEmail(), "test");
-        verify(userRepository).existsByEmail(stringArgumentCaptor.capture());
-        verify(cognitoService).registerUser(stringArgumentCaptor.capture(), stringArgumentCaptor.capture());
+        verify(userRepository).existsByEmail(newUser.getEmail());
+        verify(cognitoService).registerUser(newUser.getEmail(), "test");
         verify(userMapper).userToPreviewUserDTO(userArgumentCaptor.capture());
-
+        assertEquals(newUser.getEmail(), userArgumentCaptor.getValue().getEmail());
+        assertEquals("sample-user-sub", userArgumentCaptor.getValue().getUserSub());
         assertEquals(expectedDTO, resultDTO);
     }
 
