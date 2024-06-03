@@ -3,6 +3,7 @@ package com.socialnetwork.socialnetwork.exceptions;
 import jakarta.validation.ConstraintViolation;
 import jakarta.validation.ConstraintViolationException;
 import org.springframework.http.HttpStatus;
+import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.validation.ObjectError;
 import org.springframework.web.bind.MethodArgumentNotValidException;
@@ -21,7 +22,7 @@ public class GlobalExceptionHandler {
     @ExceptionHandler({BusinessLogicException.class, IAMProviderException.class})
     public ResponseEntity<ExceptionResponse> businessLogicAndIamExceptionHandler(SocialNetworkException exception){
         ExceptionResponse exceptionResponse = new ExceptionResponse(exception.getErrorCode(), exception.getMessage(), getCurrentTimestamp());
-        return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(exceptionResponse);
+        return ResponseEntity.status(HttpStatus.BAD_REQUEST).contentType(MediaType.APPLICATION_JSON).body(exceptionResponse);
     }
 
     @ExceptionHandler(ConstraintViolationException.class)
@@ -31,7 +32,7 @@ public class GlobalExceptionHandler {
                 .map(ConstraintViolation::getMessage)
                 .toList();
         ExceptionResponse exceptionResponse = new ExceptionResponse(ErrorCode.VALIDATION_ERROR, errorMessages.toString(), getCurrentTimestamp());
-        return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(exceptionResponse);
+        return ResponseEntity.status(HttpStatus.BAD_REQUEST).contentType(MediaType.APPLICATION_JSON).body(exceptionResponse);
     }
 
     @ExceptionHandler(MethodArgumentNotValidException.class)
@@ -45,31 +46,31 @@ public class GlobalExceptionHandler {
         }
 
         ExceptionResponse exceptionResponse = new ExceptionResponse(ErrorCode.VALIDATION_ERROR, errorMessage.toString(), getCurrentTimestamp());
-        return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(exceptionResponse);
+        return ResponseEntity.status(HttpStatus.BAD_REQUEST).contentType(MediaType.APPLICATION_JSON).body(exceptionResponse);
     }
 
     @ExceptionHandler(AccessDeniedException.class)
     public ResponseEntity<ExceptionResponse> accessDeniedExceptionHandler(AccessDeniedException exception){
         ExceptionResponse exceptionResponse = new ExceptionResponse(ErrorCode.ERROR_ACCESS_DENIED, exception.getMessage(), getCurrentTimestamp());
-        return ResponseEntity.status(HttpStatus.FORBIDDEN).body(exceptionResponse);
+        return ResponseEntity.status(HttpStatus.FORBIDDEN).contentType(MediaType.APPLICATION_JSON).body(exceptionResponse);
     }
 
     @ExceptionHandler(ResourceNotFoundException.class)
     public ResponseEntity<ExceptionResponse> resourceNotFoundExceptionHandler(ResourceNotFoundException exception){
         ExceptionResponse exceptionResponse = new ExceptionResponse(exception.getErrorCode(), exception.getMessage(), getCurrentTimestamp());
-        return ResponseEntity.status(HttpStatus.NOT_FOUND).body(exceptionResponse);
+        return ResponseEntity.status(HttpStatus.NOT_FOUND).contentType(MediaType.APPLICATION_JSON).body(exceptionResponse);
     }
 
     @ExceptionHandler(Exception.class)
     public ResponseEntity<ExceptionResponse> genericExceptionHandler(Exception exception){
         ExceptionResponse exceptionResponse = new ExceptionResponse(ErrorCode.SERVER_ERROR, exception.getMessage(), getCurrentTimestamp());
-        return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(exceptionResponse);
+        return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).contentType(MediaType.APPLICATION_JSON).body(exceptionResponse);
     }
 
     @ExceptionHandler(Error.class)
     public ResponseEntity<ExceptionResponse> genericErrorHandler(Error error){
         ExceptionResponse exceptionResponse = new ExceptionResponse(ErrorCode.SERVER_ERROR, error.getMessage(), getCurrentTimestamp());
-        return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(exceptionResponse);
+        return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).contentType(MediaType.APPLICATION_JSON).body(exceptionResponse);
     }
 
     private String getCurrentTimestamp(){
