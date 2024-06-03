@@ -595,7 +595,7 @@ class GroupControllerTestInt extends IntegrationTestConfiguration {
     void testGetPostsPublicGroup() throws ResourceNotFoundException {
         User user = jwtService.getUser();
 
-        Group testGroup = getTestGroup(user, false);
+        Group testGroup = getTestGroup(user, true);
         groupRepository.save(testGroup);
 
         Post post = getTestPost(testGroup, user);
