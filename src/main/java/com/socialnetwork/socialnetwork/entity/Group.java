@@ -33,6 +33,4 @@ public class Group {
 
     private boolean isPublic;
 
-    @OneToMany(mappedBy = "group")
-    private List<Post> posts;
 }

@@ -44,15 +44,13 @@ class GroupServiceTest {
 
     @Mock
     private GroupMapper groupMapper;
-
     @Mock
     private PostMapper postMapper;
+    @Mock
+    private PostRepository postRepository;
 
     @Mock
     private GroupMemberRepository groupMemberRepository;
-
-    @Mock
-    private PostRepository postRepository;
 
     @InjectMocks
     private GroupService groupService;
@@ -79,8 +77,8 @@ class GroupServiceTest {
     void setUp() {
         admin = new User(1, "admin@admin.com", "");
         user = new User(2, "user@user.com", "");
-        group = new Group(1, "Group1", admin, true, null);
-        group2 = new Group(2, "Group2", admin, false, null);
+        group = new Group(1, "Group1", admin, true);
+        group2 = new Group(2, "Group2", admin, false);
         post = new Post(1, true, "Test text", null, admin, group, null);
         post2 = new Post(2, false, "Test text2", null, admin, group, null);
         posts = List.of(post, post2);
