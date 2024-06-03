@@ -440,7 +440,7 @@ class GroupControllerTestInt extends IntegrationTestConfiguration {
 
     @DisplayName("Successfully create request to join to private group")
     @Test
-    void testCreateRequestPublicGroup() throws ResourceNotFoundException {
+    void testCreateRequestPrivateGroup() throws ResourceNotFoundException {
         User user = jwtService.getUser();
 
         User testUser = getTestUser();
@@ -530,7 +530,7 @@ class GroupControllerTestInt extends IntegrationTestConfiguration {
 
     @DisplayName("Successfully create request to join to public group and automatically accept")
     @Test
-    void testCreateRequestPrivateGroup() throws ResourceNotFoundException {
+    void testCreateRequestPublicGroup() throws ResourceNotFoundException {
         User user = jwtService.getUser();
 
         User testUser = getTestUser();
