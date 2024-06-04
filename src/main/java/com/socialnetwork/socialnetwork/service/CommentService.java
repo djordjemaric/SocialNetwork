@@ -53,7 +53,7 @@ public class CommentService {
         }
         Comment comment = commentMapper.commentDTOtoComment(currentUser, post, commentDTO);
         Comment savedComment = commentRepository.save(comment);
-        return new CommentDTO(savedComment.getId(), savedComment.getText(), savedComment.getPost().getId(), savedComment.getCommOwner().getId());
+        return new CommentDTO(savedComment.getId(), savedComment.getText(), savedComment.getPost().getId(), savedComment.getCommOwner().getId(),null);
 
     }
 
