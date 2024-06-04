@@ -75,14 +75,14 @@ class GroupServiceTest {
 
     @BeforeEach
     void setUp() {
-        admin = new User(1, "admin@admin.com", "");
-        user = new User(2, "user@user.com", "");
-        group = new Group(1, "Group1", admin, true);
-        group2 = new Group(2, "Group2", admin, false);
-        post = new Post(1, true, "Test text", null, admin, group, null);
-        post2 = new Post(2, false, "Test text2", null, admin, group, null);
+        admin = new User(1000, "admin@admin.com", "");
+        user = new User(2000, "user@user.com", "");
+        group = new Group(10001, "Group1", admin, true);
+        group2 = new Group(20002, "Group2", admin, false);
+        post = new Post(123, true, "Test text", null, admin, group, null);
+        post2 = new Post(2345, false, "Test text2", null, admin, group, null);
         posts = List.of(post, post2);
-        groupMember = new GroupMember(1, user, group);
+        groupMember = new GroupMember(1342, user, group);
         createGroupDTO = new CreateGroupDTO("Group1", true);
         expectedGroupDTO = new GroupDTO("Group1", "admin@admin.com", true, 1);
     }

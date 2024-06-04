@@ -1,10 +1,10 @@
 package com.socialnetwork.socialnetwork;
 
+import com.socialnetwork.socialnetwork.entity.FriendRequest;
+import com.socialnetwork.socialnetwork.entity.GroupMember;
 import com.socialnetwork.socialnetwork.entity.User;
 import com.socialnetwork.socialnetwork.exceptions.ResourceNotFoundException;
-import com.socialnetwork.socialnetwork.repository.GroupRepository;
-import com.socialnetwork.socialnetwork.repository.PostRepository;
-import com.socialnetwork.socialnetwork.repository.UserRepository;
+import com.socialnetwork.socialnetwork.repository.*;
 import com.socialnetwork.socialnetwork.service.JwtService;
 import org.junit.jupiter.api.*;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -35,6 +35,24 @@ public abstract class IntegrationTestConfiguration {
     protected UserRepository userRepository;
 
     @Autowired
+    protected GroupMemberRepository groupMemberRepository;
+
+    @Autowired
+    protected GroupRequestRepository groupRequestRepository;
+
+    @Autowired
+    protected CommentRepository commentRepository;
+
+    @Autowired
+    protected ReplyRepository replyRepository;
+
+    @Autowired
+    protected FriendRequestRepository friendRequestRepository;
+
+    @Autowired
+    protected FriendsRepository friendsRepository;
+
+    @Autowired
     protected PostRepository postRepository;
 
     @Autowired
@@ -47,6 +65,7 @@ public abstract class IntegrationTestConfiguration {
 
     @BeforeEach
     void setUp() throws ResourceNotFoundException {
+        emptyDatabase();
         User testUser = new User();
         testUser.setEmail("vica.ristic@gmail.com");
         testUser.setUserSub("93246812-3021-704e-9c37-bf46100f22dc");
@@ -64,5 +83,18 @@ public abstract class IntegrationTestConfiguration {
     @BeforeAll
     public static void beforeAll() {
         postgres.start();
+    }
+
+
+    public void emptyDatabase(){
+        friendRequestRepository.deleteAll();
+        friendsRepository.deleteAll();
+        groupMemberRepository.deleteAll();
+        groupRequestRepository.deleteAll();
+        replyRepository.deleteAll();
+        commentRepository.deleteAll();
+        postRepository.deleteAll();
+        groupRepository.deleteAll();
+        userRepository.deleteAll();
     }
 }
