@@ -1,6 +1,8 @@
 package com.socialnetwork.socialnetwork.controller;
 
 import com.socialnetwork.socialnetwork.IntegrationTestConfiguration;
+import com.socialnetwork.socialnetwork.dto.post.CommentDTO;
+import com.socialnetwork.socialnetwork.dto.post.CreateCommentDTO;
 import com.socialnetwork.socialnetwork.dto.post.PostDTO;
 import com.socialnetwork.socialnetwork.entity.Group;
 import com.socialnetwork.socialnetwork.entity.Post;
@@ -16,6 +18,8 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.*;
 import org.springframework.util.LinkedMultiValueMap;
 import org.springframework.util.MultiValueMap;
+
+import java.util.ArrayList;
 
 import static org.assertj.core.api.AssertionsForClassTypes.assertThat;
 
@@ -100,7 +104,7 @@ public class PostControllerIntTest extends IntegrationTestConfiguration {
         assertThat(postDTO.getBody().imgUrl()).isEqualTo("");
         assertThat(postDTO.getBody().userEmail()).isEqualTo(jwtService.getUser().getEmail());
         assertThat(postDTO.getBody().groupName()).isNull();
-        assertThat(postDTO.getBody().comments()).isNull();
+        assertThat(postDTO.getBody().comments()).isEqualTo(new ArrayList<>());
     }
 
     @Test

@@ -56,7 +56,7 @@ definitions:
         oidc: true
         script:
           - *createOIDC
-          - aws ecs describe-task-definition --task-definition social-network-task > taskDefinitionTainted.json
+          - aws ecs describe-task-definition --task-definition ecsstacktaskdefinitionecs6E1296C8 > taskDefinitionTainted.json
         artifacts:
           - taskDefinitionTainted.json
 
@@ -78,8 +78,8 @@ definitions:
             variables:
               AWS_DEFAULT_REGION: 'eu-central-1'
               AWS_OIDC_ROLE_ARN: 'arn:aws:iam::211125711045:role/bitbucket_oidc_role'
-              CLUSTER_NAME: 'SocialNetworkCluster'
-              SERVICE_NAME: 'SocialNetworkService'
+              CLUSTER_NAME: 'social-network-cluster'
+              SERVICE_NAME: 'ecs-stack-socialnetworkfargateserviceServiceD015C1CD-6sreONNPJ1yZ'
               TASK_DEFINITION: 'taskDefinition.json'
 pipelines:
   branches:

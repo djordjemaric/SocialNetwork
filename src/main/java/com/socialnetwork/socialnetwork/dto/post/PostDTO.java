@@ -10,6 +10,6 @@ public record PostDTO(
         String imgUrl,
         String userEmail,
         String groupName,
-        List<Comment> comments) {
+        List<CommentDTO> comments) {
 
 }
